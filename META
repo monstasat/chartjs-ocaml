@@ -1,0 +1,3 @@
+version = "dev"
+description = "Binding to the ChartJS charting library"
+archive(byte) = "chartjs.cma"
