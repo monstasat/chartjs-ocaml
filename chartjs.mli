@@ -1,3 +1,7 @@
+module Array : sig
+  type 'a t = 'a Chartjs_array.t
+  include module type of Chartjs_array with type 'a t := 'a t
+end
 module Axes : sig
   include module type of Axes
 end
@@ -5,8 +9,10 @@ module Options : sig
   include module type of Chartjs_options
 end
 module Pie : sig
-  include module type of Chart.Pie
+  include module type of Pie
 end
+
+include module type of Array.Infix
 
 type canvas = Dom_html.canvasElement Js.t
 type context = Dom_html.canvasRenderingContext2D Js.t
