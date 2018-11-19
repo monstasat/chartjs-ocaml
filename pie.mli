@@ -31,7 +31,7 @@ module Dataset : sig
       The data points should be a number, Chart.js will total all of the
       numbers and calculate the relative proportion of each. *)
   val data : t -> Chartjs_array.Float.t
-  val set_data : t -> Chartjs_array.Float.t -> unit
+  val set_data : t -> float list -> unit
 
   val make : ?background_color:Color.t list ->
              ?border_color:Color.t list ->

@@ -8,3 +8,4 @@ chartjs_options.ml
 chartjs_scales.ml
 chartjs_types.ml
 pie.ml
+line.ml

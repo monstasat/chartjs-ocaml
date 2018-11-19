@@ -132,6 +132,20 @@ let reduce_right : 'b. ('b -> 'a -> int -> 'a t -> 'b) -> 'b -> 'a t -> 'b =
 let reduce_right' (f : 'a -> 'a -> int -> 'a t -> 'a) (t : 'a t) : 'a =
   t##reduceRight (Js.wrap_callback f)
 
+let to_array (t : 'a t) : 'a array =
+  let n = length t in
+  Array.init n (fun i -> get_exn t i)
+
+let of_array (arr : 'a array) : 'a t =
+  let a = Ojs.array_to_js (fun x -> x) arr in
+  t_of_js (fun x -> x) a
+
+let to_list (t : 'a t) : 'a list =
+  Array.to_list @@ to_array t
+
+let of_list (lst : 'a list) : 'a t =
+  of_array @@ Array.of_list lst
+
 module Infix = struct
   let ( .%[] ) (t : 'a t) (i : int) = get_exn t i
   let ( .%[]<- ) (t : 'a t) (i : int) (v : 'a) = set t i v
@@ -281,6 +295,20 @@ module Make(M : M) = struct
   let reduce_right' (f : item -> item -> int -> t -> 'a) (t : t) : 'a =
     let f (acc : Ojs.t) (v : Ojs.t) n a = f (M.t_of_js acc) (M.t_of_js v) n a in
     t##reduceRight (Js.wrap_callback f)
+
+  let to_array (t : t) : item array =
+    let n = length t in
+    Array.init n (fun i -> get_exn t i)
+
+  let of_array (arr : item array) : t =
+    let a = Ojs.array_to_js M.t_to_js arr in
+    t_of_js a
+
+  let to_list (t : t) : item list =
+    Array.to_list @@ to_array t
+
+  let of_list (lst : item list) : t =
+    of_array @@ Array.of_list lst
 
   module Infix = struct
     let ( .%[] ) (t : t) (i : int) = get_exn t i

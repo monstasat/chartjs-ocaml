@@ -40,6 +40,10 @@ val reduce : ('b -> 'a -> int -> 'a t -> 'b) -> 'b -> 'a t -> 'b
 val reduce' : ('a -> 'a -> int -> 'a t -> 'a) -> 'a t -> 'a
 val reduce_right : ('b -> 'a -> int -> 'a t -> 'b) -> 'b -> 'a t -> 'b
 val reduce_right' : ('a -> 'a -> int -> 'a t -> 'a) -> 'a t -> 'a
+val to_array : 'a t -> 'a array
+val of_array : Ojs.t array -> Ojs.t t
+val to_list : 'a t -> 'a list
+val of_list : Ojs.t list -> Ojs.t t
 module Infix :
   sig
     val ( .%[] ) : 'a t -> int -> 'a
@@ -90,6 +94,10 @@ module Make :
       val reduce' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
       val reduce_right : ('b -> item -> int -> t -> 'b) -> 'b -> t -> 'b
       val reduce_right' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
+      val to_array : t -> item array
+      val of_array : item array -> t
+      val to_list : t -> item list
+      val of_list : item list -> t
       module Infix :
         sig
           val ( .%[] ) : t -> int -> item
@@ -140,6 +148,10 @@ module String :
     val reduce' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
     val reduce_right : ('b -> item -> int -> t -> 'b) -> 'b -> t -> 'b
     val reduce_right' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
+    val to_array : t -> item array
+    val of_array : item array -> t
+    val to_list : t -> item list
+    val of_list : item list -> t
     module Infix :
       sig
         val ( .%[] ) : t -> int -> item
@@ -190,6 +202,10 @@ module Int :
     val reduce' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
     val reduce_right : ('b -> item -> int -> t -> 'b) -> 'b -> t -> 'b
     val reduce_right' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
+    val to_array : t -> item array
+    val of_array : item array -> t
+    val to_list : t -> item list
+    val of_list : item list -> t
     module Infix :
       sig
         val ( .%[] ) : t -> int -> item
@@ -240,6 +256,10 @@ module Float :
     val reduce' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
     val reduce_right : ('b -> item -> int -> t -> 'b) -> 'b -> t -> 'b
     val reduce_right' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
+    val to_array : t -> item array
+    val of_array : item array -> t
+    val to_list : t -> item list
+    val of_list : item list -> t
     module Infix :
       sig
         val ( .%[] ) : t -> int -> item
@@ -290,6 +310,10 @@ module Bool :
     val reduce' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
     val reduce_right : ('b -> item -> int -> t -> 'b) -> 'b -> t -> 'b
     val reduce_right' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
+    val to_array : t -> item array
+    val of_array : item array -> t
+    val to_list : t -> item list
+    val of_list : item list -> t
     module Infix :
       sig
         val ( .%[] ) : t -> int -> item
@@ -340,6 +364,10 @@ module Color :
     val reduce' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
     val reduce_right : ('b -> item -> int -> t -> 'b) -> 'b -> t -> 'b
     val reduce_right' : (item -> item -> int -> t -> Ojs.t) -> t -> Ojs.t
+    val to_array : t -> item array
+    val of_array : item array -> t
+    val to_list : t -> item list
+    val of_list : item list -> t
     module Infix :
       sig
         val ( .%[] ) : t -> int -> item
