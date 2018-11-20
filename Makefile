@@ -1,10 +1,16 @@
 LIB_NAME 		= chartjs
 
 CC					= ocamlc
-PACKAGES		= -package gen_js_api -package js_of_ocaml -package js_of_ocaml-ppx
+PACKAGES		= -package gen_js_api.ppx \
+							-package js_of_ocaml \
+							-package js_of_ocaml-ppx \
+							-package ptime
+
+BINDINGS    = chartjs_types.ml chartjs_scales.ml chartjs_options.ml chart.ml \
+							line.ml bar.ml pie.ml
 
 ML_FILE			= chartjs_types.ml chartjs_array.ml chartjs_scales.ml chartjs_options.ml \
-							chart.ml line.ml pie.ml axes.ml chartjs.ml
+							chart.ml line.ml bar.ml pie.ml axes.ml chartjs.ml
 CMI_FILE		= $(patsubst %.ml, %.cmi, $(ML_FILE))
 CMO_FILE		= $(patsubst %.ml, %.cmo, $(ML_FILE))
 CMA_FILE		= $(LIB_NAME).cma
@@ -15,7 +21,9 @@ INSTALL			= \
 	chartjs_array.cmi \
 	$(CMA_FILE) \
 
-%.ml: %.mli
+all: build
+
+$(BINDINGS): %.ml : %.mli
 	ocamlfind gen_js_api/gen_js_api $<
 
 %.cmi: %.mli
@@ -27,7 +35,7 @@ INSTALL			= \
 %.cmo: %.ml
 	ocamlfind $(CC) -c $(PACKAGES) $<
 
-build: $(ML_FILE) $(CMI_FILE) $(CMO_FILE)
+build: $(CMI_FILE) $(CMO_FILE)
 	ocamlfind $(CC) -a -o $(CMA_FILE) -package gen_js_api -linkpkg $(CMO_FILE)
 
 install: build
@@ -37,6 +45,8 @@ remove:
 	ocamlfind remove $(LIB_NAME)
 
 clean:
-	rm -f  *.cm* chartjs_types.ml chartjs_scales.ml chartjs_options.ml chart.ml pie.ml line.ml
+	rm -f  *.cm* $(BINDINGS)
 
 re: clean all
+
+reinstall: remove install

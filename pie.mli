@@ -32,9 +32,12 @@ module Options : sig
 end
 
 module Dataset : sig
-  type t
+  type t = Chart.Dataset.t
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
+
+  val type_ : t -> typ
+  val set_type : t -> typ -> unit
 
   (** The fill color of the arcs in the dataset. *)
   val background_color : t -> Chartjs_array.Color.t
@@ -60,19 +63,14 @@ module Dataset : sig
   val hover_border_width : t -> Chartjs_array.Int.t
   val set_hover_border_width : t -> int list -> unit
 
-  (** For a pie chart, datasets need to contain an array of data points.
-      The data points should be a number, Chart.js will total all of the
-      numbers and calculate the relative proportion of each. *)
-  val data : t -> Chartjs_array.Float.t
-  val set_data : t -> float list -> unit
-
-  val make : ?background_color:Color.t list ->
+  val make : ?type_:typ ->
+             ?background_color:Color.t list ->
              ?border_color:Color.t list ->
              ?border_width:int list ->
              ?hover_background_color:Color.t list ->
              ?hover_border_color:Color.t list ->
              ?hover_border_width:int list ->
-             ?data:float list ->
+             ?data:Ojs.t ->
              unit ->
              t [@@js.builder]
 

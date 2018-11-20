@@ -153,7 +153,60 @@ end
 
 include Infix
 
-module Make(M : M) = struct
+module type Typed_array = sig
+  type item
+  type t
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+  val length : t -> int
+  val get : t -> int -> item option
+  val get_exn : t -> int -> item
+  val set : t -> int -> item -> unit
+  val make : int -> item -> t
+  val init : int -> (int -> item) -> t
+  val empty : unit -> t
+  val concat : t -> t -> t
+  val pop : t -> item option
+  val push : t -> item -> int
+  val push_2 : t -> item -> item -> int
+  val push_3 : t -> item -> item -> item -> int
+  val push_4 : t -> item -> item -> item -> item -> int
+  val reverse : t -> t
+  val shift : t -> item option
+  val slice : ?till:int -> t -> int -> t
+  val sort : (item -> item -> int) -> t -> t
+  val splice : t -> int -> int -> t
+  val splice_1 : t -> int -> int -> item -> t
+  val splice_2 : t -> int -> int -> item -> item -> t
+  val splice_3 : t -> int -> int -> item -> item -> item -> t
+  val splice_4 : t -> int -> int -> item -> item -> item -> item -> t
+  val unshift : t -> item -> int
+  val unshift_2 : t -> item -> item -> int
+  val unshift_3 : t -> item -> item -> item -> int
+  val unshift_4 : t -> item -> item -> item -> item -> int
+  val some : (item -> int -> t -> bool) -> t -> bool
+  val every : (item -> int -> t -> bool) -> t -> bool
+  val for_each : (item -> int -> t -> unit) -> t -> unit
+  val map : (item -> int -> t -> item) -> t -> t
+  val filter : (item -> int -> t -> bool) -> t -> t
+  val reduce : ('b -> item -> int -> t -> 'b) -> 'b -> t -> 'b
+  val reduce' : (item -> item -> int -> t -> item) -> t -> item
+  val reduce_right : ('b -> item -> int -> t -> 'b) -> 'b -> t -> 'b
+  val reduce_right' : (item -> item -> int -> t -> item) -> t -> item
+  val to_array : t -> item array
+  val of_array : item array -> t
+  val to_list : t -> item list
+  val of_list : item list -> t
+  module Infix :
+  sig
+    val ( .%[] ) : t -> int -> item
+    val ( .%[]<- ) : t -> int -> item -> unit
+  end
+  val ( .%[] ) : t -> int -> item
+  val ( .%[]<- ) : t -> int -> item -> unit
+end
+
+module Make(M : M) : Typed_array with type item := M.t = struct
 
   type item = M.t
   type t = Ojs.t Js.js_array Js.t
@@ -186,7 +239,7 @@ module Make(M : M) = struct
   let empty () : t =
     new%js Js.array_empty
 
-  let concat (a : t) (b : t) =
+  let concat (a : t) (b : t) : t =
     a##concat b
 
   let pop (t : t) : item option =
@@ -271,9 +324,6 @@ module Make(M : M) = struct
     let f (v : Ojs.t) n a = f (M.t_of_js v) n a |> M.t_to_js in
     t##map (Js.wrap_callback f)
 
-  let mapi (f : int -> 'a -> 'b) (t : t) : t =
-    Js.array_mapi f t
-
   let filter (f : item -> int -> t -> bool) (t : t) : t =
     let f (v : Ojs.t) n a = f (M.t_of_js v) n a |> Js.bool in
     t##filter (Js.wrap_callback f)
@@ -283,18 +333,20 @@ module Make(M : M) = struct
     let f acc (v : Ojs.t) n a = f acc (M.t_of_js v) n a in
     t##reduce_init (Js.wrap_callback f) acc
 
-  let reduce' (f : item -> item -> int -> t -> 'a) (t : t) : 'a =
-    let f (acc : Ojs.t) (v : Ojs.t) n a = f (M.t_of_js acc) (M.t_of_js v) n a in
-    t##reduce (Js.wrap_callback f)
+  let reduce' (f : item -> item -> int -> t -> item) (t : t) : item =
+    let f (acc : Ojs.t) (v : Ojs.t) n a =
+      M.t_to_js @@ f (M.t_of_js acc) (M.t_of_js v) n a in
+    M.t_of_js @@ t##reduce (Js.wrap_callback f)
 
   let reduce_right : 'b. ('b -> item -> int -> t -> 'b) -> 'b -> t -> 'b =
     fun f acc t ->
     let f acc (v : Ojs.t) n a = f acc (M.t_of_js v) n a in
     t##reduceRight_init (Js.wrap_callback f) acc
 
-  let reduce_right' (f : item -> item -> int -> t -> 'a) (t : t) : 'a =
-    let f (acc : Ojs.t) (v : Ojs.t) n a = f (M.t_of_js acc) (M.t_of_js v) n a in
-    t##reduceRight (Js.wrap_callback f)
+  let reduce_right' (f : item -> item -> int -> t -> item) (t : t) : item =
+    let f (acc : Ojs.t) (v : Ojs.t) n a =
+      M.t_to_js @@ f (M.t_of_js acc) (M.t_of_js v) n a in
+    M.t_of_js (t##reduceRight (Js.wrap_callback f))
 
   let to_array (t : t) : item array =
     let n = length t in

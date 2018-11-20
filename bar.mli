@@ -18,7 +18,7 @@ module Options : sig
     end
 
     module Cartesian : sig
-      type t = Chartjs_scales.Cartesian.t
+      type t = Chartjs_scales.scale
 
       (** Stacked bar charts can be used to show how one data series
           is made up of a number of smaller pieces. *)
@@ -54,13 +54,18 @@ module Options : sig
 end
 
 module Dataset : sig
+
   type border_skipped =
     [ `Bottom [@js "bottom"]
     | `Left [@js "left"]
     | `Top [@js "top"]
     | `Right [@js "right"]
     ] [@js.enum]
-  type t
+
+  type t = Chart.Dataset.t
+
+  val type_ : t -> typ
+  val set_type : t -> typ -> unit
 
   (** The label for the dataset which appears in the legend and tooltips. *)
   val label : t -> string
@@ -81,36 +86,72 @@ module Dataset : sig
   val stack : t -> string
   val set_stack : t -> string -> unit
 
-  (** The fill color of the bar. *)
-  val background_color : t -> Color.t
-  val set_background_color : t -> Color.t -> unit
-
-  (** The color of the bar border. *)
-  val border_color : t -> Color.t
-  val set_border_color : t -> Color.t -> unit
-
-  (** The stroke width of the bar in pixels. *)
-  val border_width : t -> int
-  val set_border_width : t -> int -> unit
-
   (** Which edge to skip drawing the border for. *)
   val border_skipped : t -> border_skipped
   val set_border_skipped : t -> border_skipped -> unit
 
+  (** Bars properties *)
+
+  (** The fill color of the bar. *)
+  val background_color : t -> Color.t indexable
+  val set_background_color : t -> Color.t indexable -> unit
+
+  (** The color of the bar border. *)
+  val border_color : t -> Color.t indexable
+  val set_border_color : t -> Color.t indexable -> unit
+
+  (** The stroke width of the bar in pixels. *)
+  val border_width : t -> int indexable
+  val set_border_width : t -> int indexable -> unit
+
   (** The fill colour of the bars when hovered. *)
-  val hover_background_color : t -> Color.t
-  val set_hover_background_color : t -> Color.t -> unit
+  val hover_background_color : t -> Color.t indexable
+  val set_hover_background_color : t -> Color.t indexable -> unit
 
   (** The stroke colour of the bars when hovered. *)
-  val hover_border_color : t -> Color.t
-  val set_hover_border_color : t -> Color.t -> unit
+  val hover_border_color : t -> Color.t indexable
+  val set_hover_border_color : t -> Color.t indexable -> unit
 
   (** The stroke width of the bars when hovered. *)
-  val hover_border_width : t -> int
-  val set_hover_border_width : t -> int -> unit
+  val hover_border_width : t -> int indexable
+  val set_hover_border_width : t -> int indexable -> unit
 
-end
+  module Indexable : sig
 
-module Data : sig
+    (** The fill color of the bar. *)
+    val background_color : t -> Chartjs_array.Color.t
+
+    (** The color of the bar border. *)
+    val border_color : t -> Chartjs_array.Color.t
+
+    (** The stroke width of the bar in pixels. *)
+    val border_width : t -> Chartjs_array.Int.t
+
+    (** The fill colour of the bars when hovered. *)
+    val hover_background_color : t -> Chartjs_array.Color.t
+
+    (** The stroke colour of the bars when hovered. *)
+    val hover_border_color : t -> Chartjs_array.Color.t
+
+    (** The stroke width of the bars when hovered. *)
+    val hover_border_width : t -> Chartjs_array.Int.t
+
+  end
+
+  val make : ?type_:typ ->
+             ?label:string ->
+             ?x_axis_id:string ->
+             ?y_axis_id:string ->
+             ?stack:string ->
+             ?border_skipped:border_skipped ->
+             ?background_color:Color.t indexable ->
+             ?border_color:Color.t indexable ->
+             ?border_width:int indexable ->
+             ?hover_background_color:Color.t indexable ->
+             ?hover_border_color:Color.t indexable ->
+             ?hover_border_width:int indexable ->
+             ?data:Ojs.t ->
+             unit ->
+             t [@@js.builder]
 
 end

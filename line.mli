@@ -14,7 +14,6 @@ module Options : sig
 end
 
 module Dataset : sig
-  type t
 
   type fill =
     [ `Abs of int
@@ -24,6 +23,7 @@ module Dataset : sig
     | `Origin
     | `Off
     ] [@js.union]
+
   val fill_to_js : fill -> Ojs.t
     [@@js.custom
      let fill_to_js : fill -> Ojs.t = function
@@ -36,6 +36,7 @@ module Dataset : sig
        | `Origin -> Ojs.string_to_js "origin"
        | `Off -> Ojs.bool_to_js false
     ]
+
   val fill_of_js : Ojs.t -> fill
     [@@js.custom
      let fill_of_js (js : Ojs.t) : fill =
@@ -77,6 +78,8 @@ module Dataset : sig
     | `List of Color.t list
     ] [@js.union]
 
+  type t = Chart.Dataset.t
+
   val stepped_line_of_js : Ojs.t -> stepped_line
     [@@js.custom
      let stepped_line_of_js (js : Ojs.t) : stepped_line =
@@ -90,6 +93,9 @@ module Dataset : sig
           end
        | _ -> assert false
     ]
+
+  val type_ : t -> typ
+  val set_type : t -> typ -> unit
 
   (** The label for the dataset which appears in the legend and tooltips. *)
   val label : t -> string
@@ -163,91 +169,79 @@ module Dataset : sig
   (** Point properties *)
 
   (** The fill color for points. *)
-  val point_background_color : t -> Color.t
-  val set_point_background_color : t -> Color.t -> unit
+  val point_background_color : t -> Color.t indexable
+  val set_point_background_color : t -> Color.t indexable -> unit
 
   (** The border color for points. *)
-  val point_border_color : t -> Color.t
-  val set_point_border_color : t -> Color.t -> unit
+  val point_border_color : t -> Color.t indexable
+  val set_point_border_color : t -> Color.t indexable -> unit
 
   (** The width of the point border in pixels. *)
-  val point_border_width : t -> int
-  val set_point_border_width : t -> int -> unit
+  val point_border_width : t -> int indexable
+  val set_point_border_width : t -> int indexable -> unit
 
   (** The radius of the point shape. If set to 0, the point is not rendered. *)
-  val point_radius : t -> int
-  val set_point_radius : t -> int -> unit
+  val point_radius : t -> int indexable
+  val set_point_radius : t -> int indexable -> unit
 
   (** The rotation of the point in degrees. *)
-  val point_rotation : t -> int
-  val set_point_rotation : t -> int -> unit
+  val point_rotation : t -> int indexable
+  val set_point_rotation : t -> int indexable -> unit
 
   (** The pixel size of the non-displayed point that reacts to mouse events. *)
-  val point_hit_radius : t -> int
-  val set_point_hit_radius : t -> int -> unit
+  val point_hit_radius : t -> int indexable
+  val set_point_hit_radius : t -> int indexable -> unit
 
-  val point_hover_background_color : t -> Color.t
-  val set_point_hover_background_color : t -> Color.t -> unit
+  val point_hover_background_color : t -> Color.t indexable
+  val set_point_hover_background_color : t -> Color.t indexable -> unit
 
-  val point_hover_border_color : t -> Color.t
-  val set_point_hover_border_color : t -> Color.t -> unit
+  val point_hover_border_color : t -> Color.t indexable
+  val set_point_hover_border_color : t -> Color.t indexable -> unit
 
   (** Border width of point when hovered. *)
-  val point_hover_border_width : t -> int
-  val set_point_hover_border_width : t -> int -> unit
+  val point_hover_border_width : t -> int indexable
+  val set_point_hover_border_width : t -> int indexable -> unit
 
   (** The radius of the point when hovered. *)
-  val point_hover_radius : t -> int
-  val set_point_hover_radius : t -> int -> unit
+  val point_hover_radius : t -> int indexable
+  val set_point_hover_radius : t -> int indexable -> unit
 
   module Indexable : sig
 
     (** The fill color for points. *)
     val point_background_color : t -> Chartjs_array.Color.t
-    val set_point_background_color : t -> Color.t list -> unit
 
     (** The border color for points. *)
     val point_border_color : t -> Chartjs_array.Color.t
-    val set_point_border_color : t -> Color.t list -> unit
 
     (** The width of the point border in pixels. *)
     val point_border_width : t -> Chartjs_array.Int.t
-    val set_point_border_width : t -> int list -> unit
 
     (** The radius of the point shape. If set to 0, the point is not rendered. *)
     val point_radius : t -> Chartjs_array.Int.t
-    val set_point_radius : t -> int list -> unit
 
     (** The rotation of the point in degrees. *)
     val point_rotation : t -> Chartjs_array.Int.t
-    val set_point_rotation : t -> int list -> unit
 
     (** The pixel size of the non-displayed point that reacts to mouse events. *)
     val point_hit_radius : t -> Chartjs_array.Int.t
-    val set_point_hit_radius : t -> int list -> unit
 
     (** Point background color when hovered. *)
     val point_hover_background_color : t -> Chartjs_array.Color.t
-    val set_point_hover_background_color_list : t -> Color.t list -> unit
 
     (** Point border color when hovered. *)
     val point_hover_border_color : t -> Chartjs_array.Color.t
-    val set_point_hover_border_color : t -> Color.t list -> unit
 
     (** Border width of point when hovered. *)
     val point_hover_border_width : t -> Chartjs_array.Int.t
-    val set_point_hover_border_width : t -> int list -> unit
 
     (** The radius of the point when hovered. *)
     val point_hover_radius : t -> Chartjs_array.Int.t
-    val set_point_hover_radius : t -> int list -> unit
 
   end
 
-  (* val data : t -> point list
-   * val set_data : t -> point list -> unit *)
-
-  val make : ?label:string ->
+  val make : ?type_:typ ->
+             ?label:string ->
              ?x_axis_id:string ->
              ?y_axis_id:string ->
              ?background_color:Color.t ->
@@ -264,17 +258,17 @@ module Dataset : sig
              ?span_gaps:bool ->
              ?stepped_line:stepped_line ->
              (* Point properties *)
-             ?point_background_color:color_point_prop ->
-             ?point_border_color:color_point_prop ->
-             ?point_border_width:int_point_prop ->
-             ?point_radius:int_point_prop ->
-             ?point_rotation:int_point_prop ->
-             ?point_hit_radius:int_point_prop ->
-             ?point_hover_background_color:color_point_prop ->
-             ?point_hover_border_color:color_point_prop ->
-             ?point_hover_border_width:int_point_prop ->
-             ?point_hover_radius:int_point_prop ->
-             (* ?data:point list -> *)
+             ?point_background_color:Color.t indexable ->
+             ?point_border_color:Color.t indexable ->
+             ?point_border_width:int indexable ->
+             ?point_radius:int indexable ->
+             ?point_rotation:int indexable ->
+             ?point_hit_radius:int indexable ->
+             ?point_hover_background_color:Color.t indexable ->
+             ?point_hover_border_color:Color.t indexable ->
+             ?point_hover_border_width:int indexable ->
+             ?point_hover_radius:int indexable ->
+             ?data:Ojs.t ->
              unit ->
              t [@@js.builder]
 

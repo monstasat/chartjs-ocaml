@@ -4,9 +4,8 @@ open Chartjs_scales
 module Scale_label = Scale_label
 module Grid_lines = Grid_lines
 
-type axis
-
 module Cartesian = struct
+  open Cartesian
 
   module Category = struct
 
@@ -15,13 +14,9 @@ module Cartesian = struct
       include (Category.Ticks : module type of Category.Ticks
                                                with type t := Ticks.t)
     end
-
-    include Cartesian
-
+    include Common
+    include (Category : module type of Category with module Ticks := Ticks)
     let make = make ~type_:"category"
-
-    let to_axis (t : t) : axis =
-      Obj.magic t
   end
 
   module Linear = struct
@@ -31,14 +26,9 @@ module Cartesian = struct
       include (Linear.Ticks : module type of Linear.Ticks
                                              with type t := Ticks.t)
     end
-
-    include Cartesian
-
+    include Common
+    include (Linear : module type of Linear with module Ticks := Ticks)
     let make = make ~type_:"linear"
-
-    let to_axis (t : t) : axis =
-      Obj.magic t
-
   end
 
   module Logarithmic = struct
@@ -49,12 +39,11 @@ module Cartesian = struct
                                                   with type t := Ticks.t)
     end
 
-    include Cartesian
-
+    include Common
+    include (Logarithmic : module type of Logarithmic
+                                          with module Ticks := Ticks)
     let make = make ~type_:"logarithmic"
 
-    let to_axis (t : t) : axis =
-      Obj.magic t
   end
 
   module Time = struct
@@ -65,15 +54,27 @@ module Cartesian = struct
                                            with type t := Ticks.t)
     end
 
-    include Cartesian
-    include (Time : module type of Time with type t := Cartesian.t
-                                   with module Ticks := Ticks)
+    include Common
+    include (Time : module type of Time with module Ticks := Ticks)
     let make = make ~type_:"time"
   end
 
 end
 
 module Radial = struct
+  open Radial
+
+  module Linear = struct
+
+    module Ticks = struct
+      include Ticks
+      include (Linear.Ticks : module type of Linear.Ticks
+                                     with type t := Ticks.t)
+    end
+
+    include Common
+    include (Linear : module type of Linear with module Ticks := Ticks)
+  end
 
 end
 

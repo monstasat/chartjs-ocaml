@@ -1,12 +1,24 @@
 open Chartjs_types
 
+module Dataset : sig
+
+  type t
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+
+  type data
+  val data_to_js : data -> Ojs.t
+  val data_of_js : Ojs.t -> data
+
+end
+
 module Data : sig
   type t
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
 
-  val datasets : t -> Ojs.t Chartjs_array.t
-  val set_datasets : t -> Ojs.t list -> unit
+  val datasets : t -> Dataset.t Chartjs_array.t
+  val set_datasets : t -> Dataset.t list -> unit
 
   val labels : t -> Chartjs_array.String.t
   val set_labels : t -> string list -> unit
@@ -17,7 +29,7 @@ module Data : sig
   val y_labels : t -> Chartjs_array.String.t
   val set_y_labels : t -> string list -> unit
 
-  val make : ?datasets:Ojs.t list ->
+  val make : ?datasets:Dataset.t list ->
              ?labels:string list ->
              ?x_labels:string list ->
              ?y_labels:string list ->
@@ -88,6 +100,11 @@ module API : sig
   val options : t -> Chartjs_options.t
   val set_options : t -> Chartjs_options.t -> unit
 
+  (** TODO add
+    'get_element_at_event',
+    'get_elements_at_event',
+    'get_dataset_meta' *)
+
   (** A config object can be provided with additional configuration
       for the update process. This is useful when update is manually
       called inside an event handler and some different animation is
@@ -102,11 +119,6 @@ module API : sig
     ?easing:easing ->
     unit ->
     config [@@js.builder]
-
-  (** TODO add
-    'get_element_at_event',
-    'get_elements_at_event',
-    'get_dataset_meta' *)
 
   (** Use this to destroy any chart instances that are created.
       This will clean up any references stored to the chart object

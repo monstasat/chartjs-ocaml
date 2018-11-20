@@ -13,23 +13,77 @@ type typ =
 val typ_to_js : typ -> Ojs.t
 val typ_of_js : Ojs.t -> typ
 
+module Time : sig
+  [@@@js.stop]
+  type t = Ptime.t
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+  [@@@js.start]
+  [@@@js.implem
+   type t = Ptime.t
+   let t_to_js x = Ojs.float_to_js @@ Ptime.to_float_s x *. 1000.
+   let t_of_js x = match Ptime.of_float_s @@ Ojs.float_of_js x with
+     | None -> failwith "bad time value"
+     | Some x -> x
+  ]
+end
+
 module Color : sig
-  type t = string [@@deriving show]
+  type t = string
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
 
 end
 
 module Font : sig
-  type family = string [@@deriving show]
+  type family = string
   val family_to_js : family -> Ojs.t
   val family_of_js : Ojs.t -> family
 
-  type style = string [@@deriving show]
+  type style = string
   val style_to_js : style -> Ojs.t
   val style_of_js : Ojs.t -> style
 
 end
+
+[@@@js.stop]
+type 'a or_false = 'a option
+val or_false_to_js : ('a -> Ojs.t) -> 'a or_false -> Ojs.t
+val or_false_of_js : (Ojs.t -> 'a) -> Ojs.t -> 'a or_false
+[@@@js.start]
+[@@@js.implem
+ type 'a or_false = 'a option
+ let or_false_to_js f = function
+   | None -> Ojs.bool_to_js false
+   | Some x -> f x
+ let or_false_of_js f js =
+   match Ojs.obj_type js with
+   | "[object Boolean]" ->
+      if Ojs.bool_of_js js then assert false else None
+   | _ -> Some (f js)
+]
+
+[@@@js.stop]
+type 'a indexable =
+  [ `Single of 'a
+  | `List of 'a list
+  ]
+val indexable_to_js : ('a -> Ojs.t) -> 'a indexable -> Ojs.t
+val indexable_of_js : (Ojs.t -> 'a) -> Ojs.t -> 'a indexable
+[@@@js.start]
+[@@@js.implem
+ type 'a indexable =
+   [ `Single of 'a
+   | `List of 'a list
+   ]
+ let indexable_to_js (f : 'a -> Ojs.t) = function
+   | `Single x -> f x
+   | `List x -> Ojs.list_to_js f x
+ let indexable_of_js (f : Ojs.t -> 'a) (js : Ojs.t) =
+   match Ojs.obj_type js with
+   | "[object Array]" -> `List (Ojs.list_of_js f js)
+   | _ -> `Single (f js)
+]
 
 type point_style =
   [ `Circle [@js "circle"]
