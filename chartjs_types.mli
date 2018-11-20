@@ -1,3 +1,18 @@
+type typ =
+  [ `Line [@js "line"]
+  | `Bar [@js "bar"]
+  | `Horizontal_bar [@js "horizontalBar"]
+  | `Radar [@js "radar"]
+  | `Doughnut [@js "doughnut"]
+  | `Pie [@js "pie"]
+  | `Polar_area [@js "polarArea"]
+  | `Bubble [@js "bubble"]
+  | `Scatter [@js "scatter"]
+  | `Custom of string [@js.default]
+  ] [@js.enum]
+val typ_to_js : typ -> Ojs.t
+val typ_of_js : Ojs.t -> typ
+
 module Color : sig
   type t = string [@@deriving show]
   val t_to_js : t -> Ojs.t

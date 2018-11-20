@@ -1,5 +1,18 @@
 open Chartjs_types
 
+module Options : sig
+  type t = Chartjs_options.t
+
+  (** If false, the lines between points are not drawn. *)
+  val show_lines : t -> bool
+  val set_show_lines : t -> bool -> unit
+
+  (** If false, NaN data causes a break in the line. *)
+  val span_gaps : t -> bool
+  val set_span_gaps : t -> bool -> unit
+
+end
+
 module Dataset : sig
   type t
 
@@ -83,7 +96,7 @@ module Dataset : sig
   val set_label : t -> string -> unit
 
   (** The ID of the x axis to plot this dataset on.
-      If not specified, this defaults to the ID of the first found x axis *)
+      If not specified, this defaults to the ID of the first found x axis. *)
   val x_axis_id : t -> string
   val set_x_axis_id : t -> string -> unit
 
@@ -264,18 +277,5 @@ module Dataset : sig
              (* ?data:point list -> *)
              unit ->
              t [@@js.builder]
-
-end
-
-module Data : sig
-  type t
-  val t_to_js : t -> Ojs.t
-  val t_of_js : Ojs.t -> t
-
-  val datasets : t -> Dataset.t Chartjs_array.t
-  val set_datasets : t -> Dataset.t list -> unit
-
-  val labels : t -> Chartjs_array.String.t
-  val set_labels : t -> string list -> unit
 
 end

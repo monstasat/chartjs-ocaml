@@ -1,7 +1,40 @@
 open Chartjs_types
 
+module Options : sig
+  type t = Chartjs_options.t
+
+  module Animation : sig
+    type t = Chartjs_options.Animation.t
+
+    (** If true, the chart will animate in with a rotation animation.
+        This property is in the options.animation object.*)
+    val animate_rotate : t -> bool
+    val set_animate_rotate : t -> bool -> unit
+
+    (** If true, will animate scaling the chart from the center outwards. *)
+    val animate_scale : t -> bool
+    val set_animate_scale : t -> bool -> unit
+
+  end
+
+  (** The percentage of the chart that is cut out of the middle. *)
+  val cutout_percentage : t -> float
+  val set_cutout_percentage : t -> float -> unit
+
+  (** Starting angle to draw arcs from. *)
+  val rotation : t -> float
+  val set_rotation : t -> float -> unit
+
+  (** Sweep to allow arcs to cover. *)
+  val circumference : t -> float
+  val set_circumference : t -> float -> unit
+
+end
+
 module Dataset : sig
   type t
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
 
   (** The fill color of the arcs in the dataset. *)
   val background_color : t -> Chartjs_array.Color.t
@@ -44,24 +77,3 @@ module Dataset : sig
              t [@@js.builder]
 
 end
-
-module Data : sig
-  type t
-  val t_to_js : t -> Ojs.t
-  val t_of_js : Ojs.t -> t
-
-  val datasets : t -> Dataset.t Chartjs_array.t
-  val set_datasets : t -> Dataset.t list -> unit
-
-  val labels : t -> Chartjs_array.String.t
-  val set_labels : t -> string list -> unit
-
-  val make : ?datasets:Dataset.t list ->
-             ?labels:string list ->
-             unit ->
-             t [@@js.builder]
-
-end
-
-val data : Chart.t -> Data.t
-val set_data : Chart.t -> Data.t -> unit

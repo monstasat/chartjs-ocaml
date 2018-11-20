@@ -14,6 +14,7 @@ module Animation : sig
 
   type t
   val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
 
   (** The number of milliseconds an animation takes. *)
   val duration : t -> int
@@ -31,24 +32,10 @@ module Animation : sig
   val on_complete : t -> callback
   val set_on_complete : t -> callback -> unit
 
-  (** Pie-specific options *)
-
-  (** If true, the chart will animate in with a rotation animation.
-        This property is in the options.animation object.*)
-  val animate_rotate : t -> bool
-  val set_animate_rotate : t -> bool -> unit
-
-  (** If true, will animate scaling the chart from the center outwards. *)
-  val animate_scale : t -> bool
-  val set_animate_scale : t -> bool -> unit
-
   val make : ?duration:int ->
              ?easing:easing ->
              ?on_progress:callback ->
              ?on_complete:callback ->
-             (* Pie-specific options *)
-             ?animate_rotate:bool ->
-             ?animate_scale:bool ->
              unit ->
              t [@@js.builder]
 
@@ -1060,30 +1047,6 @@ val set_on_hover : t -> interaction_cb -> unit
 val on_click : t -> interaction_cb
 val set_on_click : t -> interaction_cb -> unit
 
-(** Line-specific options *)
-
-(** If false, the lines between points are not drawn. *)
-val show_lines : t -> bool
-val set_show_lines : t -> bool -> unit
-
-(** If false, NaN data causes a break in the line. *)
-val span_gaps : t -> bool
-val set_span_gaps : t -> bool -> unit
-
-(** Pie-specific options *)
-
-(** The percentage of the chart that is cut out of the middle. *)
-val cutout_percentage : t -> float
-val set_cutout_percentage : t -> float -> unit
-
-(** Starting angle to draw arcs from. *)
-val rotation : t -> float
-val set_rotation : t -> float -> unit
-
-(** Sweep to allow arcs to cover. *)
-val circumference : t -> float
-val set_circumference : t -> float -> unit
-
 val make : ?elements:Elements.t ->
            ?animation:Animation.t ->
            ?layout:Layout.t ->
@@ -1102,13 +1065,6 @@ val make : ?elements:Elements.t ->
            ?events:event list ->
            ?on_hover:interaction_cb ->
            ?on_click:interaction_cb ->
-           (* Line-specific options *)
-           ?show_lines:bool ->
-           ?span_gaps:bool ->
-           (* Pie-specific options *)
-           ?cutout_percentage:float ->
-           ?rotation:float ->
-           ?circumference:float ->
            unit ->
            t [@@js.builder]
 
