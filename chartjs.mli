@@ -1,17 +1,3 @@
-module type Jsable = sig
-  type t
-  val t_to_js : t -> Ojs.t
-  val t_of_js : Ojs.t -> t
-end
-module Array = Chartjs_array
-module Data_types : sig
-  module Int : Jsable with type t = int
-  module Float : Jsable with type t = float
-  module Int32 : Jsable with type t = int32
-  module Int64 : Jsable with type t = int64
-  module String : Jsable with type t = string
-  module Time : Jsable with type t = Ptime.t
-end
 module Data : sig
   include module type of Chart.Data
 end
@@ -25,59 +11,64 @@ end
     Often, it is used to show trend data, or the comparison
     of two data sets. *)
 module Line : sig
+  open Chartjs_types
   module Options : sig
     include module type of Line.Options
   end
   module Dataset : sig
     type ('a, 'b) point = { x : 'a; y : 'b; }
+
+    include module type of Line.Dataset
     module type DS = sig
-      type dot
-      type data = dot list
+      type item
+
       include module type of Line.Dataset
+      module A : Chartjs_array.Typed_array with type item := item
+
+      val data : t -> A.t
+      val set_data : t -> item list -> unit
       val make :
-        ?data:data ->
-        ?type_:Chartjs_types.typ ->
+        ?data:item list ->
+        ?type_:typ ->
         ?label:string ->
         ?x_axis_id:string ->
         ?y_axis_id:string ->
-        ?background_color:Chartjs_types.Color.t ->
-        ?border_color:Chartjs_types.Color.t ->
+        ?background_color:Color.t ->
+        ?border_color:Color.t ->
         ?border_width:int ->
-        ?border_dash:Chartjs_types.border_dash ->
-        ?border_dash_offset:Chartjs_types.border_dash_offset ->
-        ?border_cap_style:Chartjs_types.line_cap ->
-        ?border_join_style:Chartjs_types.line_join ->
+        ?border_dash:border_dash ->
+        ?border_dash_offset:border_dash_offset ->
+        ?border_cap_style:line_cap ->
+        ?border_join_style:line_join ->
         ?cubic_interpolation_mode:cubic_interpolation_mode ->
         ?fill:fill ->
         ?line_tension:float ->
         ?show_line:bool ->
         ?span_gaps:bool ->
         ?stepped_line:stepped_line ->
-        ?point_background_color:Chartjs_types.Color.t
-          Chartjs_types.indexable ->
-        ?point_border_color:Chartjs_types.Color.t Chartjs_types.indexable ->
-        ?point_border_width:int Chartjs_types.indexable ->
-        ?point_radius:int Chartjs_types.indexable ->
-        ?point_rotation:int Chartjs_types.indexable ->
-        ?point_hit_radius:int Chartjs_types.indexable ->
-        ?point_hover_background_color:Chartjs_types.Color.t
-          Chartjs_types.indexable ->
-        ?point_hover_border_color:Chartjs_types.Color.t
-          Chartjs_types.indexable ->
-        ?point_hover_border_width:int Chartjs_types.indexable ->
-        ?point_hover_radius:int Chartjs_types.indexable -> unit -> t
+        ?point_background_color:Color.t indexable ->
+        ?point_border_color:Color.t indexable ->
+        ?point_border_width:int indexable ->
+        ?point_radius:int indexable ->
+        ?point_rotation:int indexable ->
+        ?point_hit_radius:int indexable ->
+        ?point_hover_background_color:Color.t indexable ->
+        ?point_hover_border_color:Color.t indexable ->
+        ?point_hover_border_width:int indexable ->
+        ?point_hover_radius:int indexable ->
+        unit ->
+        t
     end
     module Make_point :
     functor (X : Jsable)(Y : Jsable) -> Jsable with type t = (X.t, Y.t) point
+    module Make : functor (M : Jsable) -> DS with type item := M.t
 
-    module Make : functor (M : Jsable) -> DS with type dot := M.t
-    module Raw = Line.Dataset
-    module Int : DS with type dot := int
-    module Int32 : DS with type dot := int32
-    module Int64 : DS with type dot := int64
-    module Float : DS with type dot := float
-    module String : DS with type dot := string
-    module Time : DS with type dot := Ptime.t
+    module Int : DS with type item := int
+    module Int32 : DS with type item := int32
+    module Int64 : DS with type item := int64
+    module Float : DS with type item := float
+    module String : DS with type item := string
+    module Time : DS with type item := Ptime.t
   end
 end
 (** A bar chart provides a way of showing data values represented
@@ -90,12 +81,17 @@ module Bar : sig
   end
   module Dataset : sig
     type ('a, 'b) point = { x : 'a; y : 'b; }
+
+    include module type of Bar.Dataset
     module type DS = sig
-      type dot
-      type data = dot list
+      type item
       include module type of Bar.Dataset
+      module A : Chartjs_array.Typed_array with type item := item
+
+      val data : t -> A.t
+      val set_data : t -> item list -> unit
       val make :
-        ?data:data ->
+        ?data:item list ->
         ?type_:typ ->
         ?label:string ->
         ?x_axis_id:string ->
@@ -113,14 +109,14 @@ module Bar : sig
     end
     module Make_point :
     functor (X : Jsable)(Y : Jsable) -> Jsable with type t = (X.t, Y.t) point
-    module Make : functor (M : Jsable) -> DS with type dot := M.t
-    module Raw = Bar.Dataset
-    module Int : DS with type dot := int
-    module Int32 : DS with type dot := int32
-    module Int64 : DS with type dot := int64
-    module Float : DS with type dot := float
-    module String : DS with type dot := string
-    module Time : DS with type dot := Ptime.t
+    module Make : functor (M : Jsable) -> DS with type item := M.t
+
+    module Int : DS with type item := int
+    module Int32 : DS with type item := int32
+    module Int64 : DS with type item := int64
+    module Float : DS with type item := float
+    module String : DS with type item := string
+    module Time : DS with type item := Ptime.t
   end
 end
 (** A radar chart is a way of showing multiple data points and the
@@ -139,17 +135,17 @@ module Pie : sig
     include module type of Pie.Options
   end
   module Dataset : sig
-    module type DS = sig
-      type dot
-      include module type of Pie.Dataset
-      module Array : sig
-        include Chartjs_array.Typed_array with type item := dot
-      end
+    include module type of Pie.Dataset
 
-      val data : t -> Array.t
-      val set_data : t -> dot list -> unit
+    module type DS = sig
+      type item
+      include module type of Pie.Dataset
+      module A : Chartjs_array.Typed_array with type item := item
+
+      val data : t -> A.t
+      val set_data : t -> item list -> unit
       val make :
-        ?data:dot list ->
+        ?data:item list ->
         ?type_:typ ->
         ?background_color:Color.t list ->
         ?border_color:Color.t list ->
@@ -160,12 +156,12 @@ module Pie : sig
         unit ->
         t
     end
-    module Make : functor (M : Jsable) -> DS with type dot := M.t
-    module Raw = Pie.Dataset
-    module Int : DS with type dot := int
-    module Int32 : DS with type dot := int32
-    module Int64 : DS with type dot := int64
-    module Float : DS with type dot := float
+    module Make : functor (M : Jsable) -> DS with type item := M.t
+
+    module Int : DS with type item := int
+    module Int32 : DS with type item := int32
+    module Int64 : DS with type item := int64
+    module Float : DS with type item := float
   end
 end
 (** Polar area charts are similar to pie charts, but each segment has the
@@ -199,8 +195,6 @@ type node =
 type config
 type t = Chart.t
 
-val ( .%[] ) : 'a Chartjs_array.t -> int -> 'a
-val ( .%[]<- ) : 'a Chartjs_array.t -> int -> 'a -> unit
 val make_config :
   ?duration:int ->
   ?lazy_:bool ->

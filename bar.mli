@@ -63,6 +63,8 @@ module Dataset : sig
     ] [@js.enum]
 
   type t = Chart.Dataset.t
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
 
   val type_ : t -> typ
   val set_type : t -> typ -> unit

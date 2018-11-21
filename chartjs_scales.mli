@@ -45,8 +45,8 @@ module Scale_label : sig
   val set_font_color : t -> Color.t -> unit
 
   (** Font family for the scale title, follows CSS font-family options. *)
-  val font_family : t -> Font.family
-  val set_font_family : t -> Font.family -> unit
+  val font_family : t -> Font_family.t
+  val set_font_family : t -> Font_family.t -> unit
 
   (** Font size for scale title. *)
   val font_size : t -> int
@@ -54,8 +54,8 @@ module Scale_label : sig
 
   (** Font style for the scale title, follows CSS font-style options
       (i.e. normal, italic, oblique, initial, inherit) *)
-  val font_style : t -> Font.style
-  val set_font_style : t -> Font.style -> unit
+  val font_style : t -> Font_style.t
+  val set_font_style : t -> Font_style.t -> unit
 
   (** Padding to apply around scale labels.
       Only top and bottom are implemented. *)
@@ -66,9 +66,9 @@ module Scale_label : sig
              ?label_string:string ->
              ?line_height:line_height ->
              ?font_color:Color.t ->
-             ?font_family:Font.family ->
+             ?font_family:Font_family.t ->
              ?font_size:int ->
-             ?font_style:Font.style ->
+             ?font_style:Font_style.t ->
              ?padding:padding ->
              unit ->
              t [@@js.builder]
@@ -216,8 +216,8 @@ module Ticks : sig
     val set_font_color : t -> Color.t -> unit
 
     (** Font family for the tick labels, follows CSS font-family options. *)
-    val font_family : t -> Font.family
-    val set_font_family : t -> Font.family -> unit
+    val font_family : t -> Font_family.t
+    val set_font_family : t -> Font_family.t -> unit
 
     (** Font size for the tick labels. *)
     val font_size : t -> int
@@ -225,8 +225,8 @@ module Ticks : sig
 
     (** Font style for the tick labels, follows CSS font-style options
         (i.e. normal, italic, oblique, initial, inherit). *)
-    val font_style : t -> Font.style
-    val set_font_style : t -> Font.style -> unit
+    val font_style : t -> Font_style.t
+    val set_font_style : t -> Font_style.t -> unit
 
   end
 
@@ -286,9 +286,9 @@ module Ticks : sig
   val make : ?callback:callback ->
              ?display:bool ->
              ?font_color:Color.t ->
-             ?font_family:Font.family ->
+             ?font_family:Font_family.t ->
              ?font_size:int ->
-             ?font_style:Font.style ->
+             ?font_style:Font_style.t ->
              ?reverse:bool ->
              ?minor:Minor_major.t ->
              ?major:Minor_major.t ->
@@ -370,9 +370,9 @@ module Cartesian : sig
         (* Common*)
         ?display:bool ->
         ?font_color:Color.t ->
-        ?font_family:Font.family ->
+        ?font_family:Font_family.t ->
         ?font_size:int ->
-        ?font_style:Font.style ->
+        ?font_style:Font_style.t ->
         ?reverse:bool ->
         ?minor:Ticks.Minor_major.t ->
         ?major:Ticks.Minor_major.t ->
@@ -431,9 +431,9 @@ module Cartesian : sig
         (* Common *)
         ?display:bool ->
         ?font_color:Color.t ->
-        ?font_family:Font.family ->
+        ?font_family:Font_family.t ->
         ?font_size:int ->
-        ?font_style:Font.style ->
+        ?font_style:Font_style.t ->
         ?reverse:bool ->
         ?minor:Ticks.Minor_major.t ->
         ?major:Ticks.Minor_major.t ->
@@ -472,9 +472,9 @@ module Cartesian : sig
         (* Common *)
         ?display:bool ->
         ?font_color:Color.t ->
-        ?font_family:Font.family ->
+        ?font_family:Font_family.t ->
         ?font_size:int ->
-        ?font_style:Font.style ->
+        ?font_style:Font_style.t ->
         ?reverse:bool ->
         ?minor:Ticks.Minor_major.t ->
         ?major:Ticks.Minor_major.t ->
@@ -506,9 +506,9 @@ module Cartesian : sig
         (* Common *)
         ?display:bool ->
         ?font_color:Color.t ->
-        ?font_family:Font.family ->
+        ?font_family:Font_family.t ->
         ?font_size:int ->
-        ?font_style:Font.style ->
+        ?font_style:Font_style.t ->
         ?reverse:bool ->
         ?minor:Ticks.Minor_major.t ->
         ?major:Ticks.Minor_major.t ->
@@ -714,21 +714,21 @@ module Radial : sig
       val set_font_color : t -> Color.t -> unit
 
       (** Font family to use when rendering labels. *)
-      val font_family : t -> Font.family
-      val set_font_family : t -> Font.family -> unit
+      val font_family : t -> Font_family.t
+      val set_font_family : t -> Font_family.t -> unit
 
       (** Font size in pixels. *)
       val font_size : t -> int
       val set_font_size : t -> int -> unit
 
       (** Font style to use when rendering point labels. *)
-      val font_style : t -> Font.style
-      val set_font_style : t -> Font.style -> unit
+      val font_style : t -> Font_style.t
+      val set_font_style : t -> Font_style.t -> unit
 
       val make : ?font_color:Color.t ->
-                 ?font_family:Font.family ->
+                 ?font_family:Font_family.t ->
                  ?font_size:int ->
-                 ?font_style:Font.style ->
+                 ?font_style:Font_style.t ->
                  unit ->
                  t [@@js.builder]
 
@@ -792,9 +792,9 @@ module Radial : sig
         (* Common *)
         ?display:bool ->
         ?font_color:Color.t ->
-        ?font_family:Font.family ->
+        ?font_family:Font_family.t ->
         ?font_size:int ->
-        ?font_style:Font.style ->
+        ?font_style:Font_style.t ->
         ?reverse:bool ->
         ?minor:Ticks.Minor_major.t ->
         ?major:Ticks.Minor_major.t ->

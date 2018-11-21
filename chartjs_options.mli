@@ -161,16 +161,16 @@ module Legend : sig
     val set_font_size : t -> int -> unit
 
     (** Font style of text. *)
-    val font_style : t -> Font.style
-    val set_font_style : t -> Font.style -> unit
+    val font_style : t -> Font_style.t
+    val set_font_style : t -> Font_style.t -> unit
 
     (** Color of text. *)
     val font_color : t -> Color.t
     val set_font_color : t -> Color.t -> unit
 
     (** Font family of legend text. *)
-    val font_family : t -> Font.family
-    val set_font_family : t -> Font.family -> unit
+    val font_family : t -> Font_family.t
+    val set_font_family : t -> Font_family.t -> unit
 
     (** Padding between rows of colored boxes. *)
     val padding : t -> int
@@ -193,9 +193,9 @@ module Legend : sig
 
     val make : ?box_width:int ->
                ?font_size:int ->
-               ?font_style:Font.style ->
+               ?font_style:Font_style.t ->
                ?font_color:Color.t ->
-               ?font_family:Font.family ->
+               ?font_family:Font_family.t ->
                ?padding:int ->
                ?generate_labels:generate ->
                ?filter:filter ->
@@ -283,16 +283,16 @@ module Title : sig
   val set_font_size : t -> int -> unit
 
   (** Font family for the title text. *)
-  val font_family : t -> Font.family
-  val set_font_family : t -> Font.family -> unit
+  val font_family : t -> Font_family.t
+  val set_font_family : t -> Font_family.t -> unit
 
   (** Font color. *)
   val font_color : t -> Color.t
   val set_font_color : t -> Color.t -> unit
 
   (** Font style. *)
-  val font_style : t -> Font.style
-  val set_font_style : t -> Font.style -> unit
+  val font_style : t -> Font_style.t
+  val set_font_style : t -> Font_style.t -> unit
 
   (** Number of pixels to add above and below the title text. *)
   val padding : t -> int
@@ -310,9 +310,9 @@ module Title : sig
   val make : ?display:bool ->
              ?position:position ->
              ?font_size:int ->
-             ?font_family:Font.family ->
+             ?font_family:Font_family.t ->
              ?font_color:Color.t ->
-             ?font_style:Font.style ->
+             ?font_style:Font_style.t ->
              ?padding:int ->
              ?line_height:line_height ->
              ?text:text ->
@@ -364,23 +364,23 @@ module Tooltips : sig
       ; before_body : string list option
       ; after_body : string list option
       ; body_font_color : Color.t
-      ; body_font_family : Font.family [@js "_bodyFontFamily"]
-      ; body_font_style : Font.style [@js "_bodyFontStyle"]
+      ; body_font_family : Font_family.t [@js "_bodyFontFamily"]
+      ; body_font_style : Font_style.t [@js "_bodyFontStyle"]
       ; body_align : string [@js "_bodyAlign"]
       ; body_font_size : int
       ; body_spacing : int
       ; title : string list option
       ; title_font_color : Color.t
-      ; title_font_family : Font.family [@js "_titleFontFamily"]
-      ; title_font_style : Font.style [@js "_titleFontStyle"]
+      ; title_font_family : Font_family.t [@js "_titleFontFamily"]
+      ; title_font_style : Font_style.t [@js "_titleFontStyle"]
       ; title_font_size : int
       ; title_align : string [@js "_titleAlign"]
       ; title_spacing : int
       ; title_margin_bottom : int
       ; footer : string list option
       ; footer_font_color : Color.t
-      ; footer_font_family : Font.family [@js "_footerFontFamily"]
-      ; footer_font_style : Font.style [@js "_footerFontStyle"]
+      ; footer_font_family : Font_family.t [@js "_footerFontFamily"]
+      ; footer_font_style : Font_style.t [@js "_footerFontStyle"]
       ; footer_font_size : int
       ; footer_align : string [@js "_footerAlign"]
       ; footer_spacing : int
@@ -532,16 +532,16 @@ module Tooltips : sig
   val set_background_color : t -> Color.t -> unit
 
   (** Title font. *)
-  val title_font_family : t -> Font.family
-  val set_title_font_family : t -> Font.family -> unit
+  val title_font_family : t -> Font_family.t
+  val set_title_font_family : t -> Font_family.t -> unit
 
   (** Title font size. *)
   val title_font_size : t -> int
   val set_title_font_size : t -> int -> unit
 
   (** Title font style *)
-  val title_font_style : t -> Font.style
-  val set_title_font_style : t -> Font.style -> unit
+  val title_font_style : t -> Font_style.t
+  val set_title_font_style : t -> Font_style.t -> unit
 
   (** Title font color *)
   val title_font_color : t -> Color.t
@@ -556,16 +556,16 @@ module Tooltips : sig
   val set_title_margin_bottom : t -> int -> unit
 
   (** Body line font. *)
-  val body_font_family : t -> Font.family
-  val set_body_font_family : t -> Font.family -> unit
+  val body_font_family : t -> Font_family.t
+  val set_body_font_family : t -> Font_family.t -> unit
 
   (** Body font size. *)
   val body_font_size : t -> int
   val set_body_font_size : t -> int -> unit
 
   (** Body font style. *)
-  val body_font_style : t -> Font.style
-  val set_body_font_style : t -> Font.style -> unit
+  val body_font_style : t -> Font_style.t
+  val set_body_font_style : t -> Font_style.t -> unit
 
   (** Body font color. *)
   val body_font_color : t -> Color.t
@@ -576,16 +576,16 @@ module Tooltips : sig
   val set_body_spacing : t -> int -> unit
 
   (** Footer font. *)
-  val footer_font_family : t -> Font.family
-  val set_footer_font_family : t -> Font.family -> unit
+  val footer_font_family : t -> Font_family.t
+  val set_footer_font_family : t -> Font_family.t -> unit
 
   (** Footer font size. *)
   val footer_font_size : t -> int
   val set_footer_font_size : t -> int -> unit
 
   (** Footer font style. *)
-  val footer_font_style : t -> Font.style
-  val set_footer_font_style : t -> Font.style -> unit
+  val footer_font_style : t -> Font_style.t
+  val set_footer_font_style : t -> Font_style.t -> unit
 
   (** Footer font color. *)
   val footer_font_color : t -> Color.t
@@ -646,20 +646,20 @@ module Tooltips : sig
              ?item_sort:sort ->
              ?filter:filter ->
              ?background_color:Color.t ->
-             ?title_font_family:Font.family ->
+             ?title_font_family:Font_family.t ->
              ?title_font_size:int ->
-             ?title_font_style:Font.style ->
+             ?title_font_style:Font_style.t ->
              ?title_font_color:Color.t ->
              ?title_spacing:int ->
              ?title_margin_bottom:int ->
-             ?body_font_family:Font.family ->
+             ?body_font_family:Font_family.t ->
              ?body_font_size:int ->
-             ?body_font_style:Font.style ->
+             ?body_font_style:Font_style.t ->
              ?body_font_color:Color.t ->
              ?body_spacing:int ->
-             ?footer_font_family:Font.family ->
+             ?footer_font_family:Font_family.t ->
              ?footer_font_size:int ->
-             ?footer_font_style:Font.style ->
+             ?footer_font_style:Font_style.t ->
              ?footer_font_color:Color.t ->
              ?footer_spacing:int ->
              ?footer_margin_top:int ->

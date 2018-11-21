@@ -1,3 +1,4 @@
+(** ChartJS chart (or dataset) type *)
 type typ =
   [ `Line [@js "line"]
   | `Bar [@js "bar"]
@@ -13,39 +14,8 @@ type typ =
 val typ_to_js : typ -> Ojs.t
 val typ_of_js : Ojs.t -> typ
 
-module Time : sig
-  [@@@js.stop]
-  type t = Ptime.t
-  val t_to_js : t -> Ojs.t
-  val t_of_js : Ojs.t -> t
-  [@@@js.start]
-  [@@@js.implem
-   type t = Ptime.t
-   let t_to_js x = Ojs.float_to_js @@ Ptime.to_float_s x *. 1000.
-   let t_of_js x = match Ptime.of_float_s @@ Ojs.float_of_js x with
-     | None -> failwith "bad time value"
-     | Some x -> x
-  ]
-end
-
-module Color : sig
-  type t = string
-  val t_to_js : t -> Ojs.t
-  val t_of_js : Ojs.t -> t
-
-end
-
-module Font : sig
-  type family = string
-  val family_to_js : family -> Ojs.t
-  val family_of_js : Ojs.t -> family
-
-  type style = string
-  val style_to_js : style -> Ojs.t
-  val style_of_js : Ojs.t -> style
-
-end
-
+(** Type 'or_false' is the OCaml option type mapped
+    to 'false' when the value is None *)
 [@@@js.stop]
 type 'a or_false = 'a option
 val or_false_to_js : ('a -> Ojs.t) -> 'a or_false -> Ojs.t
@@ -63,6 +33,7 @@ val or_false_of_js : (Ojs.t -> 'a) -> Ojs.t -> 'a or_false
    | _ -> Some (f js)
 ]
 
+(** 'indexable' type represents a single value or a list of values *)
 [@@@js.stop]
 type 'a indexable =
   [ `Single of 'a
@@ -84,6 +55,30 @@ val indexable_of_js : (Ojs.t -> 'a) -> Ojs.t -> 'a indexable
    | "[object Array]" -> `List (Ojs.list_of_js f js)
    | _ -> `Single (f js)
 ]
+
+(** 'text' type represents multiline string which is converted
+    to an array of strings if '\n' char is present *)
+[@@@js.stop]
+type text = string
+val text_to_js : text -> Ojs.t
+val text_of_js : Ojs.t -> text
+[@@@js.start]
+[@@@js.implem
+ type text = string
+ let text_to_js (s : text) : Ojs.t =
+   match String.split_on_char '\n' s with
+   | [s] -> Ojs.string_to_js s
+   | l -> Ojs.list_to_js Ojs.string_to_js l
+ let text_of_js (js : Ojs.t) : text =
+   match Ojs.obj_type js with
+   | "[object Array]" ->
+      let l = Ojs.list_of_js Ojs.string_of_js js in
+      String.concat "\n" l
+   | "[object String]" ->
+      Ojs.string_of_js js
+   | _ -> assert false
+]
+
 
 type point_style =
   [ `Circle [@js "circle"]
@@ -137,26 +132,6 @@ type easing =
 val easing_to_js : easing -> Ojs.t
 val easing_of_js : Ojs.t -> easing
 
-module Update_config : sig
-  type t
-
-  val duration : t -> int
-  val set_duration : t -> int -> unit
-
-  val lazy_ : t -> bool
-  val set_lazy_ : t -> bool -> unit
-
-  val easing : t -> easing
-  val set_easing : t -> easing -> unit
-
-  val make : ?duration:int ->
-             ?lazy_:bool ->
-             ?easing:easing ->
-             unit ->
-             t [@@js.builder]
-
-end
-
 type border_dash = int list
 val border_dash_to_js : border_dash -> Ojs.t
 val border_dash_of_js : Ojs.t -> border_dash
@@ -185,26 +160,6 @@ type line_height = float
 val line_height_to_js : line_height -> Ojs.t
 val line_height_of_js : Ojs.t -> line_height
 
-type text = string [@@deriving show]
-val text_to_js : text -> Ojs.t
-  [@@js.custom
-   let text_to_js (s : text) : Ojs.t =
-     match String.split_on_char '\n' s with
-     | [s] -> Ojs.string_to_js s
-     | l -> Ojs.list_to_js Ojs.string_to_js l
-  ]
-val text_of_js : Ojs.t -> text
-  [@@js.custom
-   let text_of_js (js : Ojs.t) : text =
-     match Ojs.obj_type js with
-     | "[object Array]" ->
-        let l = Ojs.list_of_js Ojs.string_of_js js in
-        String.concat "\n" l
-     | "[object String]" ->
-        Ojs.string_of_js js
-     | _ -> assert false
-  ]
-
 type interaction_mode =
   [ `Point [@js "point"]
   | `Nearest [@js "nearest"]
@@ -215,3 +170,87 @@ type interaction_mode =
   ] [@js.enum]
 val interaction_mode_to_js : interaction_mode -> Ojs.t
 val interaction_mode_of_js : Ojs.t -> interaction_mode
+
+
+[@@@js.stop]
+module type Jsable = sig
+  type t
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+end
+[@@@js.start]
+[@@@js.implem
+module type Jsable = sig
+  type t
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+end
+]
+module Int : sig
+  type t = int
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+end
+module Float : sig
+  type t = float
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+end
+module String : sig
+  type t = string
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+end
+module Int32 : sig
+  [@@@js.stop]
+  type t = int32
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+  [@@@js.start]
+  [@@@js.implem
+   type t = int32
+   let t_to_js i = Float.t_to_js @@ Int32.to_float i
+   let t_of_js j = Int32.of_float @@ Float.t_of_js j
+  ]
+end
+module Int64 : sig
+  [@@@js.stop]
+  type t = int64
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+  [@@@js.start]
+  [@@@js.implem
+   type t = int64
+   let t_to_js i = Float.t_to_js @@ Int64.to_float i
+   let t_of_js j = Int64.of_float @@ Float.t_of_js j
+  ]
+end
+module Color : sig
+  type t = string
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+end
+module Font_family : sig
+  type t = string
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+end
+module Font_style : sig
+  type t = string
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+end
+module Time : sig
+  [@@@js.stop]
+  type t = Ptime.t
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+  [@@@js.start]
+  [@@@js.implem
+   type t = Ptime.t
+   let t_to_js x = Ojs.float_to_js @@ Ptime.to_float_s x *. 1000.
+   let t_of_js x = match Ptime.of_float_s @@ Ojs.float_of_js x with
+     | None -> failwith "bad time value"
+     | Some x -> x
+  ]
+end

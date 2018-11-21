@@ -79,6 +79,8 @@ module Dataset : sig
     ] [@js.union]
 
   type t = Chart.Dataset.t
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
 
   val stepped_line_of_js : Ojs.t -> stepped_line
     [@@js.custom

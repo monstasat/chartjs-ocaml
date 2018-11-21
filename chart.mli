@@ -17,7 +17,7 @@ module Data : sig
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
 
-  val datasets : t -> Dataset.t Chartjs_array.t
+  val datasets : t -> Dataset.t Chartjs_array.Any.t
   val set_datasets : t -> Dataset.t list -> unit
 
   val labels : t -> Chartjs_array.String.t

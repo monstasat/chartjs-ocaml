@@ -1,60 +1,60 @@
-module type M =
-  sig type t val t_to_js : t -> Ojs.t val t_of_js : Ojs.t -> t end
-type 'a t = 'a Js.js_array Js.t
-val t_to_js : 'a -> 'b -> 'c
-val t_of_js : 'a -> 'b -> 'c
-val length : 'a t -> int
-val get : 'a t -> int -> 'a option
-val get_exn : 'a t -> int -> 'a
-val set : 'a t -> int -> 'a -> unit
-val make : int -> 'a -> 'a t
-val init : int -> (int -> 'a) -> 'a t
-val empty : unit -> 'a t
-val concat : 'a t -> 'a t -> 'a Js.js_array Js.t
-val pop : 'a t -> 'a option
-val push : 'a t -> 'a -> int
-val push_2 : 'a t -> 'a -> 'a -> int
-val push_3 : 'a t -> 'a -> 'a -> 'a -> int
-val push_4 : 'a t -> 'a -> 'a -> 'a -> 'a -> int
-val reverse : 'a t -> 'a t
-val shift : 'a t -> 'a option
-val slice : ?till:int -> 'a t -> int -> 'a t
-val sort : ('a -> 'a -> int) -> 'a t -> 'a t
-val splice : 'a t -> int -> int -> 'a t
-val splice_1 : 'a t -> int -> int -> 'a -> 'a t
-val splice_2 : 'a t -> int -> int -> 'a -> 'a -> 'a t
-val splice_3 : 'a t -> int -> int -> 'a -> 'a -> 'a -> 'a t
-val splice_4 : 'a t -> int -> int -> 'a -> 'a -> 'a -> 'a -> 'a t
-val unshift : 'a t -> 'a -> int
-val unshift_2 : 'a t -> 'a -> 'a -> int
-val unshift_3 : 'a t -> 'a -> 'a -> 'a -> int
-val unshift_4 : 'a t -> 'a -> 'a -> 'a -> 'a -> int
-val some : ('a -> int -> 'a t -> bool) -> 'a t -> bool
-val every : ('a -> int -> 'a t -> bool) -> 'a t -> bool
-val for_each : ('a -> int -> 'a t -> unit) -> 'a t -> unit
-val map' : ('a -> int -> 'a t -> 'a) -> 'a t -> 'a t
-val map : ('a -> 'b) -> 'a t -> 'b t
-val mapi : (int -> 'a -> 'a) -> 'a t -> 'a t
-val filter : ('a -> int -> 'a t -> bool) -> 'a t -> 'a t
-val reduce : ('b -> 'a -> int -> 'a t -> 'b) -> 'b -> 'a t -> 'b
-val reduce' : ('a -> 'a -> int -> 'a t -> 'a) -> 'a t -> 'a
-val reduce_right : ('b -> 'a -> int -> 'a t -> 'b) -> 'b -> 'a t -> 'b
-val reduce_right' : ('a -> 'a -> int -> 'a t -> 'a) -> 'a t -> 'a
-val to_array : 'a t -> 'a array
-val of_array : Ojs.t array -> Ojs.t t
-val to_list : 'a t -> 'a list
-val of_list : Ojs.t list -> Ojs.t t
-module Infix :
+module Any : sig
+  type 'a t
+  val t_to_js : ('a -> Ojs.t) -> 'a t -> Ojs.t
+  val t_of_js : (Ojs.t -> 'a) -> Ojs.t -> 'a t
+  val length : 'a t -> int
+  val get : 'a t -> int -> 'a option
+  val get_exn : 'a t -> int -> 'a
+  val set : 'a t -> int -> 'a -> unit
+  val make : int -> 'a -> 'a t
+  val init : int -> (int -> 'a) -> 'a t
+  val empty : unit -> 'a t
+  val concat : 'a t -> 'a t -> 'a Js.js_array Js.t
+  val pop : 'a t -> 'a option
+  val push : 'a t -> 'a -> int
+  val push_2 : 'a t -> 'a -> 'a -> int
+  val push_3 : 'a t -> 'a -> 'a -> 'a -> int
+  val push_4 : 'a t -> 'a -> 'a -> 'a -> 'a -> int
+  val reverse : 'a t -> 'a t
+  val shift : 'a t -> 'a option
+  val slice : ?till:int -> 'a t -> int -> 'a t
+  val sort : ('a -> 'a -> int) -> 'a t -> 'a t
+  val splice : 'a t -> int -> int -> 'a t
+  val splice_1 : 'a t -> int -> int -> 'a -> 'a t
+  val splice_2 : 'a t -> int -> int -> 'a -> 'a -> 'a t
+  val splice_3 : 'a t -> int -> int -> 'a -> 'a -> 'a -> 'a t
+  val splice_4 : 'a t -> int -> int -> 'a -> 'a -> 'a -> 'a -> 'a t
+  val unshift : 'a t -> 'a -> int
+  val unshift_2 : 'a t -> 'a -> 'a -> int
+  val unshift_3 : 'a t -> 'a -> 'a -> 'a -> int
+  val unshift_4 : 'a t -> 'a -> 'a -> 'a -> 'a -> int
+  val some : ('a -> int -> 'a t -> bool) -> 'a t -> bool
+  val every : ('a -> int -> 'a t -> bool) -> 'a t -> bool
+  val for_each : ('a -> int -> 'a t -> unit) -> 'a t -> unit
+  val map : ('a -> int -> 'a t -> 'a) -> 'a t -> 'a t
+  val map' : ('a -> 'b) -> 'a t -> 'b t
+  val mapi' : (int -> 'a -> 'b) -> 'a t -> 'b t
+  val filter : ('a -> int -> 'a t -> bool) -> 'a t -> 'a t
+  val reduce : ('b -> 'a -> int -> 'a t -> 'b) -> 'b -> 'a t -> 'b
+  val reduce' : ('a -> 'a -> int -> 'a t -> 'a) -> 'a t -> 'a
+  val reduce_right : ('b -> 'a -> int -> 'a t -> 'b) -> 'b -> 'a t -> 'b
+  val reduce_right' : ('a -> 'a -> int -> 'a t -> 'a) -> 'a t -> 'a
+  val to_array : 'a t -> 'a array
+  val of_array : Ojs.t array -> Ojs.t t
+  val to_list : 'a t -> 'a list
+  val of_list : Ojs.t list -> Ojs.t t
+  module Infix :
   sig
     val ( .%[] ) : 'a t -> int -> 'a
     val ( .%[]<- ) : 'a t -> int -> 'a -> unit
   end
-val ( .%[] ) : 'a t -> int -> 'a
-val ( .%[]<- ) : 'a t -> int -> 'a -> unit
+  val ( .%[] ) : 'a t -> int -> 'a
+  val ( .%[]<- ) : 'a t -> int -> 'a -> unit
+end
 
 module type Typed_array = sig
   type item
-  type t
+  type t = Ojs.t Any.t
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
   val length : t -> int
@@ -105,7 +105,9 @@ module type Typed_array = sig
   val ( .%[]<- ) : t -> int -> item -> unit
 end
 
-module Make : functor (M : M) -> Typed_array with type item := M.t
+module Make : functor (M : Chartjs_types.Jsable) ->
+              Typed_array with type item := M.t
+
 module String : Typed_array with type item := string
 module Int : Typed_array with type item := int
 module Float : Typed_array with type item := float
