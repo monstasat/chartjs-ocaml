@@ -1,3 +1,8 @@
+(** Chart instance *)
+type t
+val t_to_js : t -> Ojs.t
+val t_of_js : Ojs.t -> t
+
 (** ChartJS chart (or dataset) type *)
 type typ =
   [ `Line [@js "line"]
@@ -33,29 +38,6 @@ val or_false_of_js : (Ojs.t -> 'a) -> Ojs.t -> 'a or_false
    | _ -> Some (f js)
 ]
 
-(** 'indexable' type represents a single value or a list of values *)
-[@@@js.stop]
-type 'a indexable =
-  [ `Single of 'a
-  | `List of 'a list
-  ]
-val indexable_to_js : ('a -> Ojs.t) -> 'a indexable -> Ojs.t
-val indexable_of_js : (Ojs.t -> 'a) -> Ojs.t -> 'a indexable
-[@@@js.start]
-[@@@js.implem
- type 'a indexable =
-   [ `Single of 'a
-   | `List of 'a list
-   ]
- let indexable_to_js (f : 'a -> Ojs.t) = function
-   | `Single x -> f x
-   | `List x -> Ojs.list_to_js f x
- let indexable_of_js (f : Ojs.t -> 'a) (js : Ojs.t) =
-   match Ojs.obj_type js with
-   | "[object Array]" -> `List (Ojs.list_of_js f js)
-   | _ -> `Single (f js)
-]
-
 (** 'text' type represents multiline string which is converted
     to an array of strings if '\n' char is present *)
 [@@@js.stop]
@@ -78,7 +60,6 @@ val text_of_js : Ojs.t -> text
       Ojs.string_of_js js
    | _ -> assert false
 ]
-
 
 type point_style =
   [ `Circle [@js "circle"]

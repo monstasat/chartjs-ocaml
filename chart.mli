@@ -1,43 +1,5 @@
 open Chartjs_types
 
-module Dataset : sig
-
-  type t
-  val t_to_js : t -> Ojs.t
-  val t_of_js : Ojs.t -> t
-
-  type data
-  val data_to_js : data -> Ojs.t
-  val data_of_js : Ojs.t -> data
-
-end
-
-module Data : sig
-  type t
-  val t_to_js : t -> Ojs.t
-  val t_of_js : Ojs.t -> t
-
-  val datasets : t -> Dataset.t Chartjs_array.Any.t
-  val set_datasets : t -> Dataset.t list -> unit
-
-  val labels : t -> Chartjs_array.String.t
-  val set_labels : t -> string list -> unit
-
-  val x_labels : t -> Chartjs_array.String.t
-  val set_x_labels : t -> string list -> unit
-
-  val y_labels : t -> Chartjs_array.String.t
-  val set_y_labels : t -> string list -> unit
-
-  val make : ?datasets:Dataset.t list ->
-             ?labels:string list ->
-             ?x_labels:string list ->
-             ?y_labels:string list ->
-             unit ->
-             t [@@js.builder]
-
-end
-
 [@@@js.stop]
 type canvas = Dom_html.canvasElement Js.t
 [@@@js.start]
@@ -66,12 +28,8 @@ type node =
   | `Id of string
   ] [@js.union]
 
-type t
-val t_to_js : t -> Ojs.t
-val t_of_js : Ojs.t -> t
-
 type config
-val make_config : ?data:Data.t ->
+val make_config : ?data:Chartjs_data.t ->
                   ?options:Chartjs_options.t ->
                   ?type_:Chartjs_types.typ ->
                   unit ->
@@ -82,7 +40,6 @@ val new_chart : node -> config -> t [@@js.new "Chart"]
 
 module API : sig
 
-  val id : t -> int
   val inner_radius : t -> int
   val height : t -> int
   val width : t -> int
@@ -94,8 +51,8 @@ module API : sig
   val canvas : t -> canvas
   val ctx : t -> context
 
-  val data : t -> Data.t
-  val set_data : t -> Data.t -> unit
+  val data : t -> Chartjs_data.t
+  val set_data : t -> Chartjs_data.t -> unit
 
   val options : t -> Chartjs_options.t
   val set_options : t -> Chartjs_options.t -> unit

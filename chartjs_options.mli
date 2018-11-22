@@ -2,11 +2,11 @@ open Chartjs_types
 
 module Animation : sig
   type animation =
-    { chart : Ojs.t
+    { chart : Chartjs_types.t
     ; current_step : float option
     ; num_steps : float
     ; easing : easing option
-    ; render : (chart:Ojs.t -> animation -> unit) option
+    ; render : (Chartjs_types.t -> animation -> unit) option
     ; on_animation_progress : callback option
     ; on_animation_complete : callback option
     }
@@ -43,20 +43,20 @@ end
 
 module Layout : sig
   type padding =
-    [ `Int of int
+    [ `Num of int
     | `Obj of padding_obj
     ] [@js.union]
   and padding_obj =
-    { mutable left : int option
-    ; mutable right : int option
-    ; mutable top : int option
-    ; mutable bottom : int option
+    { left : int option
+    ; right : int option
+    ; top : int option
+    ; bottom : int option
     }
   val padding_of_js : Ojs.t -> padding
     [@@js.custom
      let padding_of_js (js : Ojs.t) : padding =
        match Ojs.obj_type js with
-       | "[object Number]" -> `Int (Ojs.int_of_js js)
+       | "[object Number]" -> `Num (Ojs.int_of_js js)
        | "[object Object]" ->
           let (x : padding_obj) =
             { left = Ojs.(option_of_js int_of_js @@ get js "left")
@@ -146,9 +146,9 @@ module Legend : sig
 
   module Labels : sig
 
-    type generate = chart:Ojs.t -> Item.t list
+    type generate = Chartjs_types.t -> Item.t list
 
-    type filter = item:Item.t -> data:Ojs.t -> bool
+    type filter = item:Item.t -> Chartjs_data.t -> bool
 
     type t
 
@@ -329,6 +329,7 @@ module Tooltips : sig
     }
 
   module Item : sig
+    (* FIXME x_label and y_label must be of some defined type *)
     type t =
       { (** X Value of the tooltip as a string. *)
         x_label : Ojs.t
@@ -404,10 +405,10 @@ module Tooltips : sig
   module Callbacks : sig
     type t
 
-    type items_cb = items:Item.t list -> data:Ojs.t -> text
-    type item_cb = item:Item.t -> data:Ojs.t -> text
-    type label_color_cb = item:Item.t -> chart:Ojs.t -> color
-    type label_text_color_cb = item:Item.t -> chart:Ojs.t -> Color.t
+    type items_cb = Item.t list -> Chartjs_data.t -> text
+    type item_cb = Item.t -> Chartjs_data.t -> text
+    type label_color_cb = Item.t -> Chartjs_types.t -> color
+    type label_text_color_cb = Item.t -> Chartjs_types.t -> Color.t
 
     (** Returns the text to render before the title. *)
     val before_title : t -> items_cb
@@ -480,11 +481,11 @@ module Tooltips : sig
 
   end
 
-  type custom = model:Model.t -> unit
+  type custom = Model.t -> unit
 
-  type sort = a:Item.t -> b:Item.t -> data:Ojs.t -> int
+  type sort = Item.t -> Item.t -> Chartjs_data.t -> int
 
-  type filter = item:Item.t -> data:Ojs.t -> bool
+  type filter = Item.t -> Chartjs_data.t -> bool
 
   type position =
     [ `Average [@js "average"]
@@ -942,6 +943,14 @@ module Elements : sig
              t [@@js.builder]
 end
 
+module Plugins : sig
+  type t
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+
+  val make : unit -> t [@@js.builder]
+end
+
 (** The configuration is used to change how the chart behaves.
     There are properties to control styling, fonts, the legend, etc. *)
 type t
@@ -978,7 +987,10 @@ val set_title : t -> Title.t -> unit
 val elements : t -> Elements.t
 val set_elements : t -> Elements.t -> unit
 
-type legend_callback = chart:Ojs.t -> string
+val plugins : t -> Plugins.t
+val set_plugins : t -> Plugins.t -> unit
+
+type legend_callback = Chartjs_types.t -> string
 
 val legend_callback : t -> legend_callback
 val set_legend_callback : t -> legend_callback -> unit
@@ -1007,7 +1019,7 @@ type size =
   { width : int
   ; height : int
   }
-type resize_cb = chart:Ojs.t -> size -> unit
+type resize_cb = Chartjs_types.t -> size -> unit
 
 (** Called when a resize occurs. Gets passed two arguments:
     the chart instance and the new size. *)
@@ -1054,7 +1066,8 @@ val make : ?elements:Elements.t ->
            ?title:Title.t ->
            ?tooltips:Tooltips.t ->
            ?hover:Hover.t ->
-           ?scales:Chartjs_scales.t ->
+           ?plugins:Plugins.t ->
+           ?scales:Chartjs_scales.scales ->
            ?legend_callback:legend_callback ->
            ?responsive:bool ->
            ?responsive_animation_duration:int ->
@@ -1067,19 +1080,3 @@ val make : ?elements:Elements.t ->
            ?on_click:interaction_cb ->
            unit ->
            t [@@js.builder]
-
-type options =
-  { animation : Animation.t
-  ; layout : Layout.t
-  ; legend : Legend.t
-  ; title : Title.t
-  ; tooltips : Tooltips.t
-  ; hover : Hover.t
-  ; elements : Elements.t
-  ; responsive : bool
-  ; responsive_animation_duration : int
-  ; maintain_aspect_ratio : bool
-  ; cutout_percentage : float
-  }
-val options_to_js : options -> Ojs.t
-val options_of_js : Ojs.t -> options

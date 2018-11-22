@@ -1,4 +1,5 @@
 open Chartjs_types
+open Chartjs_option_types
 
 module Options : sig
   type t = Chartjs_options.t
@@ -78,7 +79,7 @@ module Dataset : sig
     | `List of Color.t list
     ] [@js.union]
 
-  type t = Chart.Dataset.t
+  type t = Chartjs_data.Dataset.t
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
 

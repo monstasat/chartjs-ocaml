@@ -1,4 +1,5 @@
 open Chartjs_types
+open Chartjs_option_types
 
 module Options : sig
   type t = Chartjs_options.t
@@ -18,7 +19,7 @@ module Options : sig
     end
 
     module Cartesian : sig
-      type t = Chartjs_scales.scale
+      type t = Chartjs_scales.t
 
       (** Stacked bar charts can be used to show how one data series
           is made up of a number of smaller pieces. *)
@@ -62,7 +63,7 @@ module Dataset : sig
     | `Right [@js "right"]
     ] [@js.enum]
 
-  type t = Chart.Dataset.t
+  type t = Chartjs_data.Dataset.t
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
 

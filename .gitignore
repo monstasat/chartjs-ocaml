@@ -5,7 +5,6 @@
 # gen_js_api
 chart.ml
 chartjs_options.ml
-chartjs_scales.ml
 chartjs_types.ml
 pie.ml
 line.ml

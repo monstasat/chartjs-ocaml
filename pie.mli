@@ -32,7 +32,8 @@ module Options : sig
 end
 
 module Dataset : sig
-  type t = Chart.Dataset.t
+
+  type t = Chartjs_data.Dataset.t
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
 

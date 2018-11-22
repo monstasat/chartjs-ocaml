@@ -1,22 +1,15 @@
 open Chartjs_types
+open Chartjs_option_types
 
-module Scales = struct
-  include Axes
-end
-
-module Data = struct
-  include Chart.Data
-end
-
-module Options = struct
-  include Chartjs_options
-end
+module Scales = Chartjs_scales
+module Data = Chartjs_data
+module Options = Chartjs_options
 
 module Line = struct
   module Options = Line.Options
   module Dataset = struct
     include Line.Dataset
-          
+
     type ('a, 'b) point = { x : 'a; y : 'b }
 
     module type DS = sig
@@ -229,7 +222,7 @@ end
 type canvas = Chart.canvas
 type context = Chart.context
 type node = Chart.node
-type t = Chart.t
+type t = Chartjs_types.t
 
 let make ?(options : Options.t option)
       ?(data : Data.t option)

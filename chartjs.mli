@@ -1,9 +1,5 @@
-module Data : sig
-  include module type of Chart.Data
-end
-module Scales : sig
-  include module type of Axes
-end
+module Data = Chartjs_data
+module Scales = Chartjs_scales
 module Options : sig
   include module type of Chartjs_options
 end
@@ -12,6 +8,7 @@ end
     of two data sets. *)
 module Line : sig
   open Chartjs_types
+  open Chartjs_option_types
   module Options : sig
     include module type of Line.Options
   end
@@ -76,6 +73,7 @@ end
     the comparison of multiple data sets side by side. *)
 module Bar : sig
   open Chartjs_types
+  open Chartjs_option_types
   module Options : sig
     include module type of Bar.Options
   end
@@ -193,7 +191,7 @@ type node =
   | `Id of string
   ]
 type config
-type t = Chart.t
+type t = Chartjs_types.t
 
 val make_config :
   ?duration:int ->
@@ -210,7 +208,6 @@ val make :
   t
 
 (* Getters *)
-val id : t -> int
 val inner_radius : t -> int
 val height : t -> int
 val width : t -> int

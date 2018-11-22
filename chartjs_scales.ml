@@ -1,11 +1,29 @@
 open Chartjs_types
-open Chartjs_scales
+open Chartjs_scales_raw
 
 module Scale_label = Scale_label
 module Grid_lines = Grid_lines
+module Ticks = Ticks
+
+type typ = Chartjs_scales_raw.typ
+
+type t = Chartjs_scales_raw.t
+let t_to_js = Chartjs_scales_raw.t_to_js
+let t_of_js = Chartjs_scales_raw.t_of_js
+
+type scales = Chartjs_scales_raw.scales
+let scales_to_js = Chartjs_scales_raw.scales_to_js
+let scales_of_js = Chartjs_scales_raw.scales_of_js
+let make = make
 
 module Cartesian = struct
   open Cartesian
+  type position = Cartesian.position
+
+  module Ticks = struct
+    include Ticks
+    include (Common_ticks : module type of Common_ticks with type t := Ticks.t)
+  end
 
   module Category = struct
 
@@ -16,7 +34,6 @@ module Cartesian = struct
     end
     include Common
     include (Category : module type of Category with module Ticks := Ticks)
-    let make = make ~type_:"category"
   end
 
   module Linear = struct
@@ -28,7 +45,6 @@ module Cartesian = struct
     end
     include Common
     include (Linear : module type of Linear with module Ticks := Ticks)
-    let make = make ~type_:"linear"
   end
 
   module Logarithmic = struct
@@ -42,8 +58,6 @@ module Cartesian = struct
     include Common
     include (Logarithmic : module type of Logarithmic
                                           with module Ticks := Ticks)
-    let make = make ~type_:"logarithmic"
-
   end
 
   module Time = struct
@@ -56,7 +70,6 @@ module Cartesian = struct
 
     include Common
     include (Time : module type of Time with module Ticks := Ticks)
-    let make = make ~type_:"time"
   end
 
 end
@@ -77,5 +90,3 @@ module Radial = struct
   end
 
 end
-
-let make = make
