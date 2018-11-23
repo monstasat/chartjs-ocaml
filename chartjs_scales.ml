@@ -34,6 +34,7 @@ module Cartesian = struct
     end
     include Common
     include (Category : module type of Category with module Ticks := Ticks)
+    let make ?(type_ = `Category) = make ~type_
   end
 
   module Linear = struct
@@ -45,6 +46,7 @@ module Cartesian = struct
     end
     include Common
     include (Linear : module type of Linear with module Ticks := Ticks)
+    let make ?(type_ = `Linear) = make ~type_
   end
 
   module Logarithmic = struct
@@ -58,6 +60,7 @@ module Cartesian = struct
     include Common
     include (Logarithmic : module type of Logarithmic
                                           with module Ticks := Ticks)
+    let make ?(type_ = `Logarithmic) = make ~type_
   end
 
   module Time = struct
@@ -70,6 +73,7 @@ module Cartesian = struct
 
     include Common
     include (Time : module type of Time with module Ticks := Ticks)
+    let make ?(type_ = `Time) = make ~type_
   end
 
 end

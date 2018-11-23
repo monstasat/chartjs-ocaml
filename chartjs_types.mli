@@ -230,7 +230,9 @@ module Time : sig
   [@@@js.implem
    type t = Ptime.t
    let t_to_js x = Ojs.float_to_js @@ Ptime.to_float_s x *. 1000.
-   let t_of_js x = match Ptime.of_float_s @@ Ojs.float_of_js x with
+   let t_of_js x =
+     let s = Ojs.float_of_js x /. 1000. in
+     match Ptime.of_float_s s with
      | None -> failwith "bad time value"
      | Some x -> x
   ]
