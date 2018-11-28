@@ -206,6 +206,11 @@ module Int64 : sig
    let t_of_js j = Int64.of_float @@ Float.t_of_js j
   ]
 end
+module Bool : sig
+  type t = bool
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+end
 module Color : sig
   type t = string
   val t_to_js : t -> Ojs.t
@@ -236,4 +241,44 @@ module Time : sig
      | None -> failwith "bad time value"
      | Some x -> x
   ]
+end
+module Padding : sig
+  type t =
+    [ `Num of int
+    | `Obj of obj
+    ] [@js.union]
+  and obj =
+    { top : int option
+    ; right : int option
+    ; bottom : int option
+    ; left : int option
+    }
+
+  val make : ?top:int ->
+             ?right:int ->
+             ?bottom:int ->
+             ?left:int ->
+             unit ->
+             t
+    [@@js.custom
+     let make ?top ?right ?bottom ?left () : t =
+       `Obj { top; right; bottom; left }
+    ]
+
+  val t_to_js : t -> Ojs.t
+  val t_of_js : Ojs.t -> t
+    [@@js.custom
+     let t_of_js (js : Ojs.t) : t =
+       match Ojs.obj_type js with
+       | "[object Number]" -> `Num (Ojs.int_of_js js)
+       | "[object Object]" ->
+          let (x : obj) =
+            { left = Ojs.(option_of_js int_of_js @@ get js "left")
+            ; right = Ojs.(option_of_js int_of_js @@ get js "right")
+            ; top = Ojs.(option_of_js int_of_js @@ get js "top")
+            ; bottom = Ojs.(option_of_js int_of_js @@ get js "bottom")
+            } in
+          `Obj x
+       | _ -> assert false
+    ]
 end

@@ -1,4 +1,5 @@
 open Types
+open Option_types
 
 type typ =
   [ `Category [@js "category"]
@@ -13,27 +14,6 @@ val t_to_js : t -> Ojs.t
 val t_of_js : Ojs.t -> t
 
 module Scale_label : sig
-  type padding =
-    [ `Obj of padding_obj
-    | `Int of int
-    ] [@js.union]
-  and padding_obj =
-    { top : int option
-    ; bottom : int option
-    }
-  val padding_of_js : Ojs.t -> padding
-    [@@js.custom
-     let padding_of_js (js : Ojs.t) : padding =
-       match Ojs.obj_type js with
-       | "[object Number]" -> `Int (Ojs.int_of_js js)
-       | "[object Object]" ->
-          let x =
-            { top = Ojs.(option_of_js int_of_js @@ get js "top")
-            ; bottom = Ojs.(option_of_js int_of_js @@ get js "bottom")
-            } in
-          `Obj x
-       | _ -> assert false
-    ]
   type t
 
   (** If true, display the axis title. *)
@@ -67,8 +47,8 @@ module Scale_label : sig
 
   (** Padding to apply around scale labels.
       Only top and bottom are implemented. *)
-  val padding : t -> padding
-  val set_padding : t -> padding -> unit
+  val padding : t -> Padding.t
+  val set_padding : t -> Padding.t -> unit
 
   val make : ?display:bool ->
              ?label_string:string ->
@@ -77,39 +57,13 @@ module Scale_label : sig
              ?font_family:Font_family.t ->
              ?font_size:int ->
              ?font_style:Font_style.t ->
-             ?padding:padding ->
+             ?padding:Padding.t ->
              unit ->
              t [@@js.builder]
 
 end
 
 module Grid_lines : sig
-  type color =
-    [ `Single of Color.t
-    | `List of Color.t list
-    ] [@js.union]
-  val color_of_js : Ojs.t -> color
-    [@@js.custom
-     let color_of_js (js : Ojs.t) : color =
-       match Ojs.obj_type js with
-       | "[object Array]" ->
-          `List (Ojs.list_of_js Color.t_of_js js)
-       | _ -> `Single (Color.t_of_js js)
-    ]
-  type line_width =
-    [ `Single of int
-    | `List of int list
-    ] [@js.union]
-  val line_width_of_js : Ojs.t -> line_width
-    [@@js.custom
-     let line_width_of_js (js : Ojs.t) : line_width =
-       match Ojs.obj_type js with
-       | "[object Array]" ->
-          `List (Ojs.list_of_js Ojs.int_of_js js)
-       | "[object Number]" ->
-          `Single (Ojs.int_of_js js)
-       | _ -> assert false
-    ]
   type t
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
@@ -125,8 +79,8 @@ module Grid_lines : sig
   (** The color of the grid lines. If specified as an array,
       the first color applies to the first grid line, the second
       to the second grid line and so on. *)
-  val color : t -> color
-  val set_color : t -> color -> unit
+  val color : t -> Color.t indexable
+  val set_color : t -> Color.t indexable -> unit
 
   (** Length and spacing of dashes on grid lines. *)
   val border_dash : t -> border_dash
@@ -137,8 +91,8 @@ module Grid_lines : sig
   val set_border_dash_offset : t -> border_dash_offset -> unit
 
   (** Stroke width of grid lines. *)
-  val line_width : t -> line_width
-  val set_line_width : t -> line_width -> unit
+  val line_width : t -> int indexable
+  val set_line_width : t -> int indexable -> unit
 
   (** If true, draw border at the edge between the axis and the chart area. *)
   val draw_border : t -> bool
@@ -182,10 +136,10 @@ module Grid_lines : sig
 
   val make : ?display:bool ->
              ?circular:bool ->
-             ?color:color ->
+             ?color:Color.t indexable ->
              ?border_dash:border_dash ->
              ?border_dash_offset:border_dash_offset ->
-             ?line_width:line_width ->
+             ?line_width:int indexable ->
              ?draw_border:bool ->
              ?draw_on_chart_area:bool ->
              ?draw_ticks:bool ->

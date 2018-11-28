@@ -14,6 +14,7 @@ end
 type 'a indexable =
   [ `Single of 'a
   | `List of 'a list
+  | `Js_array of 'a Js_array.t
   ]
 val indexable_to_js : ('a -> Ojs.t) -> 'a indexable -> Ojs.t
 val indexable_of_js : (Ojs.t -> 'a) -> Ojs.t -> 'a indexable
@@ -22,13 +23,15 @@ val indexable_of_js : (Ojs.t -> 'a) -> Ojs.t -> 'a indexable
  type 'a indexable =
    [ `Single of 'a
    | `List of 'a list
+   | `Js_array of 'a Js_array.t
    ]
  let indexable_to_js (f : 'a -> Ojs.t) = function
    | `Single x -> f x
    | `List x -> Ojs.list_to_js f x
+   | `Js_array x -> Js_array.t_to_js f x
  let indexable_of_js (f : Ojs.t -> 'a) (js : Ojs.t) =
    match Ojs.obj_type js with
-   | "[object Array]" -> `List (Ojs.list_of_js f js)
+   | "[object Array]" -> `Js_array (Js_array.t_of_js f js)
    | _ -> `Single (f js)
 ]
 
@@ -46,7 +49,7 @@ val scriptable_of_js : (Ojs.t -> 'a) -> Ojs.t -> 'a scriptable
    | `Fun of (Option_context.t -> 'a)
    ]
  let scriptable_to_js (f : 'a -> Ojs.t) = function
-   | (`Single _ | `List _) as indexable -> indexable_to_js f indexable
+   | (`Single _ | `List _ | `Js_array _) as x -> indexable_to_js f x
    | `Fun f -> Ojs.fun_to_js 1 (fun js -> f (Option_context.t_of_js js))
  let scriptable_of_js (f : Ojs.t -> 'a) (j : Ojs.t) =
    match Ojs.type_of j with

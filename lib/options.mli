@@ -42,40 +42,13 @@ module Animation : sig
 end
 
 module Layout : sig
-  type padding =
-    [ `Num of int
-    | `Obj of padding_obj
-    ] [@js.union]
-  and padding_obj =
-    { left : int option
-    ; right : int option
-    ; top : int option
-    ; bottom : int option
-    }
-  val padding_of_js : Ojs.t -> padding
-    [@@js.custom
-     let padding_of_js (js : Ojs.t) : padding =
-       match Ojs.obj_type js with
-       | "[object Number]" -> `Num (Ojs.int_of_js js)
-       | "[object Object]" ->
-          let (x : padding_obj) =
-            { left = Ojs.(option_of_js int_of_js @@ get js "left")
-            ; right = Ojs.(option_of_js int_of_js @@ get js "right")
-            ; top = Ojs.(option_of_js int_of_js @@ get js "top")
-            ; bottom = Ojs.(option_of_js int_of_js @@ get js "bottom")
-            } in
-          `Obj x
-       | _ -> assert false
-    ]
   type t
 
   (** The padding to add inside the chart. *)
-  val padding : t -> padding
-  val set_padding : t -> padding -> unit
+  val padding : t -> Padding.t
+  val set_padding : t -> Padding.t -> unit
 
-  val make : ?padding:padding ->
-             unit ->
-             t [@@js.builder]
+  val make : ?padding:Padding.t -> unit -> t [@@js.builder]
 
 end
 

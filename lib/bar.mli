@@ -119,28 +119,6 @@ module Dataset : sig
   val hover_border_width : t -> int indexable
   val set_hover_border_width : t -> int indexable -> unit
 
-  module Indexable : sig
-
-    (** The fill color of the bar. *)
-    val background_color : t -> Color.t Js_array.t
-
-    (** The color of the bar border. *)
-    val border_color : t -> Color.t Js_array.t
-
-    (** The stroke width of the bar in pixels. *)
-    val border_width : t -> int Js_array.t
-
-    (** The fill colour of the bars when hovered. *)
-    val hover_background_color : t -> Color.t Js_array.t
-
-    (** The stroke colour of the bars when hovered. *)
-    val hover_border_color : t -> Color.t Js_array.t
-
-    (** The stroke width of the bars when hovered. *)
-    val hover_border_width : t -> int Js_array.t
-
-  end
-
   val make : ?type_:typ ->
              ?label:string ->
              ?x_axis_id:string ->
