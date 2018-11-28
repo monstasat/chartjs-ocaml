@@ -1,4 +1,3 @@
-open Chartjs.Types
 open Chartjs.Option_types
 
 module Option_context : sig
@@ -8,6 +7,7 @@ module Option_context : sig
 end
 
 module Font : sig
+  open Chartjs.Types
   type t
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
@@ -95,11 +95,11 @@ val set_align : t -> align scriptable -> unit
 val anchor : t -> anchor scriptable
 val set_anchor : t -> anchor scriptable -> unit
 
-val background_color : t -> Color.t scriptable
-val set_background_color : t -> Color.t scriptable -> unit
+val background_color : t -> Chartjs.Types.Color.t scriptable
+val set_background_color : t -> Chartjs.Types.Color.t scriptable -> unit
 
-val border_color : t -> Color.t scriptable
-val set_border_color : t -> Color.t scriptable -> unit
+val border_color : t -> Chartjs.Types.Color.t scriptable
+val set_border_color : t -> Chartjs.Types.Color.t scriptable -> unit
 
 val border_radius : t -> int scriptable
 val set_border_radius : t -> int scriptable -> unit
@@ -110,8 +110,8 @@ val set_border_width : t -> float scriptable -> unit
 val clip : t -> bool scriptable
 val set_clip : t -> bool scriptable -> unit
 
-val color : t -> Color.t scriptable
-val set_color : t -> Color.t scriptable -> unit
+val color : t -> Chartjs.Types.Color.t scriptable
+val set_color : t -> Chartjs.Types.Color.t scriptable -> unit
 
 val display : t -> bool scriptable
 val set_display : t -> bool scriptable -> unit
@@ -137,14 +137,48 @@ val set_text_align : t -> text_align scriptable -> unit
 val formatter : t -> formatter
 val set_formatter : t -> formatter -> unit
 
+module Indexable : sig
+
+  val align : t -> align Chartjs.Js_array.t
+
+  val anchor : t -> anchor Chartjs.Js_array.t
+
+  val background_color : t -> Chartjs.Types.Color.t Chartjs.Js_array.t
+
+  val border_color : t -> Chartjs.Types.Color.t Chartjs.Js_array.t
+
+  val border_radius : t -> int Chartjs.Js_array.t
+
+  val border_width : t -> float Chartjs.Js_array.t
+
+  val clip : t -> bool Chartjs.Js_array.t
+
+  val color : t -> Chartjs.Types.Color.t Chartjs.Js_array.t
+
+  val display : t -> bool Chartjs.Js_array.t
+
+  val font : t -> Font.t Chartjs.Js_array.t
+
+  val offset : t -> int Chartjs.Js_array.t
+
+  val opacity : t -> float Chartjs.Js_array.t
+
+  val padding : t -> padding Chartjs.Js_array.t
+
+  val rotation : t -> int Chartjs.Js_array.t
+
+  val text_align : t -> text_align Chartjs.Js_array.t
+
+end
+
 val make : ?align:align scriptable ->
            ?anchor:anchor scriptable ->
-           ?background_color:Color.t scriptable ->
-           ?border_color:Color.t scriptable ->
+           ?background_color:Chartjs.Types.Color.t scriptable ->
+           ?border_color:Chartjs.Types.Color.t scriptable ->
            ?border_radius:int scriptable ->
            ?border_width:float scriptable ->
            ?clip:bool scriptable ->
-           ?color:Color.t scriptable ->
+           ?color:Chartjs.Types.Color.t scriptable ->
            ?display:bool scriptable ->
            ?font:Font.t scriptable ->
            ?offset:int scriptable ->
@@ -157,11 +191,13 @@ val make : ?align:align scriptable ->
            t [@@js.builder]
 
 module Per_dataset : sig
-  val datalabels : Chartjs.Data.Dataset.t -> t
-  val set_datalabels : Chartjs.Data.Dataset.t -> t -> unit
+  val get : Chartjs.Data.Dataset.t -> t [@@js.get "datalabels"]
+  val set : Chartjs.Data.Dataset.t -> t -> unit [@@js.set "datalabels"]
 end
 
 module Per_chart : sig
-  val datalabels : Chartjs.Options.Plugins.t -> t
-  val set_datalabels : Chartjs.Options.Plugins.t -> t or_false -> unit
+  val get : Chartjs.Options.Plugins.t -> t [@@js.get "datalabels"]
+  val set : Chartjs.Options.Plugins.t ->
+            t Chartjs.Types.or_false ->
+            unit [@@js.set "datalabels"]
 end
