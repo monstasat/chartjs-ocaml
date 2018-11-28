@@ -1,46 +1,42 @@
-open Chartjs_types
+open Types
 
 [@@@js.stop]
-type canvas = Dom_html.canvasElement Js.t
-[@@@js.start]
-[@@@js.implem
- type canvas = Dom_html.canvasElement Js.t
-]
-val canvas_to_js : canvas -> Ojs.t
-  [@@js.custom let canvas_to_js = Obj.magic]
-val canvas_of_js : Ojs.t -> canvas
-  [@@js.custom let canvas_of_js = Obj.magic]
-
-[@@@js.stop]
-type context = Dom_html.canvasRenderingContext2D Js.t
-[@@@js.start]
-[@@@js.implem
- type context = Dom_html.canvasRenderingContext2D Js.t
-]
-val context_to_js : context -> Ojs.t
-  [@@js.custom let context_to_js = Obj.magic]
-val context_of_js : Ojs.t -> context
-  [@@js.custom let context_of_js = Obj.magic]
-
-type node =
-  [ `Canvas of canvas
-  | `Context of context
+type 'a node =
+  [ `Canvas of 'a
   | `Id of string
-  ] [@js.union]
+  ]
+val node_to_js : ('a -> Ojs.t) -> 'a node -> Ojs.t
+[@@@js.start]
+[@@@js.implem
+ type 'a node =
+   [ `Canvas of 'a
+   | `Id of string
+   ]
+ let node_to_js (f : 'a -> Ojs.t) (x : 'a node) : Ojs.t =
+   match x with
+   | `Id id -> Ojs.string_to_js id
+   | `Canvas x -> f x
+]
 
 type config
-val make_config : ?data:Chartjs_data.t ->
-                  ?options:Chartjs_options.t ->
-                  ?type_:Chartjs_types.typ ->
+val make_config : ?data:Data.t ->
+                  ?options:Options.t ->
+                  ?type_:Types.typ ->
                   unit ->
                   config [@@js.builder]
 
 (** Create new chart instance *)
-val new_chart : node -> config -> t [@@js.new "Chart"]
+[@@@js.stop]
+val new_chart : 'a node -> config -> t
+[@@@js.start]
+[@@@js.implem
+ val new_chart' : Ojs.t -> config -> t [@@js.new "Chart"]
+ let new_chart (node : 'a node) (config : config) : t =
+   new_chart' (node_to_js Obj.magic node) config
+]
 
 module API : sig
 
-  val inner_radius : t -> int
   val height : t -> int
   val width : t -> int
   val offset_x : t -> int
@@ -48,14 +44,14 @@ module API : sig
   val border_width : t -> int
   val animating : t -> bool
   val aspect_ratio : t -> float
-  val canvas : t -> canvas
-  val ctx : t -> context
+  val canvas : t -> Ojs.t
+  val ctx : t -> Ojs.t
 
-  val data : t -> Chartjs_data.t
-  val set_data : t -> Chartjs_data.t -> unit
+  val data : t -> Data.t
+  val set_data : t -> Data.t -> unit
 
-  val options : t -> Chartjs_options.t
-  val set_options : t -> Chartjs_options.t -> unit
+  val options : t -> Options.t
+  val set_options : t -> Options.t -> unit
 
   (** TODO add
     'get_element_at_event',

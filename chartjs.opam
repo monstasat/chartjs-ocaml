@@ -1,0 +1,22 @@
+opam-version: "2.0"
+name: "chartjs"
+maintainer: "sashayanin@gmail.com"
+authors: ["Alexander Yanin"]
+homepage: "https://github.com/monstasat/chartjs-ocaml"
+dev-repo: "git+https://github.com/monstasat/chartjs-ocaml.git"
+bug-reports: "https://github.com/monstasat/chartjs-ocaml/issues"
+license: "MIT"
+
+build: [
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
+]
+
+depends: [
+  "ocaml" {>= "4.06.0"}
+  "dune" {build}
+  "ppxfind" {build}
+  "gen_js_api"
+  "ptime"
+]

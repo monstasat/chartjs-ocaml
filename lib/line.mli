@@ -1,8 +1,8 @@
-open Chartjs_types
-open Chartjs_option_types
+open Types
+open Option_types
 
 module Options : sig
-  type t = Chartjs_options.t
+  type t = Options.t
 
   (** If false, the lines between points are not drawn. *)
   val show_lines : t -> bool
@@ -79,7 +79,7 @@ module Dataset : sig
     | `List of Color.t list
     ] [@js.union]
 
-  type t = Chartjs_data.Dataset.t
+  type t = Data.Dataset.t
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
 
@@ -212,34 +212,34 @@ module Dataset : sig
   module Indexable : sig
 
     (** The fill color for points. *)
-    val point_background_color : t -> Chartjs_array.Color.t
+    val point_background_color : t -> Color.t Js_array.t
 
     (** The border color for points. *)
-    val point_border_color : t -> Chartjs_array.Color.t
+    val point_border_color : t -> Color.t Js_array.t
 
     (** The width of the point border in pixels. *)
-    val point_border_width : t -> Chartjs_array.Int.t
+    val point_border_width : t -> int Js_array.t
 
     (** The radius of the point shape. If set to 0, the point is not rendered. *)
-    val point_radius : t -> Chartjs_array.Int.t
+    val point_radius : t -> int Js_array.t
 
     (** The rotation of the point in degrees. *)
-    val point_rotation : t -> Chartjs_array.Int.t
+    val point_rotation : t -> int Js_array.t
 
     (** The pixel size of the non-displayed point that reacts to mouse events. *)
-    val point_hit_radius : t -> Chartjs_array.Int.t
+    val point_hit_radius : t -> int Js_array.t
 
     (** Point background color when hovered. *)
-    val point_hover_background_color : t -> Chartjs_array.Color.t
+    val point_hover_background_color : t -> Color.t Js_array.t
 
     (** Point border color when hovered. *)
-    val point_hover_border_color : t -> Chartjs_array.Color.t
+    val point_hover_border_color : t -> Color.t Js_array.t
 
     (** Border width of point when hovered. *)
-    val point_hover_border_width : t -> Chartjs_array.Int.t
+    val point_hover_border_width : t -> int Js_array.t
 
     (** The radius of the point when hovered. *)
-    val point_hover_radius : t -> Chartjs_array.Int.t
+    val point_hover_radius : t -> int Js_array.t
 
   end
 

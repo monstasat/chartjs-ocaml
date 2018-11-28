@@ -1,4 +1,4 @@
-open Chartjs_types
+open Types
 
 type typ =
   [ `Category [@js "category"]

@@ -1,19 +1,18 @@
-open Chartjs_types
-open Chartjs_scales_raw
+open Scales_raw
 
 module Scale_label = Scale_label
 module Grid_lines = Grid_lines
 module Ticks = Ticks
 
-type typ = Chartjs_scales_raw.typ
+type typ = Scales_raw.typ
 
-type t = Chartjs_scales_raw.t
-let t_to_js = Chartjs_scales_raw.t_to_js
-let t_of_js = Chartjs_scales_raw.t_of_js
+type t = Scales_raw.t
+let t_to_js = Scales_raw.t_to_js
+let t_of_js = Scales_raw.t_of_js
 
-type scales = Chartjs_scales_raw.scales
-let scales_to_js = Chartjs_scales_raw.scales_to_js
-let scales_of_js = Chartjs_scales_raw.scales_of_js
+type scales = Scales_raw.scales
+let scales_to_js = Scales_raw.scales_to_js
+let scales_of_js = Scales_raw.scales_of_js
 let make = make
 
 module Cartesian = struct
