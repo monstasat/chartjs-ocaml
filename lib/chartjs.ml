@@ -1,9 +1,5 @@
-open Chartjs_types
-open Chartjs_option_types
-
-module Scales = Chartjs_scales
-module Data = Chartjs_data
-module Options = Chartjs_options
+open Types
+open Option_types
 
 module Line = struct
   module Options = Line.Options
@@ -16,9 +12,9 @@ module Line = struct
       type item
 
       include module type of Line.Dataset
-      module A : Chartjs_array.Typed_array with type item := item
+      module Values : Js_array.Typed with type item := item
 
-      val data : t -> A.t
+      val data : t -> item Js_array.t
       val set_data : t -> item list -> unit
       val make :
         ?data:item list ->
@@ -62,14 +58,14 @@ module Line = struct
         ; y = Y.t_of_js @@ Ojs.get j "y"
         }
     end
-    module Make(M : Jsable) = struct
-      type item
-
+    module Make(M : Jsable) : DS with type item := M.t = struct
       include Line.Dataset
-      module A = Chartjs_array.Make(M)
+      module Values = Js_array.Make(M)
 
-      val data : t -> A.t [@@js.get]
-      val set_data : t -> M.t list -> unit [@@js.set]
+      let data (t : t) : M.t Js_array.t =
+        Values.t_of_js @@ Ojs.get (t_to_js t) "data"
+      let set_data (t : t) (v : M.t list) : unit =
+        Ojs.set (t_to_js t) "data" (Ojs.list_to_js M.t_to_js v)
       let make ?(data : M.t list option) =
         let data = match data with
           | None -> None
@@ -97,9 +93,9 @@ module Bar = struct
       type item
 
       include module type of Bar.Dataset
-      module A : Chartjs_array.Typed_array with type item := item
+      module Values : Js_array.Typed with type item := item
 
-      val data : t -> A.t
+      val data : t -> item Js_array.t
       val set_data : t -> item list -> unit
       val make :
         ?data:item list ->
@@ -129,13 +125,13 @@ module Bar = struct
         }
     end
     module Make(M : Jsable) : DS with type item := M.t = struct
-      type item
-
       include Bar.Dataset
-      module A = Chartjs_array.Make(M)
+      module Values = Js_array.Make(M)
 
-      val data : t -> A.t [@@js.get]
-      val set_data : t -> M.t list -> unit [@@js.set]
+      let data (t : t) : M.t Js_array.t =
+        Values.t_of_js @@ Ojs.get (t_to_js t) "data"
+      let set_data (t : t) (v : M.t list) : unit =
+        Ojs.set (t_to_js t) "data" (Ojs.list_to_js M.t_to_js v)
       let make ?(data : M.t list option) =
         let data = match data with
           | None -> None
@@ -167,9 +163,9 @@ module Pie = struct
       type item
 
       include module type of Pie.Dataset
-      module A : Chartjs_array.Typed_array with type item := item
+      module Values : Js_array.Typed with type item := item
 
-      val data : t -> A.t
+      val data : t -> item Js_array.t
       val set_data : t -> item list -> unit
       val make :
         ?data:item list ->
@@ -185,13 +181,13 @@ module Pie = struct
     end
 
     module Make(M : Jsable) : DS with type item := M.t = struct
-      type item
-
       include Pie.Dataset
-      module A = Chartjs_array.Make(M)
+      module Values = Js_array.Make(M)
 
-      val data : t -> A.t [@@js.get]
-      val set_data : t -> M.t list -> unit [@@js.set]
+      let data (t : t) : M.t Js_array.t =
+        Values.t_of_js @@ Ojs.get (t_to_js t) "data"
+      let set_data (t : t) (v : M.t list) : unit =
+        Ojs.set (t_to_js t) "data" (Ojs.list_to_js M.t_to_js v)
       let make ?(data : M.t list option) =
         let data = match data with
           | None -> None
@@ -219,16 +215,21 @@ module Scatter = struct
   (* TODO implement *)
 end
 
-type canvas = Chart.canvas
-type context = Chart.context
-type node = Chart.node
-type t = Chartjs_types.t
+type 'a node = 'a Chart.node
+type t = Types.t
 
 let make ?(options : Options.t option)
       ?(data : Data.t option)
       (typ : typ)
-      (node : node) : t =
+      (node : 'a node) : t =
   let config = Chart.make_config ?data ?options ~type_:typ () in
   Chart.new_chart node config
+
+module Types = Types
+module Scales = Scales
+module Data = Data
+module Option_types = Option_types
+module Options = Options
+module Js_array = Js_array
 
 include Chart.API

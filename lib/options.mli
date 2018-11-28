@@ -1,12 +1,12 @@
-open Chartjs_types
+open Types
 
 module Animation : sig
   type animation =
-    { chart : Chartjs_types.t
+    { chart : Types.t
     ; current_step : float option
     ; num_steps : float
     ; easing : easing option
-    ; render : (Chartjs_types.t -> animation -> unit) option
+    ; render : (Types.t -> animation -> unit) option
     ; on_animation_progress : callback option
     ; on_animation_complete : callback option
     }
@@ -146,9 +146,9 @@ module Legend : sig
 
   module Labels : sig
 
-    type generate = Chartjs_types.t -> Item.t list
+    type generate = Types.t -> Item.t list
 
-    type filter = item:Item.t -> Chartjs_data.t -> bool
+    type filter = item:Item.t -> Data.t -> bool
 
     type t
 
@@ -405,10 +405,10 @@ module Tooltips : sig
   module Callbacks : sig
     type t
 
-    type items_cb = Item.t list -> Chartjs_data.t -> text
-    type item_cb = Item.t -> Chartjs_data.t -> text
-    type label_color_cb = Item.t -> Chartjs_types.t -> color
-    type label_text_color_cb = Item.t -> Chartjs_types.t -> Color.t
+    type items_cb = Item.t list -> Data.t -> text
+    type item_cb = Item.t -> Data.t -> text
+    type label_color_cb = Item.t -> Types.t -> color
+    type label_text_color_cb = Item.t -> Types.t -> Color.t
 
     (** Returns the text to render before the title. *)
     val before_title : t -> items_cb
@@ -483,9 +483,9 @@ module Tooltips : sig
 
   type custom = Model.t -> unit
 
-  type sort = Item.t -> Item.t -> Chartjs_data.t -> int
+  type sort = Item.t -> Item.t -> Data.t -> int
 
-  type filter = Item.t -> Chartjs_data.t -> bool
+  type filter = Item.t -> Data.t -> bool
 
   type position =
     [ `Average [@js "average"]
@@ -990,7 +990,7 @@ val set_elements : t -> Elements.t -> unit
 val plugins : t -> Plugins.t
 val set_plugins : t -> Plugins.t -> unit
 
-type legend_callback = Chartjs_types.t -> string
+type legend_callback = Types.t -> string
 
 val legend_callback : t -> legend_callback
 val set_legend_callback : t -> legend_callback -> unit
@@ -1019,7 +1019,7 @@ type size =
   { width : int
   ; height : int
   }
-type resize_cb = Chartjs_types.t -> size -> unit
+type resize_cb = Types.t -> size -> unit
 
 (** Called when a resize occurs. Gets passed two arguments:
     the chart instance and the new size. *)
@@ -1067,7 +1067,7 @@ val make : ?elements:Elements.t ->
            ?tooltips:Tooltips.t ->
            ?hover:Hover.t ->
            ?plugins:Plugins.t ->
-           ?scales:Chartjs_scales.scales ->
+           ?scales:Scales.scales ->
            ?legend_callback:legend_callback ->
            ?responsive:bool ->
            ?responsive_animation_duration:int ->

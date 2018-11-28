@@ -1,13 +1,13 @@
-open Chartjs_types
-open Chartjs_option_types
+open Types
+open Option_types
 
 module Options : sig
-  type t = Chartjs_options.t
+  type t = Options.t
 
   module Scales : sig
 
     module Grid_lines : sig
-      type t = Chartjs_scales.Grid_lines.t
+      type t = Scales.Grid_lines.t
 
       (** If true, the bars for a particular data point fall between
         the grid lines. The grid line will move to the left by one
@@ -19,7 +19,7 @@ module Options : sig
     end
 
     module Cartesian : sig
-      type t = Chartjs_scales.t
+      type t = Scales.t
 
       (** Stacked bar charts can be used to show how one data series
           is made up of a number of smaller pieces. *)
@@ -63,7 +63,7 @@ module Dataset : sig
     | `Right [@js "right"]
     ] [@js.enum]
 
-  type t = Chartjs_data.Dataset.t
+  type t = Data.Dataset.t
   val t_to_js : t -> Ojs.t
   val t_of_js : Ojs.t -> t
 
@@ -122,22 +122,22 @@ module Dataset : sig
   module Indexable : sig
 
     (** The fill color of the bar. *)
-    val background_color : t -> Chartjs_array.Color.t
+    val background_color : t -> Color.t Js_array.t
 
     (** The color of the bar border. *)
-    val border_color : t -> Chartjs_array.Color.t
+    val border_color : t -> Color.t Js_array.t
 
     (** The stroke width of the bar in pixels. *)
-    val border_width : t -> Chartjs_array.Int.t
+    val border_width : t -> int Js_array.t
 
     (** The fill colour of the bars when hovered. *)
-    val hover_background_color : t -> Chartjs_array.Color.t
+    val hover_background_color : t -> Color.t Js_array.t
 
     (** The stroke colour of the bars when hovered. *)
-    val hover_border_color : t -> Chartjs_array.Color.t
+    val hover_border_color : t -> Color.t Js_array.t
 
     (** The stroke width of the bars when hovered. *)
-    val hover_border_width : t -> Chartjs_array.Int.t
+    val hover_border_width : t -> int Js_array.t
 
   end
 
