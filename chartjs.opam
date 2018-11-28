@@ -6,6 +6,7 @@ homepage: "https://github.com/monstasat/chartjs-ocaml"
 dev-repo: "git+https://github.com/monstasat/chartjs-ocaml.git"
 bug-reports: "https://github.com/monstasat/chartjs-ocaml/issues"
 license: "MIT"
+synopsis: "OCaml bindings for Chart.js"
 
 build: [
   ["dune" "subst"] {pinned}
