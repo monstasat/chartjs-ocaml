@@ -209,40 +209,6 @@ module Dataset : sig
   val point_hover_radius : t -> int indexable
   val set_point_hover_radius : t -> int indexable -> unit
 
-  module Indexable : sig
-
-    (** The fill color for points. *)
-    val point_background_color : t -> Color.t Js_array.t
-
-    (** The border color for points. *)
-    val point_border_color : t -> Color.t Js_array.t
-
-    (** The width of the point border in pixels. *)
-    val point_border_width : t -> int Js_array.t
-
-    (** The radius of the point shape. If set to 0, the point is not rendered. *)
-    val point_radius : t -> int Js_array.t
-
-    (** The rotation of the point in degrees. *)
-    val point_rotation : t -> int Js_array.t
-
-    (** The pixel size of the non-displayed point that reacts to mouse events. *)
-    val point_hit_radius : t -> int Js_array.t
-
-    (** Point background color when hovered. *)
-    val point_hover_background_color : t -> Color.t Js_array.t
-
-    (** Point border color when hovered. *)
-    val point_hover_border_color : t -> Color.t Js_array.t
-
-    (** Border width of point when hovered. *)
-    val point_hover_border_width : t -> int Js_array.t
-
-    (** The radius of the point when hovered. *)
-    val point_hover_radius : t -> int Js_array.t
-
-  end
-
   val make : ?type_:typ ->
              ?label:string ->
              ?x_axis_id:string ->

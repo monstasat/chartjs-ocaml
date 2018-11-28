@@ -1,0 +1,9 @@
+(library
+  (name chartjs_datalabels)
+  (public_name chartjs.datalabels)
+  (libraries gen_js_api chartjs))
+
+(rule
+  (targets chartjs_datalabels.ml)
+  (deps chartjs_datalabels.mli)
+  (action (run ocamlfind gen_js_api/gen_js_api %{deps})))

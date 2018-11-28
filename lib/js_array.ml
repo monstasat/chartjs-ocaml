@@ -1,6 +1,6 @@
 type 'a js_array
-let js_array_to_js _ t = Obj.magic t
-let js_array_of_js _ j = Obj.magic j
+let js_array_to_js (_ : 'a -> Ojs.t) (t : 'a js_array) : Ojs.t = Obj.magic t
+let js_array_of_js (_ : Ojs.t -> 'a) (j : Ojs.t) : 'a js_array = Obj.magic j
 
 module Make(M : Types.Jsable) = struct
   type t = M.t js_array
@@ -89,4 +89,5 @@ module Int = Make(Types.Int)
 module Int32 = Make(Types.Int32)
 module Int64 = Make(Types.Int64)
 module Float = Make(Types.Float)
+module Bool = Make(Types.Bool)
 module Color = Make(Types.Color)
