@@ -887,6 +887,12 @@ module Elements : sig
     val border_width : t -> int
     val set_border_width : t -> int -> unit
 
+    val make : ?background_color:Color.t ->
+               ?border_color:Color.t ->
+               ?border_width:int ->
+               unit ->
+               t [@@js.builder]
+
   end
 
   type t
