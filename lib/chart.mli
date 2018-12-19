@@ -63,6 +63,9 @@ module API : sig
       called inside an event handler and some different animation is
       desired. *)
   type config
+  val config_to_js : config -> Ojs.t
+  val config_of_js : Ojs.t -> config
+
   val make_config :
     (** Time for the animation of the redraw in milliseconds. *)
     ?duration:int ->

@@ -50,6 +50,18 @@ val set_frame_rate : t -> float -> unit
 val pause : t -> bool
 val set_pause : t -> bool -> unit
 
+val make_config :
+  (* Time for the animation of the redraw in milliseconds. *)
+  ?duration:int ->
+  (* If true, the animation can be interrupted by other animations. *)
+  ?lazy_:bool ->
+  (* The animation easing function. *)
+  ?easing:Chartjs.Types.easing ->
+  (* Update chart datasets keeping the current animation *)
+  ?preservation:bool ->
+  unit ->
+  Chartjs.config [@@js.builder]
+
 val make : ?duration:int ->
            ?ttl:int ->
            ?delay:int ->
