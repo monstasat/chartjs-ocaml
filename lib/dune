@@ -1,22 +1,5 @@
 (library
   (name chartjs)
   (public_name chartjs)
-  (libraries gen_js_api ptime)
-  (js_of_ocaml (flags +gen_js_api/ojs_runtime.js))
-  (preprocess (action (run ppxfind -legacy gen_js_api.ppx --as-pp %{input-file}))))
-
-(rule
-  (targets types.ml scales_raw.ml data.ml option_types.ml
-           options.ml chart.ml line.ml bar.ml pie.ml)
-  (deps types.mli scales_raw.mli data.mli option_types.mli
-        options.mli chart.mli line.mli bar.mli pie.mli)
-  (action (progn
-            (run ocamlfind gen_js_api/gen_js_api types.mli)
-            (run ocamlfind gen_js_api/gen_js_api scales_raw.mli)
-            (run ocamlfind gen_js_api/gen_js_api data.mli)
-            (run ocamlfind gen_js_api/gen_js_api option_types.mli)
-            (run ocamlfind gen_js_api/gen_js_api options.mli)
-            (run ocamlfind gen_js_api/gen_js_api chart.mli)
-            (run ocamlfind gen_js_api/gen_js_api line.mli)
-            (run ocamlfind gen_js_api/gen_js_api bar.mli)
-            (run ocamlfind gen_js_api/gen_js_api pie.mli))))
+  (libraries ptime js_of_ocaml)
+  (preprocess (pps js_of_ocaml-ppx)))
