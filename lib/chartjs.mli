@@ -230,7 +230,7 @@ module Or_false : sig
 
   val make : 'a -> 'a t Js.t
 
-  val _false : 'a t
+  val _false : 'a t Js.t
 end
 
 type line_dash = float Js.js_array Js.t
@@ -1782,7 +1782,7 @@ module CoerceTo : sig
 
   val bar : 'a chart Js.t -> barChart Js.t Js.opt
 
-  val horizontalBar : 'a chart Js.t -> barChart Js.opt
+  val horizontal_bar : 'a chart Js.t -> barChart Js.t Js.opt
 end
 
 (** {1 Creating a Chart} *)
