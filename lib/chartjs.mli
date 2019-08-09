@@ -1,310 +1,349 @@
 open Js_of_ocaml
 
-module Indexable = struct
+module Indexable : sig
   type 'a t
+  (** Indexable type represents a single value or a list of values *)
 
-  let of_single (x : 'a) : 'a t Js.t = Obj.magic x
+  val of_single : 'a -> 'a t Js.t
 
-  let of_js_array (x : 'a Js.js_array Js.t) : 'a t Js.t =
-    Js.Unsafe.coerce x
+  val of_js_array : 'a Js.js_array Js.t -> 'a t Js.t
 
-  let of_array (x : 'a array) : 'a t Js.t =
-    of_js_array @@ Js.array x
+  val of_array : 'a array -> 'a t Js.t
 
-  let of_list (x : 'a list) : 'a t Js.t =
-    of_array @@ Array.of_list x
+  val of_list : 'a list -> 'a t Js.t
 
-  let cast_single (t : 'a t Js.t) : 'a Js.opt =
-    if Js.instanceof t Js.array_empty
-    then Js.null
-    else Js.some (Obj.magic t)
+  val cast_single : 'a t Js.t -> 'a Js.opt
 
-  let cast_js_array (t : 'a t Js.t) : 'a Js.js_array Js.t Js.opt =
-    if Js.instanceof t Js.array_empty
-    then Js.some (Js.Unsafe.coerce t)
-    else Js.null
+  val cast_js_array : 'a t Js.t -> 'a Js.js_array Js.t Js.opt
 end
 
-module Scriptable = struct
+module Scriptable : sig
   type 'a t
 end
 
-module Line_cap = struct
-  type t = Js.js_string Js.t
+module Line_cap : sig
+  type t
 
-  let butt = Js.string "butt"
-  let round = Js.string "round"
-  let square = Js.string "square"
+  val butt : t
+
+  val round : t
+
+  val square : t
 end
 
-module Line_join = struct
-  type t = Js.js_string Js.t
+module Line_join : sig
+  type t
 
-  let round = Js.string "round"
-  let bevel = Js.string "bevel"
-  let miter = Js.string "miter"
+  val round : t
+
+  val bevel : t
+
+  val miter : t
 end
 
-module Interaction_mode = struct
-  type t = Js.js_string Js.t
+module Interaction_mode : sig
+  type t
 
-  let point = Js.string "point"
-  let nearest = Js.string "nearest"
-  let index = Js.string "index"
-  let dataset = Js.string "dataset"
-  let x = Js.string "x"
-  let y = Js.string "y"
+  val point : t
+
+  val nearest : t
+
+  val index : t
+
+  val dataset : t
+
+  val x : t
+
+  val y : t
 end
 
-module Point_style = struct
-  type t = Js.js_string Js.t
+module Point_style : sig
+  type t
 
-  let circle = Js.string "circle"
-  let cross = Js.string "cross"
-  let crossRot = Js.string "crossRot"
-  let dash = Js.string "dash"
-  let line = Js.string "line"
-  let rect = Js.string "rect"
-  let rectRounded = Js.string "rectRounded"
-  let rectRot = Js.string "rectRot"
-  let star = Js.string "star"
-  let triangle = Js.string "triangle"
+  val circle : t
+
+  val cross : t
+
+  val crossRot : t
+
+  val dash : t
+
+  val line : t
+
+  val rect : t
+
+  val rectRounded : t
+
+  val rectRot : t
+
+  val star : t
+
+  val triangle : t
 end
 
-module Easing = struct
-  type t = Js.js_string Js.t
+module Easing : sig
+  type t
 
-  let linear = Js.string "linear"
-  let easeInQuad = Js.string "easeInQuad"
-  let easeOutQuad = Js.string "easeOutQuad"
-  let easeInOutQuad = Js.string "easeInOutQuad"
-  let easeInCubic = Js.string "easeInCubic"
-  let easeOutCubic = Js.string "easeOutCubic"
-  let easeInOutCubic = Js.string "easeInOutCubic"
-  let easeInQuart = Js.string "easeInQuart"
-  let easeOutQuart = Js.string "easeOutQuart"
-  let easeInOutQuart = Js.string "easeInOutQuart"
-  let easeInQuint = Js.string "easeInQuint"
-  let easeOutQuint = Js.string "easeOutQuint"
-  let easeInOutQuint = Js.string "easeInOutQuint"
-  let easeInSine = Js.string "easeInSine"
-  let easeOutSine = Js.string "easeOutSine"
-  let easeInOutSine = Js.string "easeInOutSine"
-  let easeInExpo = Js.string "easeInExpo"
-  let easeOutExpo = Js.string "easeOutExpo"
-  let easeInOutExpo = Js.string "easeInOutExpo"
-  let easeInCirc = Js.string "easeInCirc"
-  let easeOutCirc = Js.string "easeOutCirc"
-  let easeInOutCirc = Js.string "easeInOutCirc"
-  let easeInElastic = Js.string "easeInElastic"
-  let easeOutElastic = Js.string "easeOutElastic"
-  let easeInOutElastic = Js.string "easeInOutElastic"
-  let easeInBack = Js.string "easeInBack"
-  let easeOutBack = Js.string "easeOutBack"
-  let easeInOutBack = Js.string "easeInOutBack"
-  let easeInBounce = Js.string "easeInBounce"
-  let easeOutBounce = Js.string "easeOutBounce"
-  let easeInOutBounce = Js.string "easeInOutBounce"
+  val linear : t
+
+  val easeInQuad : t
+
+  val easeOutQuad : t
+
+  val easeInOutQuad : t
+
+  val easeInCubic : t
+
+  val easeOutCubic : t
+
+  val easeInOutCubic : t
+
+  val easeInQuart : t
+
+  val easeOutQuart : t
+
+  val easeInOutQuart : t
+
+  val easeInQuint : t
+
+  val easeOutQuint : t
+
+  val easeInOutQuint : t
+
+  val easeInSine : t
+
+  val easeOutSine : t
+
+  val easeInOutSine : t
+
+  val easeInExpo : t
+
+  val easeOutExpo : t
+
+  val easeInOutExpo : t
+
+  val easeInCirc : t
+
+  val easeOutCirc : t
+
+  val easeInOutCirc : t
+
+  val easeInElastic : t
+
+  val easeOutElastic : t
+
+  val easeInOutElastic : t
+
+  val easeInBack : t
+
+  val easeOutBack : t
+
+  val easeInOutBack : t
+
+  val easeInBounce : t
+
+  val easeOutBounce : t
+
+  val easeInOutBounce : t
 end
 
-module Padding = struct
+module Padding : sig
   type t
 
   class type obj = object
     method top : int Js.optdef Js.prop
+
     method right : int Js.optdef Js.prop
+
     method bottom : int Js.optdef Js.prop
+
     method left : int Js.optdef Js.prop
   end
 
-  let obj ?top ?right ?bottom ?left () : t Js.t =
-    let iter f = function None -> () | Some x -> f x in
-    let (obj : obj Js.t) = Js.Unsafe.obj [||] in
-    iter (fun x -> obj##.top := x) top;
-    iter (fun x -> obj##.right := x) right;
-    iter (fun x -> obj##.bottom := x) bottom;
-    iter (fun x -> obj##.left := x) left;
-    Js.Unsafe.coerce obj
+  val obj : ?top:int -> ?right:int -> ?bottom:int -> ?left:int -> unit -> t Js.t
 
-  let int (x : int) : t Js.t =
-    Js.Unsafe.coerce @@ Js.number_of_float @@ float_of_int x
+  val int : int -> t Js.t
 
-  let cast_int (x : t Js.t) : int Js.opt =
-    match Js.to_string @@ Js.typeof x with
-    | "number" ->
-      Js.some
-      @@ int_of_float
-      @@ Js.float_of_number
-      @@ Js.Unsafe.coerce x
-    | _ -> Js.null
+  val cast_int : t Js.t -> int Js.opt
 
-  let cast_obj (x : t Js.t) : obj Js.t Js.opt =
-    match Js.to_string @@ Js.typeof x with
-    | "object" -> Js.some @@ Js.Unsafe.coerce x
-    | _ -> Js.null
+  val cast_obj : t Js.t -> obj Js.t Js.opt
 end
 
-module Color = struct
+module Color : sig
   type t = Js.js_string Js.t
 end
 
-module Position = struct
-  type t = Js.js_string Js.t
+module Position : sig
+  type t
 
-  let left = Js.string "left"
-  let right = Js.string "right"
-  let top = Js.string "top"
-  let bottom = Js.string "bottom"
+  val left : t
+
+  val right : t
+
+  val top : t
+
+  val bottom : t
 end
 
-module Tooltip_position = struct
-  type t = Js.js_string Js.t
+module Tooltip_position : sig
+  type t
 
-  let average = Js.string "average"
-  let nearest = Js.string "nearest"
+  val average : t
+
+  val nearest : t
 end
 
-(* FIXME *)
-module Line_height = struct
+module Line_height : sig
   type t = int
 end
 
-module Hover_axis = struct
-  type t = Js.js_string Js.t
-
-  let x = Js.string "x"
-  let y = Js.string "y"
-  let xy = Js.string "xy"
-end
-
-module Fill = struct
+module Hover_axis : sig
   type t
 
-  let zero : t Js.t = Js.Unsafe.coerce @@ Js.string "zero"
-  let top : t Js.t = Js.Unsafe.coerce @@ Js.string "top"
-  let bottom : t Js.t = Js.Unsafe.coerce @@ Js.string "bottom"
-  let _true : t Js.t = Js.Unsafe.coerce Js._true
-  let _false : t Js.t = Js.Unsafe.coerce Js._false
+  val x : t
+
+  val y : t
+
+  val xy : t
 end
 
-module Time = struct
+module Fill : sig
+  type t
+
+  val zero : t Js.t
+
+  val top : t Js.t
+
+  val bottom : t Js.t
+
+  val _true : t Js.t
+
+  val _false : t Js.t
+end
+
+module Time : sig
   type t = float
 end
 
-module Or_false = struct
+module Or_false : sig
   type 'a t
-  let make : 'a. 'a -> 'a t Js.t = fun x -> Obj.magic x
-  let _false = Js.Unsafe.coerce Js._false
+
+  val make : 'a -> 'a t Js.t
+
+  val _false : 'a t
 end
 
 type line_dash = float Js.js_array Js.t
 
 type line_dash_offset = float
 
-module Chart_type = struct
-  type 'a t = Js.js_string Js.t
+module Chart_type : sig
+  type 'a t
 
-  let line = Js.string "line"
-  let bar = Js.string "bar"
-  let horizontal_bar = Js.string "horizontalBar"
+  (* let line = Js.string "line"
+   * let bar = Js.string "bar"
+   * let horizontal_bar = Js.string "horizontalBar" *)
 
-  (* TODO implement *)
-
-  (* let radar = Js.string "radar"
-   * let doughnut = Js.string "doughnut"
-   * let pie = Js.string "pie"
-   * let polar_area = Js.string "polarArea"
-   * let bubble = Js.string "bubble"
-   * let scatter = Js.string "scatter" *)
-
-  let make s = Js.string s
+  val make : string -> 'a t
 end
 
-module Axis_type = struct
-  type t = Js.js_string Js.t
-
-  let cartesian_category = Js.string "category"
-  let cartesian_linear = Js.string "linear"
-  let cartesian_logarithmic = Js.string "logarithmic"
-  let cartesian_time = Js.string "time"
-
-  let make s = Js.string s
-end
-
-module Time_ticks_source = struct
-  type t = Js.js_string Js.t
-
-  let auto = Js.string "auto"
-  let data = Js.string "data"
-  let labels = Js.string "labels"
-end
-
-module Time_distribution = struct
-  type t = Js.js_string Js.t
-
-  let linear = Js.string "linear"
-  let series = Js.string "series"
-end
-
-module Time_bounds = struct
-  type t = Js.js_string Js.t
-
-  let data = Js.string "data"
-  let ticks = Js.string "ticks"
-end
-
-module Time_unit = struct
-  type t = Js.js_string Js.t
-
-  let millisecond = Js.string "millisecond"
-  let second = Js.string "second"
-  let minute = Js.string "minute"
-  let hour = Js.string "hour"
-  let day = Js.string "day"
-  let week = Js.string "week"
-  let month = Js.string "month"
-  let quarter = Js.string "quarter"
-  let year = Js.string "year"
-end
-
-module Interpolation_mode = struct
-  type t = Js.js_string Js.t
-
-  let default = Js.string "default"
-  let monotone = Js.string "monotone"
-end
-
-module Stepped_line = struct
+module Axis_type : sig
   type t
 
-  let _false : t Js.t = Js.Unsafe.coerce Js._false
-  let _true : t Js.t = Js.Unsafe.coerce Js._true
-  let before : t Js.t = Js.Unsafe.coerce @@ Js.string "before"
-  let after : t Js.t = Js.Unsafe.coerce @@ Js.string "after"
-  let middle : t Js.t = Js.Unsafe.coerce @@ Js.string "middle"
+  val cartesian_category : t
+
+  val cartesian_linear : t
+
+  val cartesian_logarithmic : t
+
+  val cartesian_time : t
+
+  val make : string -> t
 end
 
-module Line_fill = struct
+module Time_ticks_source : sig
   type t
 
-  let relative (x : int) : t Js.t =
-    Js.Unsafe.coerce
-    @@ Js.string
-    @@ string_of_int x
+  val auto : t
 
-  let absolute (x : int) : t Js.t =
-    Js.Unsafe.coerce
-    @@ Js.number_of_float
-    @@ float_of_int x
+  val data : t
 
-  let _false : t Js.t = Js.Unsafe.coerce Js._false
+  val labels : t
+end
 
-  let _true : t Js.t = Js.Unsafe.coerce Js._true
+module Time_distribution : sig
+  type t
+
+  val linear : t
+
+  val series : t
+end
+
+module Time_bounds : sig
+  type t
+
+  val data : t
+
+  val ticks : t
+end
+
+module Time_unit : sig
+  type t
+
+  val millisecond : t
+
+  val second : t
+
+  val minute : t
+
+  val hour : t
+
+  val day : t
+
+  val week : t
+
+  val month : t
+
+  val quarter : t
+
+  val year : t
+end
+
+module Interpolation_mode : sig
+  type t
+
+  val default : t
+
+  val monotone : t
+end
+
+module Stepped_line : sig
+  type t
+
+  val _false : t Js.t
+  val _true : t Js.t
+  val before : t Js.t
+  val after : t Js.t
+  val middle : t Js.t
+end
+
+module Line_fill : sig
+  type t
+
+  val relative : int -> t Js.t
+
+  val absolute : int -> t Js.t
+
+  val _false : t Js.t
+
+  val _true : t Js.t
   (** Equivalent to [origin] *)
 
-  let start : t Js.t = Js.Unsafe.coerce @@ Js.string "start"
-  let _end : t Js.t = Js.Unsafe.coerce @@ Js.string "end"
-  let origin : t Js.t = Js.Unsafe.coerce @@ Js.string "origin"
+  val start : t Js.t
+
+  val _end : t Js.t
+
+  val origin : t Js.t
 end
 
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
@@ -1738,53 +1777,37 @@ end
 
 (** {1 Type Coercion} *)
 
-module CoerceTo = struct
+module CoerceTo : sig
+  val line : 'a chart Js.t -> lineChart Js.t Js.opt
 
-  let unsafe_coerce_chart typ (chart : 'a chart Js.t) =
-    if chart##.config##._type##toLowerCase == Js.string typ
-    then Js.some (Js.Unsafe.coerce chart)
-    else Js.null
+  val bar : 'a chart Js.t -> barChart Js.t Js.opt
 
-  let line c = unsafe_coerce_chart "line" c
-
-  let bar c = unsafe_coerce_chart "bar" c
-
-  let horizontal_bar c = unsafe_coerce_chart "horizontalBar" c
-
+  val horizontalBar : 'a chart Js.t -> barChart Js.opt
 end
 
 (** {1 Creating a Chart} *)
 
-let chart_constr = Js.Unsafe.global##._Chart
+val chart_from_canvas : 'a Chart_type.t
+  -> data Js.t
+  -> 'a chartOptions Js.t
+  -> Dom_html.canvasElement Js.t
+  -> 'a chart Js.t
 
-let chart_from_canvas typ data options (canvas : Dom_html.canvasElement Js.t) =
-  let config : 'a chartConfig Js.t = object%js
-    val mutable _type = typ
-    val mutable data = data
-    val mutable options = options
-  end in
-  new%js chart_constr canvas config
+val chart_from_ctx : 'a Chart_type.t
+  -> data Js.t
+  -> 'a chartOptions Js.t
+  -> Dom_html.canvasRenderingContext2D Js.t
+  -> 'a chart Js.t
 
-let chart_from_ctx typ data options (ctx : Dom_html.canvasRenderingContext2D Js.t) =
-  let config : 'a chartConfig Js.t = object%js
-    val mutable _type = typ
-    val mutable data = data
-    val mutable options = options
-  end in
-  new%js chart_constr ctx config
+val chart_from_id : 'a Chart_type.t
+  -> data Js.t
+  -> 'a chartOptions Js.t
+  -> string
+  -> 'a chart Js.t
 
-let chart_from_id typ data options (id : string) =
-  let config : 'a chartConfig Js.t = object%js
-    val mutable _type = typ
-    val mutable data = data
-    val mutable options = options
-  end in
-  new%js chart_constr (Js.string id) config
-
-let make_update_config ?duration ?lazy_ ?easing () : updateConfig Js.t =
-  let iter f = function None -> () | Some x -> f x in
-  let (conf : updateConfig Js.t) = Js.Unsafe.obj [||] in
-  iter (fun x -> conf##.duration := x) duration;
-  iter (fun x -> conf##.lazy_ := Js.bool x) lazy_;
-  iter (fun x -> conf##.easing := x) easing;
-  conf
+val make_update_config :
+  ?duration:int
+  -> ?lazy_:bool
+  -> ?easing:Easing.t
+  -> unit
+  -> updateConfig Js.t
