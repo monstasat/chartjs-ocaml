@@ -71,6 +71,8 @@ module Interaction_mode : sig
   val x : t
 
   val y : t
+
+  val make : string -> t
 end
 
 module Point_style : sig
@@ -167,13 +169,13 @@ module Padding : sig
   type t
 
   class type obj = object
-    method top : int Js.optdef Js.prop
+    method top : int Js.optdef_prop
 
-    method right : int Js.optdef Js.prop
+    method right : int Js.optdef_prop
 
-    method bottom : int Js.optdef Js.prop
+    method bottom : int Js.optdef_prop
 
-    method left : int Js.optdef Js.prop
+    method left : int Js.optdef_prop
   end
 
   val obj : ?top:int -> ?right:int -> ?bottom:int -> ?left:int -> unit -> t Js.t
@@ -368,6 +370,12 @@ type ('a, 'b, 'c) tooltip_cb =
 
 class type ['a, 'b] dataPoint = object
   method x : 'a Js.prop
+
+  method y : 'b Js.prop
+end
+
+class type ['a, 'b] timeDataPoint = object
+  method t : 'a Js.prop
 
   method y : 'b Js.prop
 end
@@ -571,7 +579,7 @@ end
 
 class type ['a] cartesianAxis = object
 
-  method _type : Axis.typ Js.optdef Js.prop
+  method _type : Axis.typ Js.optdef_prop
   (** Type of scale being employed.
       Custom scales can be created and registered with a string key.
       This allows changing the type of an axis for a chart. *)
@@ -1447,11 +1455,11 @@ class type chartSize = object
 end
 
 class type updateConfig = object
-  method duration : int Js.optdef Js.prop
+  method duration : int Js.optdef_prop
 
-  method _lazy : bool Js.t Js.optdef Js.prop
+  method _lazy : bool Js.t Js.optdef_prop
 
-  method easing : Easing.t Js.optdef Js.prop
+  method easing : Easing.t Js.optdef_prop
 end
 
 val createUpdateConfig :
@@ -1803,12 +1811,12 @@ val createLineDataset : 'a Js.js_array Js.t -> 'a lineDataset Js.t
 
 (** {2 Bar Chart} *)
 
-class type barOptionContext = object
+class type ['a] barOptionContext = object
   method chart : barChart Js.t Js.readonly_prop
 
   method dataIndex : int Js.readonly_prop
 
-  method dataset : barDataset Js.t Js.readonly_prop
+  method dataset : 'a barDataset Js.t Js.readonly_prop
 
   method datasetIndex : int Js.readonly_prop
 end
@@ -1823,15 +1831,15 @@ and barScale = object
   (** Percent (0-1) of the available width each category should be within
       the sample width. *)
 
-  method barThickness : float Js.optdef Js.prop (* FIXME *)
+  method barThickness : float Js.optdef_prop (* FIXME *)
   (** Manually set width of each bar in pixels. If set to 'flex',
       it computes "optimal" sample widths that globally arrange bars side by side.
       If not set (default), bars are equally sized based on the smallest interval. *)
 
-  method maxBarThickness : float Js.optdef Js.prop
+  method maxBarThickness : float Js.optdef_prop
   (** Set this to ensure that bars are not sized thicker than this. *)
 
-  method minBarLength : float Js.optdef Js.prop
+  method minBarLength : float Js.optdef_prop
   (** Set this to ensure that bars have a minimum length in pixels. *)
 end
 
@@ -1839,29 +1847,32 @@ and barOptions = object
   inherit [barChart, barChart animation] chartOptions
 end
 
-and barDataset = object
+and ['a] barDataset = object
   inherit dataset
+
+  method data : 'a Js.js_array Js.t Js.prop
 
   (** {2 General} *)
 
-  method xAxisID : Js.js_string Js.t Js.prop
+  method xAxisID : Js.js_string Js.t Js.optdef_prop
   (** The ID of the x axis to plot this dataset on. *)
 
-  method yAxisID : Js.js_string Js.t Js.prop
+  method yAxisID : Js.js_string Js.t Js.optdef_prop
   (** The ID of the y axis to plot this dataset on. *)
 
   (** {2 Styling} *)
 
   method backgroundColor :
-    (barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.prop
+    ('a barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** The bar background color. *)
 
   method borderColor :
-    (barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.prop
+    ('a barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** The bar border color. *)
 
   method borderSkipped :
-    (barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable_indexable.t Js.t Js.prop
+    ('a barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable_indexable.t Js.t
+      Js.optdef_prop
   (** The edge to skip when drawing bar.
       This setting is used to avoid drawing the bar stroke at the base of the fill.
       In general, this does not need to be changed except when creating chart types
@@ -1876,7 +1887,8 @@ and barDataset = object
       [false] *)
 
   method borderWidth :
-    (barOptionContext Js.t, Padding.t Js.t Or_false.t Js.t) Scriptable_indexable.t Js.t Js.prop
+    ('a barOptionContext Js.t, Padding.t Js.t) Scriptable_indexable.t Js.t
+      Js.optdef_prop
   (** The bar border width (in pixels).
       If this value is a number, it is applied to all sides of the rectangle
       (left, top, right, bottom), except [borderSkipped]. If this value is
@@ -1888,13 +1900,13 @@ and barDataset = object
       All these values, if undefined, fallback to the associated
       [elements.rectangle.*] options. *)
 
-  method hoverBackgroundColor : Color.t Indexable.t Js.t Js.optdef Js.prop
+  method hoverBackgroundColor : Color.t Indexable.t Js.t Js.optdef_prop
   (** The bar background color when hovered. *)
 
-  method hoverBorderColor : Color.t Indexable.t Js.t Js.optdef Js.prop
+  method hoverBorderColor : Color.t Indexable.t Js.t Js.optdef_prop
   (** The bar border color when hovered. *)
 
-  method hoverBorderWidth : Color.t Indexable.t Js.t Js.prop
+  method hoverBorderWidth : Color.t Indexable.t Js.t Js.optdef_prop
   (** The bar border width when hovered (in pixels). *)
 
 end
@@ -1903,14 +1915,18 @@ and barChart = object
   inherit [barOptions] chart
 end
 
+val createBarOptions : unit -> barOptions Js.t
+
+val createBarDataset : 'a Js.js_array Js.t -> 'a barDataset Js.t
+
 (** {2 Pie Chart} *)
 
-class type pieOptionContext = object
+class type ['a] pieOptionContext = object
   method chart : pieChart Js.t Js.readonly_prop
 
   method dataIndex : int Js.readonly_prop
 
-  method dataset : pieDataset Js.t Js.readonly_prop
+  method dataset : 'a pieDataset Js.t Js.readonly_prop
 
   method datasetIndex : int Js.readonly_prop
 end
@@ -1938,23 +1954,23 @@ and pieOptions = object
   (** Sweep to allow arcs to cover. *)
 end
 
-and pieDataset = object
+and ['a] pieDataset = object
   inherit dataset
 
-  method data : float Js.js_array Js.t Js.prop
+  method data : 'a Js.js_array Js.t Js.prop
 
   (** {2 Styling} *)
 
   method backgroundColor :
-    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc background color. *)
 
   method borderColor :
-    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc border color. *)
 
   method borderWidth :
-    (pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc border width (in pixels). *)
 
   method weight : float Js.optdef_prop
@@ -1966,15 +1982,15 @@ and pieDataset = object
   (** {2 Interactions} *)
 
   method hoverBackgroundColor :
-    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc background color when hovered. *)
 
   method hoverBorderColor :
-    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc border color when hovered. *)
 
   method hoverBorderWidth :
-    (pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc border width when hovered (in pixels). *)
 
   (** {2 Border Alignment} *)
@@ -1995,7 +2011,7 @@ val createPieAnimation : unit -> pieAnimation Js.t
 
 val createPieOptions : unit -> pieOptions Js.t
 
-val createPieDataset : float Js.js_array Js.t -> pieDataset Js.t
+val createPieDataset : 'a Js.js_array Js.t -> 'a pieDataset Js.t
 
 module Chart : sig
   type 'a typ

@@ -14,7 +14,7 @@ let () =
     | 1 -> Js.string "lightblue"
     | 2 -> Js.string "lightgreen"
     | _ -> Js.string "initial)" in
-  let dataset = createPieDataset (Js.array [|10.; 15.; 20.|]) in
+  let dataset = createPieDataset (Js.array [|40; 15; 20|]) in
   dataset##.borderColor := Scriptable_indexable.of_fun border_color_fun;
   dataset##.backgroundColor := Scriptable_indexable.of_fun background_color_fun;
   dataset##.borderWidth := Scriptable_indexable.of_single 5;

@@ -55,7 +55,9 @@ module Line_cap = struct
   type t = Js.js_string Js.t
 
   let butt = Js.string "butt"
+
   let round = Js.string "round"
+
   let square = Js.string "square"
 end
 
@@ -63,7 +65,9 @@ module Line_join = struct
   type t = Js.js_string Js.t
 
   let round = Js.string "round"
+
   let bevel = Js.string "bevel"
+
   let miter = Js.string "miter"
 end
 
@@ -71,25 +75,41 @@ module Interaction_mode = struct
   type t = Js.js_string Js.t
 
   let point = Js.string "point"
+
   let nearest = Js.string "nearest"
+
   let index = Js.string "index"
+
   let dataset = Js.string "dataset"
+
   let x = Js.string "x"
+
   let y = Js.string "y"
+
+  let make s = Js.string s
 end
 
 module Point_style = struct
   type t = Js.js_string Js.t
 
   let circle = Js.string "circle"
+
   let cross = Js.string "cross"
+
   let crossRot = Js.string "crossRot"
+
   let dash = Js.string "dash"
+
   let line = Js.string "line"
+
   let rect = Js.string "rect"
+
   let rectRounded = Js.string "rectRounded"
+
   let rectRot = Js.string "rectRot"
+
   let star = Js.string "star"
+
   let triangle = Js.string "triangle"
 end
 
@@ -133,22 +153,22 @@ module Padding = struct
   type t
 
   class type obj = object
-    method top : int Js.optdef Js.prop
+    method top : int Js.optdef_prop
 
-    method right : int Js.optdef Js.prop
+    method right : int Js.optdef_prop
 
-    method bottom : int Js.optdef Js.prop
+    method bottom : int Js.optdef_prop
 
-    method left : int Js.optdef Js.prop
+    method left : int Js.optdef_prop
   end
 
   let obj ?top ?right ?bottom ?left () : t Js.t =
     let iter f = function None -> () | Some x -> f x in
     let (obj : obj Js.t) = Js.Unsafe.obj [||] in
-    iter (fun x -> obj##.top := Js.def x) top;
-    iter (fun x -> obj##.right := Js.def x) right;
-    iter (fun x -> obj##.bottom := Js.def x) bottom;
-    iter (fun x -> obj##.left := Js.def x) left;
+    iter (fun x -> obj##.top := x) top;
+    iter (fun x -> obj##.right := x) right;
+    iter (fun x -> obj##.bottom := x) bottom;
+    iter (fun x -> obj##.left := x) left;
     Js.Unsafe.coerce obj
 
   let int (x : int) : t Js.t =
@@ -329,6 +349,12 @@ class type ['a, 'b] dataPoint = object
   method y : 'b Js.prop
 end
 
+class type ['a, 'b] timeDataPoint = object
+  method t : 'a Js.prop
+
+  method y : 'b Js.prop
+end
+
 class type minorTicks = object
   method callback : 'a tick_cb Js.prop
 
@@ -432,7 +458,7 @@ class type cartesianTicks = object
 end
 
 class type ['a] cartesianAxis = object
-  method _type : Axis.typ Js.optdef Js.prop
+  method _type : Axis.typ Js.optdef_prop
 
   method position : Position.t Js.prop
 
@@ -1091,19 +1117,19 @@ class type chartSize = object
 end
 
 class type updateConfig = object
-  method duration : int Js.optdef Js.prop
+  method duration : int Js.optdef_prop
 
-  method _lazy : bool Js.t Js.optdef Js.prop
+  method _lazy : bool Js.t Js.optdef_prop
 
-  method easing : Easing.t Js.optdef Js.prop
+  method easing : Easing.t Js.optdef_prop
 end
 
 let createUpdateConfig ?duration ?_lazy ?easing () : updateConfig Js.t =
   let iter f = function None -> () | Some x -> f x in
   let (conf : updateConfig Js.t) = Js.Unsafe.obj [||] in
-  iter (fun x -> conf##.duration := Js.def x) duration;
-  iter (fun x -> conf##._lazy := Js.def @@ Js.bool x) _lazy;
-  iter (fun x -> conf##.easing := Js.def x) easing;
+  iter (fun x -> conf##.duration := x) duration;
+  iter (fun x -> conf##._lazy := Js.bool x) _lazy;
+  iter (fun x -> conf##.easing := x) easing;
   conf
 
 class type ['chart, 'animation] chartOptions = object
@@ -1312,12 +1338,12 @@ let createLineDataset data : 'a lineDataset Js.t =
   lineDataset##.data := data;
   lineDataset
 
-class type barOptionContext = object
+class type ['a] barOptionContext = object
   method chart : barChart Js.t Js.readonly_prop
 
   method dataIndex : int Js.readonly_prop
 
-  method dataset : barDataset Js.t Js.readonly_prop
+  method dataset : 'a barDataset Js.t Js.readonly_prop
 
   method datasetIndex : int Js.readonly_prop
 end
@@ -1327,53 +1353,64 @@ and barScale = object
 
   method categoryPercentage : float Js.prop
 
-  method barThickness : float Js.optdef Js.prop (* FIXME *)
+  method barThickness : float Js.optdef_prop (* FIXME *)
 
-  method maxBarThickness : float Js.optdef Js.prop
+  method maxBarThickness : float Js.optdef_prop
 
-  method minBarLength : float Js.optdef Js.prop
+  method minBarLength : float Js.optdef_prop
 end
 
 and barOptions = object
   inherit [barChart, barChart animation] chartOptions
 end
 
-and barDataset = object
+and ['a] barDataset = object
   inherit dataset
 
-  method xAxisID : Js.js_string Js.t Js.prop
+  method data : 'a Js.js_array Js.t Js.prop
 
-  method yAxisID : Js.js_string Js.t Js.prop
+  method xAxisID : Js.js_string Js.t Js.optdef_prop
+
+  method yAxisID : Js.js_string Js.t Js.optdef_prop
 
   method backgroundColor :
-    (barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.prop
+    ('a barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderColor :
-    (barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.prop
+    ('a barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderSkipped :
-    (barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable_indexable.t Js.t Js.prop
+    ('a barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable_indexable.t Js.t
+      Js.optdef_prop
 
   method borderWidth :
-    (barOptionContext Js.t, Padding.t Js.t Or_false.t Js.t) Scriptable_indexable.t Js.t Js.prop
+    ('a barOptionContext Js.t, Padding.t Js.t) Scriptable_indexable.t
+      Js.t Js.optdef_prop
 
-  method hoverBackgroundColor : Color.t Indexable.t Js.t Js.optdef Js.prop
+  method hoverBackgroundColor : Color.t Indexable.t Js.t Js.optdef_prop
 
-  method hoverBorderColor : Color.t Indexable.t Js.t Js.optdef Js.prop
+  method hoverBorderColor : Color.t Indexable.t Js.t Js.optdef_prop
 
-  method hoverBorderWidth : Color.t Indexable.t Js.t Js.prop
+  method hoverBorderWidth : Color.t Indexable.t Js.t Js.optdef_prop
 end
 
 and barChart = object
   inherit [barOptions] chart
 end
 
-class type pieOptionContext = object
+let createBarOptions () = Js.Unsafe.obj [||]
+
+let createBarDataset data : 'a barDataset Js.t =
+  let (barDataset : 'a barDataset Js.t) = Js.Unsafe.obj [||] in
+  barDataset##.data := data;
+  barDataset
+
+class type ['a] pieOptionContext = object
   method chart : pieChart Js.t Js.readonly_prop
 
   method dataIndex : int Js.readonly_prop
 
-  method dataset : pieDataset Js.t Js.readonly_prop
+  method dataset : 'a pieDataset Js.t Js.readonly_prop
 
   method datasetIndex : int Js.readonly_prop
 end
@@ -1396,30 +1433,30 @@ and pieOptions = object
   method circumference : float Js.prop
 end
 
-and pieDataset = object
+and ['a] pieDataset = object
   inherit dataset
 
-  method data : float Js.js_array Js.t Js.prop
+  method data : 'a Js.js_array Js.t Js.prop
 
   method backgroundColor :
-    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderColor :
-    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderWidth :
-    (pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method weight : float Js.optdef_prop
 
   method hoverBackgroundColor :
-    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method hoverBorderColor :
-    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method hoverBorderWidth :
-    (pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderAlign : Pie_border_align.t Js.optdef_prop
 end
@@ -1432,8 +1469,8 @@ let createPieAnimation () = Js.Unsafe.obj [||]
 
 let createPieOptions () = Js.Unsafe.obj [||]
 
-let createPieDataset data : pieDataset Js.t =
-  let (pieDataset : pieDataset Js.t) = Js.Unsafe.coerce @@ Js.Unsafe.obj [||] in
+let createPieDataset data : 'a pieDataset Js.t =
+  let (pieDataset : 'a pieDataset Js.t) = Js.Unsafe.coerce @@ Js.Unsafe.obj [||] in
   pieDataset##.data := data;
   pieDataset
 
