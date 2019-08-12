@@ -1,14 +1,3 @@
-(executables
-  (names basic)
-  (libraries chartjs)
-  (preprocess (pps js_of_ocaml-ppx)))
-
-(rule
-  (targets basic.js)
-  (action
-    (run %{bin:js_of_ocaml} --noruntime %{lib:js_of_ocaml-compiler:runtime.js}
-         --source-map %{dep:basic.bc} -o %{targets} --pretty)))
-
 (alias
-  (name examples)
-  (deps basic.js index.html))
+  (name default)
+  (deps index.html))

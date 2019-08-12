@@ -32,6 +32,25 @@ module Scriptable = struct
     Obj.magic @@ Js.wrap_callback x
 end
 
+module Scriptable_indexable = struct
+  type ('a, 'b) t
+
+  let of_single (x : 'b) : ('a, 'b) t Js.t =
+    Obj.magic x
+
+  let of_js_array (x : 'b Js.js_array Js.t) : ('a, 'b) t Js.t =
+    Js.Unsafe.coerce x
+
+  let of_array (x : 'b array) : ('a, 'b) t Js.t =
+    of_js_array @@ Js.array x
+
+  let of_list (x : 'b list) : ('a, 'b) t Js.t =
+    of_array @@ Array.of_list x
+
+  let of_fun (x : 'a -> 'b) : ('a, 'b) t Js.t =
+    Obj.magic @@ Js.wrap_callback x
+end
+
 module Line_cap = struct
   type t = Js.js_string Js.t
 
@@ -172,7 +191,7 @@ end
 
 (* FIXME *)
 module Line_height = struct
-  type t = int
+  type t = float
 end
 
 module Hover_axis = struct
@@ -303,6 +322,12 @@ type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
 type ('a, 'b, 'c) tooltip_cb =
   ('a, ('b -> 'c -> Js.js_string Js.t Indexable.t Js.t))
     Js.meth_callback Js.optdef
+
+class type ['a, 'b] dataPoint = object
+  method x : 'a Js.prop
+
+  method y : 'b Js.prop
+end
 
 class type minorTicks = object
   method callback : 'a tick_cb Js.prop
@@ -525,46 +550,50 @@ class type scales = object
 end
 
 class type dataset = object
-  method _type : Js.js_string Js.t Js.optdef Js.prop
+  method _type : Js.js_string Js.t Js.optdef_prop
 
-  method data : 'a Js.js_array Js.t Js.prop
+  method label : Js.js_string Js.t Js.optdef_prop
 end
 
 class type data = object
   method datasets : dataset Js.t Js.js_array Js.t Js.prop
 
-  method labels : Js.js_string Js.t Js.js_array Js.t Js.prop
+  method labels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
 
-  method xLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef Js.prop
+  method xLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
 
-  method yLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef Js.prop
+  method yLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
 end
 
-class type ['chart] optionContext = object
-  method chart : 'chart Js.t Js.optdef Js.readonly_prop
-
-  method dataIndex : int Js.optdef Js.readonly_prop
-
-  method dataset : #dataset Js.t Js.optdef Js.readonly_prop
-
-  method datasetIndex : int Js.optdef Js.readonly_prop
-end
+let createData ?(datasets = []) ?labels ?xLabels ?yLabels () =
+  let iter f = function None -> () | Some x -> f x in
+  let map_labels x = Js.array @@ Array.of_list @@ List.map Js.string x in
+  let (obj : data Js.t) = Js.Unsafe.obj [||] in
+  iter (fun x -> obj##.labels := map_labels x) labels;
+  iter (fun x -> obj##.xLabels := map_labels x) xLabels;
+  iter (fun x -> obj##.yLabels := map_labels x) yLabels;
+  let datasets =
+    Js.array
+    @@ Array.of_list
+    @@ List.map (fun x -> (x :> dataset Js.t)) datasets in
+  obj##.datasets := datasets;
+  obj
 
 class type ['chart] animationItem = object
-  method chart : 'chart Js.t Js.prop
+  method chart : 'chart Js.t Js.readonly_prop
 
-  method currentStep : float Js.prop
+  method currentStep : float Js.readonly_prop
 
-  method numSteps : float Js.prop
+  method numSteps : float Js.readonly_prop
 
   method render : 'chart Js.t -> 'chart animationItem Js.t -> unit Js.meth
 
-  method onAnimationProgress : ('chart animationItem Js.t -> unit) Js.callback Js.prop
+  method onAnimationProgress : 'chart animationItem Js.t -> unit Js.meth
 
-  method onAnimationComplete : ('chart animationItem Js.t -> unit) Js.callback Js.prop
+  method onAnimationComplete : 'chart animationItem Js.t -> unit Js.meth
 end
 
-and ['chart] animation = object
+class type ['chart] animation = object
   method duration : int Js.prop
 
   method easing : Easing.t Js.prop
@@ -574,9 +603,13 @@ and ['chart] animation = object
   method onComplete : ('chart animationItem Js.t -> unit) Js.callback Js.opt Js.prop
 end
 
+let createAnimation () = Js.Unsafe.obj [||]
+
 class type layout = object
   method padding : Padding.t Js.prop
 end
+
+let createLayout () = Js.Unsafe.obj [||]
 
 class type legendItem = object
   method text : Js.js_string Js.t Js.prop
@@ -585,45 +618,50 @@ class type legendItem = object
 
   method hidden : bool Js.t Js.prop
 
-  method lineCap : Line_cap.t Js.prop
+  method lineCap : Line_cap.t Js.optdef_prop
 
-  method lineDash : line_dash Js.prop
+  method lineDash : line_dash Js.optdef_prop
 
-  method lineDashOffset : line_dash_offset Js.prop
+  method lineDashOffset : line_dash_offset Js.optdef_prop
 
-  method lineJoin : Line_join.t Js.prop
+  method lineJoin : Line_join.t Js.optdef_prop
 
   method lineWidth : int Js.prop
 
   method strokeStyle : Color.t Js.prop
 
-  method pointStyle : Js.js_string Js.t Js.prop
+  method pointStyle : Js.js_string Js.t Js.optdef_prop
 
   method datasetIndex : int Js.prop
 end
 
-and ['chart] legendLabels = object
+class type ['chart] legendLabels = object('self)
   method boxWidth : int Js.prop
 
-  method fontSize : int Js.prop
+  method fontSize : int Js.optdef_prop
 
-  method fontStyle : Js.js_string Js.prop
+  method fontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method fontColor : Color.t Js.prop
+  method fontColor : Color.t Js.optdef_prop
 
-  method fontFamily : Js.js_string Js.prop
+  method fontFamily : Js.js_string Js.t Js.optdef_prop
 
   method padding : int Js.prop
 
-  method generateLabels : ('chart Js.t -> legendItem Js.t Js.js_array Js.t)
-      Js.callback Js.prop
+  method generateLabels :
+    ('chart Js.t
+     -> legendItem Js.t Js.js_array Js.t) Js.callback Js.prop
 
-  method filter : (legendItem Js.t -> data Js.t -> bool Js.t) Js.callback Js.prop
+  method filter :
+    ('self,
+     legendItem Js.t
+     -> data Js.t
+     -> bool Js.t) Js.meth_callback Js.optdef_prop
 
-  method usePointStyle : bool Js.t Js.prop
+  method usePointStyle : bool Js.t Js.optdef_prop
 end
 
-and ['chart] legend = object
+class type ['chart] legend = object
   method display : bool Js.t Js.prop
 
   method position : Position.t Js.prop
@@ -631,44 +669,55 @@ and ['chart] legend = object
   method fullWidth : bool Js.t Js.prop
 
   method onClick :
-    (Dom_html.event Js.t
+    ('chart,
+     Dom_html.event Js.t
      -> legendItem Js.t
-     -> unit) Js.callback Js.prop
+     -> unit) Js.meth_callback Js.optdef_prop
 
   method onHover :
-    (Dom_html.event Js.t
+    ('chart,
+     Dom_html.event Js.t
      -> legendItem Js.t
-     -> unit) Js.callback Js.prop
+     -> unit) Js.meth_callback Js.optdef_prop
 
   method onLeave :
-    (Dom_html.event Js.t
+    ('chart,
+     Dom_html.event Js.t
      -> legendItem Js.t
-     -> unit) Js.callback Js.prop
+     -> unit) Js.meth_callback Js.optdef_prop
 
   method reverse : bool Js.t Js.prop
 
   method labels : 'chart legendLabels Js.t Js.prop
 end
 
+let createLegendLabels () = Js.Unsafe.obj [||]
+
+let createLegend () = Js.Unsafe.obj [||]
+
 class type title = object
   method display : bool Js.t Js.prop
 
   method position : Position.t Js.prop
 
-  method fontSize : int Js.optdef Js.prop
+  method fontSize : int Js.optdef_prop
 
-  method fontFamily : Js.js_string Js.t Js.prop
+  method fontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method fontColor : Js.js_string Js.prop
+  method fontColor : Js.js_string Js.t Js.optdef_prop
 
-  method fontStyle : Js.js_string Js.prop
+  method fontStyle : Js.js_string Js.t Js.optdef_prop
+
+  method fullWidth : bool Js.t Js.prop
 
   method padding : int Js.prop
 
-  method lineHeight : Line_height.t Js.prop
+  method lineHeight : Line_height.t Js.optdef_prop
 
-  method text : Js.js_string Js.t Indexable.t Js.prop
+  method text : Js.js_string Js.t Indexable.t Js.t Js.prop
 end
+
+let createTitle () = Js.Unsafe.obj [||]
 
 class type tooltipItem = object
   method label : Js.js_string Js.t Js.readonly_prop
@@ -856,7 +905,7 @@ and ['chart] tooltipCallbacks = object
 
 end
 
-and ['chart] tooltip = object
+and ['chart] tooltip = object('self)
   method enabled : bool Js.t Js.prop
 
   method custom : (tooltipModel Js.t -> unit) Js.callback Js.opt Js.prop
@@ -867,48 +916,52 @@ and ['chart] tooltip = object
 
   method position : Tooltip_position.t Js.prop
 
-  method callbacks : 'chart tooltipCallbacks Js.t Js.optdef Js.prop
+  method callbacks : 'chart tooltipCallbacks Js.t Js.prop
 
-  method itemSort : (tooltipItem Js.t
-                     -> tooltipItem Js.t
-                     -> data Js.t
-                     -> int) Js.callback Js.optdef Js.prop
+  method itemSort :
+    ('self,
+     tooltipItem Js.t
+     -> tooltipItem Js.t
+     -> data Js.t (* FIXME *)
+     -> int) Js.meth_callback Js.optdef_prop
 
-  method filter : (tooltipItem Js.t
-                   -> data Js.t
-                   -> bool Js.t) Js.callback Js.optdef Js.prop
+  method filter :
+    ('self,
+     tooltipItem Js.t
+     -> data Js.t
+     -> bool Js.t) Js.meth_callback Js.optdef_prop
 
   method backgroundColor : Color.t Js.prop
 
-  method titleFontFamily : Js.js_string Js.t Js.prop
+  method titleFontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method titleFontSize : int Js.prop
+  method titleFontSize : int Js.optdef_prop
 
-  method titleFontStyle : Js.js_string Js.t Js.prop
+  method titleFontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method titleFontColor : Color.t Js.prop
+  method titleFontColor : Color.t Js.optdef_prop
 
   method titleSpacing : int Js.prop
 
   method titleMarginBottom : int Js.prop
 
-  method bodyFontFamily : Js.js_string Js.t Js.prop
+  method bodyFontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method bodyFontSize : int Js.prop
+  method bodyFontSize : int Js.optdef_prop
 
-  method bodyFontStyle : Js.js_string Js.t Js.prop
+  method bodyFontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method bodyFontColor : Color.t Js.prop
+  method bodyFontColor : Color.t Js.optdef_prop
 
   method bodySpacing : int Js.prop
 
-  method footerFontFamily : Js.js_string Js.t Js.prop
+  method footerFontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method footerFontSize : int Js.prop
+  method footerFontSize : int Js.optdef_prop
 
-  method footerFontStyle : Js.js_string Js.t Js.prop
+  method footerFontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method footerFontColor : Color.t Js.prop
+  method footerFontColor : Color.t Js.optdef_prop
 
   method footerSpacing : int Js.prop
 
@@ -933,6 +986,8 @@ and ['chart] tooltip = object
   method borderWidth : int Js.prop
 end
 
+let createTooltip () = Js.Unsafe.obj [||]
+
 class type hover = object
   method mode : Interaction_mode.t Js.prop
 
@@ -942,6 +997,8 @@ class type hover = object
 
   method animationDuration : int Js.prop
 end
+
+let createHover () = Js.Unsafe.obj [||]
 
 class type pointElement = object
   method radius : int Js.prop
@@ -1017,6 +1074,16 @@ class type elements = object
   method arc : arcElement Js.t Js.prop
 end
 
+let createPointElement () = Js.Unsafe.obj [||]
+
+let createLineElement () = Js.Unsafe.obj [||]
+
+let createRectangleElement () = Js.Unsafe.obj [||]
+
+let createArcElement () = Js.Unsafe.obj [||]
+
+let createElements () = Js.Unsafe.obj [||]
+
 class type chartSize = object
   method width : int Js.readonly_prop
 
@@ -1031,31 +1098,28 @@ class type updateConfig = object
   method easing : Easing.t Js.optdef Js.prop
 end
 
-class type ['chart,
-            'animation,
-            'layout,
-            'legend,
-            'title,
-            'tooltip,
-            'elements] chartOptions = object
+let createUpdateConfig ?duration ?_lazy ?easing () : updateConfig Js.t =
+  let iter f = function None -> () | Some x -> f x in
+  let (conf : updateConfig Js.t) = Js.Unsafe.obj [||] in
+  iter (fun x -> conf##.duration := Js.def x) duration;
+  iter (fun x -> conf##._lazy := Js.def @@ Js.bool x) _lazy;
+  iter (fun x -> conf##.easing := Js.def x) easing;
+  conf
+
+class type ['chart, 'animation] chartOptions = object
   constraint 'animation = 'chart #animation
-  constraint 'layout = #layout
-  constraint 'legend = 'chart #legend
-  constraint 'title = #title
-  constraint 'tooltip = 'chart #tooltip
-  constraint 'elements = #elements
 
   method animation : 'animation Js.t Js.prop
 
-  method layout : 'layout Js.t Js.prop
+  method layout : layout Js.t Js.prop
 
-  method legend : 'legend Js.t Js.prop
+  method legend : 'chart legend Js.t Js.prop
 
-  method title : 'title Js.t Js.prop
+  method title : title Js.t Js.prop
 
-  method tooltip : 'tooltip Js.t Js.prop
+  method tooltips : 'chart tooltip Js.t Js.prop
 
-  method elements : 'elements Js.t Js.prop
+  method elements : elements Js.t Js.prop
 
   method plugins : 'a Js.t Js.prop
 
@@ -1067,14 +1131,14 @@ class type ['chart,
 
   method maintainAspectRatio : bool Js.t Js.prop
 
-  method aspectRatio : float Js.prop
+  method aspectRatio : float Js.optdef_prop
 
   method onResize :
     ('chart Js.t
      -> chartSize Js.t
-     -> unit) Js.callback Js.opt Js.prop
+     -> unit) Js.callback Js.opt Js.optdef_prop
 
-  method devicePixelRatio : float Js.prop
+  method devicePixelRatio : float Js.optdef_prop
 
   method events : Js.js_string Js.t Js.js_array Js.t Js.prop
 
@@ -1083,14 +1147,14 @@ class type ['chart,
      Dom_html.event Js.t
      -> 'a Js.t Js.js_array Js.t
      -> unit)
-      Js.meth_callback Js.opt Js.prop
+      Js.meth_callback Js.opt Js.optdef_prop
 
   method onClick :
     ('chart Js.t,
      Dom_html.event Js.t
      -> 'a Js.t Js.js_array Js.t
      -> unit)
-      Js.meth_callback Js.opt Js.prop
+      Js.meth_callback Js.opt Js.optdef_prop
 end
 
 class type ['a] chartConfig = object
@@ -1151,113 +1215,109 @@ class type ['a] chart = object('self)
   method generateLegend : Js.js_string Js.t Js.meth
 end
 
-class type lineOptionContext = object
+class type ['a] lineOptionContext = object
   method chart : lineChart Js.t Js.readonly_prop
 
   method dataIndex : int Js.readonly_prop
 
-  method dataset : lineDataset Js.t Js.readonly_prop
+  method dataset : 'a lineDataset Js.t Js.readonly_prop
 
   method datasetIndex : int Js.readonly_prop
 end
 
 and lineOptions = object
-  inherit [lineChart,
-           lineChart animation,
-           layout,
-           lineChart legend,
-           title,
-           lineChart tooltip,
-           elements] chartOptions
+  inherit [lineChart, lineChart animation] chartOptions
+
   method showLines : bool Js.t Js.prop
 
   method spanGaps : bool Js.t Js.prop
 end
 
-(* and ['a, 'b] lineDataPoint = object
- *   method x : 'a Js.prop
- * 
- *   method y : 'b Js.prop
- * end *)
-
-and lineDataset = object
+and ['a] lineDataset = object
   inherit dataset
 
-  method label : Js.js_string Js.t Js.prop
+  method data : 'a Js.js_array Js.t Js.prop
 
-  method xAxisID : Js.js_string Js.t Js.prop
+  method xAxisID : Js.js_string Js.t Js.optdef_prop
 
-  method yAxisID : Js.js_string Js.t Js.prop
+  method yAxisID : Js.js_string Js.t Js.optdef_prop
 
   method pointBackgroundColor :
-    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointBorderColor :
-    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointBorderWidth :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointHitRadius :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointRadius :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointRotation :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method pointStyle : Point_style.t Js.prop
+  method pointStyle : Point_style.t Js.optdef_prop
 
-  method backgroundColor : Color.t Js.prop
+  method backgroundColor : Color.t Js.optdef_prop
 
-  method borderCapStyle : Line_cap.t Js.prop
+  method borderCapStyle : Line_cap.t Js.optdef_prop
 
-  method borderColor : Color.t Js.prop
+  method borderColor : Color.t Js.optdef_prop
 
-  method borderDash : line_dash Js.prop
+  method borderDash : line_dash Js.optdef_prop
 
-  method borderDashOffset : line_dash_offset Js.prop
+  method borderDashOffset : line_dash_offset Js.optdef_prop
 
-  method borderJoinStyle : Line_join.t Js.prop
+  method borderJoinStyle : Line_join.t Js.optdef_prop
 
-  method borderWidth : int Js.prop
+  method borderWidth : int Js.optdef_prop
 
-  method fill : Line_fill.t Js.t Js.prop
+  method fill : Line_fill.t Js.t Js.optdef_prop
 
-  method lineTension : float Js.prop
+  method lineTension : float Js.optdef_prop
 
-  method showLine : bool Js.t Js.optdef Js.prop
+  method showLine : bool Js.t Js.optdef_prop
 
-  method spanGaps : bool Js.t Js.optdef Js.prop
+  method spanGaps : bool Js.t Js.optdef_prop
 
   method pointHoverBackgroundColor :
-    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.optdef Js.prop
+    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointHoverBorderColor :
-    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.optdef Js.prop
+    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointHoverBorderWidth :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.optdef Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointHoverRadius :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.optdef Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method cubicInterpolationMode : Interpolation_mode.t Js.prop
+  method cubicInterpolationMode : Interpolation_mode.t Js.optdef_prop
 
-  method steppedLine : Stepped_line.t Js.t Js.prop
+  method steppedLine : Stepped_line.t Js.t Js.optdef_prop
 end
 
 and lineChart = object
   inherit [lineOptions] chart
 end
 
+let createLineOptions () = Js.Unsafe.obj [||]
+
+let createLineDataset data : 'a lineDataset Js.t =
+  let (lineDataset : 'a lineDataset Js.t) = Js.Unsafe.obj [||] in
+  lineDataset##.data := data;
+  lineDataset
+
 class type barOptionContext = object
-  method chart : lineChart Js.t Js.readonly_prop
+  method chart : barChart Js.t Js.readonly_prop
 
   method dataIndex : int Js.readonly_prop
 
-  method dataset : lineDataset Js.t Js.readonly_prop
+  method dataset : barDataset Js.t Js.readonly_prop
 
   method datasetIndex : int Js.readonly_prop
 end
@@ -1275,35 +1335,27 @@ and barScale = object
 end
 
 and barOptions = object
-  inherit [barChart,
-           barChart animation,
-           layout,
-           barChart legend,
-           title,
-           barChart tooltip,
-           elements] chartOptions
+  inherit [barChart, barChart animation] chartOptions
 end
 
 and barDataset = object
   inherit dataset
-
-  method label : Js.js_string Js.t Js.prop
 
   method xAxisID : Js.js_string Js.t Js.prop
 
   method yAxisID : Js.js_string Js.t Js.prop
 
   method backgroundColor :
-    (barOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    (barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.prop
 
   method borderColor :
-    (barOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    (barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.prop
 
   method borderSkipped :
-    (barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable.t Js.t Js.prop
+    (barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable_indexable.t Js.t Js.prop
 
   method borderWidth :
-    (barOptionContext Js.t, Padding.t Js.t Or_false.t Js.t) Scriptable.t Js.t Js.prop
+    (barOptionContext Js.t, Padding.t Js.t Or_false.t Js.t) Scriptable_indexable.t Js.t Js.prop
 
   method hoverBackgroundColor : Color.t Indexable.t Js.t Js.optdef Js.prop
 
@@ -1335,13 +1387,7 @@ and pieAnimation = object
 end
 
 and pieOptions = object
-  inherit [pieChart,
-           pieAnimation,
-           layout,
-           pieChart legend,
-           title,
-           pieChart tooltip,
-           elements] chartOptions
+  inherit [pieChart, pieAnimation] chartOptions
 
   method cutoutPercentage : float Js.prop
 
@@ -1351,37 +1397,48 @@ and pieOptions = object
 end
 
 and pieDataset = object
+  inherit dataset
+
   method data : float Js.js_array Js.t Js.prop
 
   method backgroundColor :
-    (pieOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderColor :
-    (pieOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderWidth :
-    (pieOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    (pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method weight : float Js.prop
+  method weight : float Js.optdef_prop
 
   method hoverBackgroundColor :
-    (pieOptionContext Js.t, Color.t) Scriptable.t Js.prop
+    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method hoverBorderColor :
-    (pieOptionContext Js.t, Color.t) Scriptable.t Js.prop
+    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method hoverBorderWidth :
-    (pieOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    (pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method borderAlign : Pie_border_align.t Js.t Js.prop
+  method borderAlign : Pie_border_align.t Js.optdef_prop
 end
 
 and pieChart = object
   inherit [pieOptions] chart
 end
 
+let createPieAnimation () = Js.Unsafe.obj [||]
+
+let createPieOptions () = Js.Unsafe.obj [||]
+
+let createPieDataset data : pieDataset Js.t =
+  let (pieDataset : pieDataset Js.t) = Js.Unsafe.coerce @@ Js.Unsafe.obj [||] in
+  pieDataset##.data := data;
+  pieDataset
+
 module Chart = struct
-  type ('a, 'b) typ = Js.js_string Js.t
+  type 'a typ = Js.js_string Js.t
 
   let line = Js.string "line"
 
@@ -1434,11 +1491,3 @@ let chart_from_id typ data options (id : string) =
     val mutable options = options
   end in
   new%js chart_constr (Js.string id) config
-
-let make_update_config ?duration ?_lazy ?easing () : updateConfig Js.t =
-  let iter f = function None -> () | Some x -> f x in
-  let (conf : updateConfig Js.t) = Js.Unsafe.obj [||] in
-  iter (fun x -> conf##.duration := Js.def x) duration;
-  iter (fun x -> conf##._lazy := Js.def @@ Js.bool x) _lazy;
-  iter (fun x -> conf##.easing := Js.def x) easing;
-  conf

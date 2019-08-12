@@ -23,6 +23,20 @@ module Scriptable : sig
   val of_fun : ('a -> 'b) -> ('a, 'b) t Js.t
 end
 
+module Scriptable_indexable : sig
+  type ('a, 'b) t
+
+  val of_single : 'b -> ('a, 'b) t Js.t
+
+  val of_js_array : 'b Js.js_array Js.t -> ('a, 'b) t Js.t
+
+  val of_array : 'b array -> ('a, 'b) t Js.t
+
+  val of_list : 'b list -> ('a, 'b) t Js.t
+
+  val of_fun : ('a -> 'b) -> ('a, 'b) t Js.t
+end
+
 module Line_cap : sig
   type t
 
@@ -196,7 +210,7 @@ module Tooltip_position : sig
 end
 
 module Line_height : sig
-  type t = int
+  type t = float
 end
 
 module Hover_axis : sig
@@ -351,6 +365,12 @@ type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
 type ('a, 'b, 'c) tooltip_cb =
   ('a, ('b -> 'c -> Js.js_string Js.t Indexable.t Js.t))
     Js.meth_callback Js.optdef
+
+class type ['a, 'b] dataPoint = object
+  method x : 'a Js.prop
+
+  method y : 'b Js.prop
+end
 
 (** {1 Axes} *)
 
@@ -730,65 +750,54 @@ class type scales = object
 end
 
 class type dataset = object
-  method _type : Js.js_string Js.t Js.optdef Js.prop
+  method _type : Js.js_string Js.t Js.optdef_prop
 
-  method data : 'a Js.js_array Js.t Js.prop
+  method label : Js.js_string Js.t Js.optdef_prop
 end
 
 class type data = object
   method datasets : dataset Js.t Js.js_array Js.t Js.prop
 
-  method labels : Js.js_string Js.t Js.js_array Js.t Js.prop
+  method labels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
 
-  method xLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef Js.prop
+  method xLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
 
-  method yLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef Js.prop
+  method yLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
 end
 
-(** The option context is used to give contextual information when resolving
-    options and currently only applies to scriptable options.
-    Note: Since the context can represent different types of entities
-    (dataset, data, etc.), some properties may be undefined so be sure to test
-    any context property before using it.
-*)
-class type ['chart] optionContext = object
-  method chart : 'chart Js.t Js.optdef Js.readonly_prop
-  (** The associated chart. *)
-
-  method dataIndex : int Js.optdef Js.readonly_prop
-  (** Index of the current data. *)
-
-  method dataset : #dataset Js.t Js.optdef Js.readonly_prop
-  (** Dataset at index datasetIndex. *)
-
-  method datasetIndex : int Js.optdef Js.readonly_prop
-  (** Index of the current dataset. *)
-end
+val createData :
+  ?datasets:#dataset Js.t list
+  -> ?labels:string list
+  -> ?xLabels:string list
+  -> ?yLabels:string list
+  -> unit
+  -> data Js.t
 
 (** {1 Chart configuration} *)
 
 (** {2 Animation} *)
 
 class type ['chart] animationItem = object
-  method chart : 'chart Js.t Js.prop
+  method chart : 'chart Js.t Js.readonly_prop
   (** Chart object. *)
 
-  method currentStep : float Js.prop
+  method currentStep : float Js.readonly_prop
   (** Current Animation frame number. *)
 
-  method numSteps : float Js.prop
+  method numSteps : float Js.readonly_prop
   (** Number of animation frames. *)
 
   method render : 'chart Js.t -> 'chart animationItem Js.t -> unit Js.meth
   (** Function that renders the chart. *)
 
-  method onAnimationProgress : ('chart animationItem Js.t -> unit) Js.callback Js.prop
+  method onAnimationProgress : 'chart animationItem Js.t -> unit Js.meth
+  (** User callback. *)
 
-  method onAnimationComplete : ('chart animationItem Js.t -> unit) Js.callback Js.prop
+  method onAnimationComplete : 'chart animationItem Js.t -> unit Js.meth
+  (** User callback. *)
 end
 
-and ['chart] animation = object
-
+class type ['chart] animation = object
   method duration : int Js.prop
   (** The number of milliseconds an animation takes. *)
 
@@ -800,8 +809,9 @@ and ['chart] animation = object
 
   method onComplete : ('chart animationItem Js.t -> unit) Js.callback Js.opt Js.prop
   (** Callback called at the end of an animation. *)
-
 end
+
+val createAnimation : unit -> 'a animation Js.t
 
 (** {2 Layout} *)
 
@@ -810,29 +820,33 @@ class type layout = object
   (** The padding to add inside the chart. *)
 end
 
+val createLayout : unit -> layout Js.t
+
 (** {2 Legend} *)
 
+(* FIXME this interface differs between Pie and other chart types *)
 class type legendItem = object
   method text : Js.js_string Js.t Js.prop
   (** Label that will be displayed. *)
 
+  (* FIXME seems it can be Indexable & Scriptable dependent on chart type *)
   method fillStyle : Color.t Js.prop
   (** Fill style of the legend box. *)
 
   method hidden : bool Js.t Js.prop
-  (** If true, this item represents a hidden dataset.
+  (** If [true], this item represents a hidden dataset.
       Label will be rendered with a strike-through effect. *)
 
-  method lineCap : Line_cap.t Js.prop
+  method lineCap : Line_cap.t Js.optdef_prop
   (** For box border. *)
 
-  method lineDash : line_dash Js.prop
+  method lineDash : line_dash Js.optdef_prop
   (** For box border. *)
 
-  method lineDashOffset : line_dash_offset Js.prop
+  method lineDashOffset : line_dash_offset Js.optdef_prop
   (** For box border. *)
 
-  method lineJoin : Line_join.t Js.prop
+  method lineJoin : Line_join.t Js.optdef_prop
   (** For box border. *)
 
   method lineWidth : int Js.prop
@@ -841,47 +855,51 @@ class type legendItem = object
   method strokeStyle : Color.t Js.prop
   (** Stroke style of the legend box. *)
 
-  method pointStyle : Js.js_string Js.t Js.prop
+  method pointStyle : Js.js_string Js.t Js.optdef_prop
   (** Point style of the legend box (only used if usePointStyle is true) *)
 
   method datasetIndex : int Js.prop
 end
 
-and ['chart] legendLabels = object
-
+class type ['chart] legendLabels = object('self)
   method boxWidth : int Js.prop
   (** Width of coloured box. *)
 
-  method fontSize : int Js.prop
+  method fontSize : int Js.optdef_prop
   (** Font size of text. *)
 
-  method fontStyle : Js.js_string Js.prop
+  method fontStyle : Js.js_string Js.t Js.optdef_prop
   (** Font style of text. *)
 
-  method fontColor : Color.t Js.prop
+  method fontColor : Color.t Js.optdef_prop
   (** Color of text. *)
 
-  method fontFamily : Js.js_string Js.prop
+  method fontFamily : Js.js_string Js.t Js.optdef_prop
   (** Font family of legend text. *)
 
   method padding : int Js.prop
   (** Padding between rows of colored boxes. *)
 
-  method generateLabels : ('chart Js.t -> legendItem Js.t Js.js_array Js.t)
-      Js.callback Js.prop
+  method generateLabels :
+    ('chart Js.t
+     -> legendItem Js.t Js.js_array Js.t) Js.callback Js.prop
   (** Generates legend items for each thing in the legend.
       Default implementation returns the text + styling for the color box. *)
 
-  method filter : (legendItem Js.t -> data Js.t -> bool Js.t) Js.callback Js.prop
+  method filter :
+    ('self,
+     legendItem Js.t
+     -> data Js.t
+     -> bool Js.t) Js.meth_callback Js.optdef_prop
   (** Filters legend items out of the legend. Receives 2 parameters,
       a Legend Item and the chart data. *)
 
-  method usePointStyle : bool Js.t Js.prop
+  method usePointStyle : bool Js.t Js.optdef_prop
   (** Label style will match corresponding point style
       (size is based on fontSize, boxWidth is not used in this case). *)
 end
 
-and ['chart] legend = object
+class type ['chart] legend = object
   method display : bool Js.t Js.prop
   (** Is the legend shown. *)
 
@@ -894,23 +912,26 @@ and ['chart] legend = object
       in day-to-day use. *)
 
   method onClick :
-    (Dom_html.event Js.t
+    ('chart,
+     Dom_html.event Js.t
      -> legendItem Js.t
-     -> unit) Js.callback Js.prop
+     -> unit) Js.meth_callback Js.optdef_prop
   (** A callback that is called when a click event is
       registered on a label item *)
 
   method onHover :
-    (Dom_html.event Js.t
+    ('chart,
+     Dom_html.event Js.t
      -> legendItem Js.t
-     -> unit) Js.callback Js.prop
+     -> unit) Js.meth_callback Js.optdef_prop
   (** A callback that is called when a 'mousemove' event is
       registered on top of a label item *)
 
   method onLeave :
-    (Dom_html.event Js.t
+    ('chart,
+     Dom_html.event Js.t
      -> legendItem Js.t
-     -> unit) Js.callback Js.prop
+     -> unit) Js.meth_callback Js.optdef_prop
 
   method reverse : bool Js.t Js.prop
   (** Legend will show datasets in reverse order. *)
@@ -918,6 +939,10 @@ and ['chart] legend = object
   method labels : 'chart legendLabels Js.t Js.prop
   (** Legend label configuration. *)
 end
+
+val createLegendLabels : unit -> 'a legendLabels Js.t
+
+val createLegend : unit -> 'a legend Js.t
 
 (** {2 Title} *)
 
@@ -928,28 +953,32 @@ class type title = object
   method position : Position.t Js.prop
   (** Position of title. *)
 
-  method fontSize : int Js.optdef Js.prop
+  method fontSize : int Js.optdef_prop
   (** Font size. *)
 
-  method fontFamily : Js.js_string Js.t Js.prop
+  method fontFamily : Js.js_string Js.t Js.optdef_prop
   (** Font family for the title text. *)
 
-  method fontColor : Js.js_string Js.prop
+  method fontColor : Js.js_string Js.t Js.optdef_prop
   (** Font color. *)
 
-  method fontStyle : Js.js_string Js.prop
+  method fontStyle : Js.js_string Js.t Js.optdef_prop
   (** Font style. *)
+
+  method fullWidth : bool Js.t Js.prop
 
   method padding : int Js.prop
   (** Number of pixels to add above and below the title text. *)
 
-  method lineHeight : Line_height.t Js.prop
+  method lineHeight : Line_height.t Js.optdef_prop
   (** Height of an individual line of text. *)
 
-  method text : Js.js_string Js.t Indexable.t Js.prop
+  method text : Js.js_string Js.t Indexable.t Js.t Js.prop
   (** Title text to display. If specified as an array,
       text is rendered on multiple lines. *)
 end
+
+val createTitle : unit -> title Js.t
 
 (** {3 Tooltip} *)
 
@@ -1146,7 +1175,7 @@ and ['chart] tooltipCallbacks = object
     (** Text to render after the footer section. *)
 end
 
-and ['chart] tooltip = object
+and ['chart] tooltip = object('self)
   method enabled : bool Js.t Js.prop
   (** Are on-canvas tooltips enabled. *)
 
@@ -1157,40 +1186,44 @@ and ['chart] tooltip = object
   (** Sets which elements appear in the tooltip. *)
 
   method intersect : bool Js.t Js.prop
-  (** If true, the tooltip mode applies only when the mouse position
-      intersects with an element. If false, the mode will be applied
+  (** If [true], the tooltip mode applies only when the mouse position
+      intersects with an element. If [false], the mode will be applied
       at all times. *)
 
   method position : Tooltip_position.t Js.prop
   (** The mode for positioning the tooltip. *)
 
-  method callbacks : 'chart tooltipCallbacks Js.t Js.optdef Js.prop
+  method callbacks : 'chart tooltipCallbacks Js.t Js.prop
   (** Callbacks. *)
 
-  method itemSort : (tooltipItem Js.t
-                     -> tooltipItem Js.t
-                     -> data Js.t (* FIXME *)
-                     -> int) Js.callback Js.optdef Js.prop
+  method itemSort :
+    ('self,
+     tooltipItem Js.t
+     -> tooltipItem Js.t
+     -> data Js.t (* FIXME *)
+     -> int) Js.meth_callback Js.optdef_prop
   (** Sort tooltip items. *)
 
-  method filter : (tooltipItem Js.t
-                   -> data Js.t
-                   -> bool Js.t) Js.callback Js.optdef Js.prop
+  method filter :
+    ('self,
+     tooltipItem Js.t
+     -> data Js.t
+     -> bool Js.t) Js.meth_callback Js.optdef_prop
   (** Filter tooltip items. *)
 
   method backgroundColor : Color.t Js.prop
   (** Background color of the tooltip. *)
 
-  method titleFontFamily : Js.js_string Js.t Js.prop
+  method titleFontFamily : Js.js_string Js.t Js.optdef_prop
   (** Title font. *)
 
-  method titleFontSize : int Js.prop
+  method titleFontSize : int Js.optdef_prop
   (** Title font size. *)
 
-  method titleFontStyle : Js.js_string Js.t Js.prop
+  method titleFontStyle : Js.js_string Js.t Js.optdef_prop
   (** Title font style *)
 
-  method titleFontColor : Color.t Js.prop
+  method titleFontColor : Color.t Js.optdef_prop
   (** Title font color *)
 
   method titleSpacing : int Js.prop
@@ -1199,31 +1232,31 @@ and ['chart] tooltip = object
   method titleMarginBottom : int Js.prop
   (** Margin to add on bottom of title section. *)
 
-  method bodyFontFamily : Js.js_string Js.t Js.prop
+  method bodyFontFamily : Js.js_string Js.t Js.optdef_prop
   (** Body line font. *)
 
-  method bodyFontSize : int Js.prop
+  method bodyFontSize : int Js.optdef_prop
   (** Body font size. *)
 
-  method bodyFontStyle : Js.js_string Js.t Js.prop
+  method bodyFontStyle : Js.js_string Js.t Js.optdef_prop
   (** Body font style. *)
 
-  method bodyFontColor : Color.t Js.prop
+  method bodyFontColor : Color.t Js.optdef_prop
   (** Body font color. *)
 
   method bodySpacing : int Js.prop
   (** Spacing to add to top and bottom of each tooltip item. *)
 
-  method footerFontFamily : Js.js_string Js.t Js.prop
+  method footerFontFamily : Js.js_string Js.t Js.optdef_prop
   (** Footer font. *)
 
-  method footerFontSize : int Js.prop
+  method footerFontSize : int Js.optdef_prop
   (** Footer font size. *)
 
-  method footerFontStyle : Js.js_string Js.t Js.prop
+  method footerFontStyle : Js.js_string Js.t Js.optdef_prop
   (** Footer font style. *)
 
-  method footerFontColor : Color.t Js.prop
+  method footerFontColor : Color.t Js.optdef_prop
   (** Footer font color. *)
 
   method footerSpacing : int Js.prop
@@ -1262,6 +1295,8 @@ and ['chart] tooltip = object
   (** Size of the border. *)
 end
 
+val createTooltip : unit -> 'a tooltip Js.t
+
 (** {2 Interactions} *)
 
 class type hover = object
@@ -1280,6 +1315,8 @@ class type hover = object
   method animationDuration : int Js.prop
   (** Duration in milliseconds it takes to animate hover style changes. *)
 end
+
+val createHover : unit -> hover Js.t
 
 (** {2 Elements} *)
 
@@ -1391,6 +1428,16 @@ class type elements = object
   (** Arcs are used in the polar area, doughnut and pie charts. *)
 end
 
+val createPointElement : unit -> pointElement Js.t
+
+val createLineElement : unit -> lineElement Js.t
+
+val createRectangleElement : unit -> rectangleElement Js.t
+
+val createArcElement : unit -> arcElement Js.t
+
+val createElements : unit -> elements Js.t
+
 (** {2 Options} *)
 
 class type chartSize = object
@@ -1407,20 +1454,17 @@ class type updateConfig = object
   method easing : Easing.t Js.optdef Js.prop
 end
 
+val createUpdateConfig :
+  ?duration:int
+  -> ?_lazy:bool
+  -> ?easing:Easing.t
+  -> unit
+  -> updateConfig Js.t
+
 (** The configuration is used to change how the chart behaves.
     There are properties to control styling, fonts, the legend, etc. *)
-class type ['chart,
-            'animation,
-            'layout,
-            'legend,
-            'title,
-            'tooltip,
-            'elements] chartOptions = object
+class type ['chart, 'animation] chartOptions = object
   constraint 'animation = 'chart #animation
-  constraint 'layout = #layout
-  constraint 'legend = 'chart #legend
-  constraint 'title = #title
-  constraint 'tooltip = 'chart #tooltip
   constraint 'elements = #elements
 
   method animation : 'animation Js.t Js.prop
@@ -1428,19 +1472,19 @@ class type ['chart,
       A number of options are provided to configure how the animation
       looks and how long it takes. *)
 
-  method layout : 'layout Js.t Js.prop
+  method layout : layout Js.t Js.prop
   (** Layout configurations. *)
 
-  method legend : 'legend Js.t Js.prop
+  method legend : 'chart legend Js.t Js.prop
   (** The chart legend displays data about the datasets
       that are appearing on the chart. *)
 
-  method title : 'title Js.t Js.prop
+  method title : title Js.t Js.prop
   (** The chart title defines text to draw at the top of the chart. *)
 
-  method tooltip : 'tooltip Js.t Js.prop
+  method tooltips : 'chart tooltip Js.t Js.prop
 
-  method elements : 'elements Js.t Js.prop
+  method elements : elements Js.t Js.prop
   (** While chart types provide settings to configure the styling
       of each dataset, you sometimes want to style all datasets the same way.
       A common example would be to stroke all of the bars in a bar chart with
@@ -1472,7 +1516,7 @@ class type ['chart,
   method maintainAspectRatio : bool Js.t Js.prop
   (** Maintain the original canvas aspect ratio (width / height) when resizing. *)
 
-  method aspectRatio : float Js.prop
+  method aspectRatio : float Js.optdef_prop
   (** Canvas aspect ratio (i.e. width / height, a value of 1
       representing a square canvas). Note that this option is
       ignored if the height is explicitly defined either as
@@ -1481,11 +1525,11 @@ class type ['chart,
   method onResize :
     ('chart Js.t
      -> chartSize Js.t
-     -> unit) Js.callback Js.opt Js.prop
+     -> unit) Js.callback Js.opt Js.optdef_prop
   (** Called when a resize occurs. Gets passed two arguments:
       the chart instance and the new size. *)
 
-  method devicePixelRatio : float Js.prop
+  method devicePixelRatio : float Js.optdef_prop
   (** Override the window's default devicePixelRatio. *)
 
   method events : Js.js_string Js.t Js.js_array Js.t Js.prop
@@ -1496,7 +1540,7 @@ class type ['chart,
     ('chart Js.t, Dom_html.event Js.t
      -> 'a Js.t Js.js_array Js.t
      -> unit)
-      Js.meth_callback Js.opt Js.prop
+      Js.meth_callback Js.opt Js.optdef_prop
   (** Called when any of the events fire.
       Called in the context of the chart and passed the event
       and an array of active elements (bars, points, etc). *)
@@ -1505,7 +1549,7 @@ class type ['chart,
     ('chart Js.t, Dom_html.event Js.t
      -> 'a Js.t Js.js_array Js.t
      -> unit)
-      Js.meth_callback Js.opt Js.prop
+      Js.meth_callback Js.opt Js.optdef_prop
       (** Called if the event is of type 'mouseup' or 'click'.
           Called in the context of the chart and passed the event
           and an array of active elements. *)
@@ -1606,24 +1650,18 @@ end
 
 (** {2 Line Chart} *)
 
-class type lineOptionContext = object
+class type ['a] lineOptionContext = object
   method chart : lineChart Js.t Js.readonly_prop
 
   method dataIndex : int Js.readonly_prop
 
-  method dataset : lineDataset Js.t Js.readonly_prop
+  method dataset : 'a lineDataset Js.t Js.readonly_prop
 
   method datasetIndex : int Js.readonly_prop
 end
 
 and lineOptions = object
-  inherit [lineChart,
-           lineChart animation,
-           layout,
-           lineChart legend,
-           title,
-           lineChart tooltip,
-           elements] chartOptions
+  inherit [lineChart, lineChart animation] chartOptions
 
   method showLines : bool Js.t Js.prop
   (** If [false], the lines between points are not drawn. *)
@@ -1632,107 +1670,106 @@ and lineOptions = object
   (** If [false], NaN data causes a break in the line. *)
 end
 
-and lineDataset = object
+and ['a] lineDataset = object
   inherit dataset
+
+  method data : 'a Js.js_array Js.t Js.prop
 
   (** {2 General} *)
 
-  method label : Js.js_string Js.t Js.prop
-  (** The label for the dataset which appears in the legend and tooltips. *)
-
-  method xAxisID : Js.js_string Js.t Js.prop
+  method xAxisID : Js.js_string Js.t Js.optdef_prop
   (** The ID of the x axis to plot this dataset on. *)
 
-  method yAxisID : Js.js_string Js.t Js.prop
+  method yAxisID : Js.js_string Js.t Js.optdef_prop
   (** The ID of the y axis to plot this dataset on. *)
 
   (** {2 Point styling} *)
 
   method pointBackgroundColor :
-    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** The fill color for points. *)
 
   method pointBorderColor :
-    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** The border color for points. *)
 
   method pointBorderWidth :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
   (** The width of the point border in pixels. *)
 
   method pointHitRadius :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
   (** The pixel size of the non-displayed point that reacts to mouse events. *)
 
   method pointRadius :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
   (** The radius of the point shape. If set to 0, the point is not rendered. *)
 
   method pointRotation :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
   (** The rotation of the point in degrees. *)
 
-  method pointStyle : Point_style.t Js.prop
+  method pointStyle : Point_style.t Js.optdef_prop
   (** Style of the point. *)
 
   (** {2 Line styling} *)
 
-  method backgroundColor : Color.t Js.prop
+  method backgroundColor : Color.t Js.optdef_prop
   (** The line fill color. *)
 
-  method borderCapStyle : Line_cap.t Js.prop
+  method borderCapStyle : Line_cap.t Js.optdef_prop
   (** Cap style of the line. *)
 
-  method borderColor : Color.t Js.prop
+  method borderColor : Color.t Js.optdef_prop
   (** The line color. *)
 
-  method borderDash : line_dash Js.prop
+  method borderDash : line_dash Js.optdef_prop
   (** Length and spacing of dashes. *)
 
-  method borderDashOffset : line_dash_offset Js.prop
+  method borderDashOffset : line_dash_offset Js.optdef_prop
   (** Offset for line dashes. *)
 
-  method borderJoinStyle : Line_join.t Js.prop
+  method borderJoinStyle : Line_join.t Js.optdef_prop
   (** Line joint style. *)
 
-  method borderWidth : int Js.prop
+  method borderWidth : int Js.optdef_prop
   (** The line width (in pixels). *)
 
-  method fill : Line_fill.t Js.t Js.prop
+  method fill : Line_fill.t Js.t Js.optdef_prop
   (** How to fill the area under the line. *)
 
-  method lineTension : float Js.prop
+  method lineTension : float Js.optdef_prop
   (** Bezier curve tension of the line. Set to 0 to draw straightlines.
       This option is ignored if monotone cubic interpolation is used. *)
 
-  method showLine : bool Js.t Js.optdef Js.prop
+  method showLine : bool Js.t Js.optdef_prop
   (** If [false], the line is not drawn for this dataset. *)
 
-  method spanGaps : bool Js.t Js.optdef Js.prop
+  method spanGaps : bool Js.t Js.optdef_prop
   (** If [true], lines will be drawn between points with no or null data.
       If [false], points with NaN data will create a break in the line. *)
 
   (** {2 Interactions} *)
 
   method pointHoverBackgroundColor :
-    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.optdef Js.prop
+    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Point background color when hovered. *)
 
   method pointHoverBorderColor :
-    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.optdef Js.prop
+    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Point border color when hovered. *)
 
   method pointHoverBorderWidth :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.optdef Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Border width of point when hovered. *)
 
   method pointHoverRadius :
-    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.optdef Js.prop
+    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
   (** The radius of the point when hovered. *)
 
   (** {2 Cubic Interpolation Mode} *)
 
-  method cubicInterpolationMode : Interpolation_mode.t Js.prop
+  method cubicInterpolationMode : Interpolation_mode.t Js.optdef_prop
   (** The [default] and [monotone] interpolation modes are supported.
       The [default] algorithm uses a custom weighted cubic interpolation,
       which produces pleasant curves for all types of datasets.
@@ -1744,7 +1781,7 @@ and lineDataset = object
 
   (** {2 Stepped Line} *)
 
-  method steppedLine : Stepped_line.t Js.t Js.prop
+  method steppedLine : Stepped_line.t Js.t Js.optdef_prop
   (** The following values are supported for steppedLine.
       [false]: No Step Interpolation (default)
       [true]: Step-before Interpolation (eq. 'before')
@@ -1760,20 +1797,23 @@ and lineChart = object
   inherit [lineOptions] chart
 end
 
+val createLineOptions : unit -> lineOptions Js.t
+
+val createLineDataset : 'a Js.js_array Js.t -> 'a lineDataset Js.t
+
 (** {2 Bar Chart} *)
 
 class type barOptionContext = object
-  method chart : lineChart Js.t Js.readonly_prop
+  method chart : barChart Js.t Js.readonly_prop
 
   method dataIndex : int Js.readonly_prop
 
-  method dataset : lineDataset Js.t Js.readonly_prop
+  method dataset : barDataset Js.t Js.readonly_prop
 
   method datasetIndex : int Js.readonly_prop
 end
 
 and barScale = object
-
   method barPercentage : float Js.prop
   (** Percent (0-1) of the available width each bar should be within
       the category width. 1.0 will take the whole category width and
@@ -1793,26 +1833,16 @@ and barScale = object
 
   method minBarLength : float Js.optdef Js.prop
   (** Set this to ensure that bars have a minimum length in pixels. *)
-
 end
 
 and barOptions = object
-  inherit [barChart,
-           barChart animation,
-           layout,
-           barChart legend,
-           title,
-           barChart tooltip,
-           elements] chartOptions
+  inherit [barChart, barChart animation] chartOptions
 end
 
 and barDataset = object
   inherit dataset
 
   (** {2 General} *)
-
-  method label : Js.js_string Js.t Js.prop
-  (** The label for the dataset which appears in the legend and tooltips. *)
 
   method xAxisID : Js.js_string Js.t Js.prop
   (** The ID of the x axis to plot this dataset on. *)
@@ -1823,15 +1853,15 @@ and barDataset = object
   (** {2 Styling} *)
 
   method backgroundColor :
-    (barOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    (barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.prop
   (** The bar background color. *)
 
   method borderColor :
-    (barOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    (barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.prop
   (** The bar border color. *)
 
   method borderSkipped :
-    (barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable.t Js.t Js.prop
+    (barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable_indexable.t Js.t Js.prop
   (** The edge to skip when drawing bar.
       This setting is used to avoid drawing the bar stroke at the base of the fill.
       In general, this does not need to be changed except when creating chart types
@@ -1846,7 +1876,7 @@ and barDataset = object
       [false] *)
 
   method borderWidth :
-    (barOptionContext Js.t, Padding.t Js.t Or_false.t Js.t) Scriptable.t Js.t Js.prop
+    (barOptionContext Js.t, Padding.t Js.t Or_false.t Js.t) Scriptable_indexable.t Js.t Js.prop
   (** The bar border width (in pixels).
       If this value is a number, it is applied to all sides of the rectangle
       (left, top, right, bottom), except [borderSkipped]. If this value is
@@ -1873,6 +1903,8 @@ and barChart = object
   inherit [barOptions] chart
 end
 
+(** {2 Pie Chart} *)
+
 class type pieOptionContext = object
   method chart : pieChart Js.t Js.readonly_prop
 
@@ -1894,13 +1926,7 @@ and pieAnimation = object
 end
 
 and pieOptions = object
-  inherit [pieChart,
-           pieAnimation,
-           layout,
-           pieChart legend,
-           title,
-           pieChart tooltip,
-           elements] chartOptions
+  inherit [pieChart, pieAnimation] chartOptions
 
   method cutoutPercentage : float Js.prop
   (** The percentage of the chart that is cut out of the middle. *)
@@ -1913,23 +1939,25 @@ and pieOptions = object
 end
 
 and pieDataset = object
+  inherit dataset
+
   method data : float Js.js_array Js.t Js.prop
 
   (** {2 Styling} *)
 
   method backgroundColor :
-    (pieOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc background color. *)
 
   method borderColor :
-    (pieOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc border color. *)
 
   method borderWidth :
-    (pieOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    (pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc border width (in pixels). *)
 
-  method weight : float Js.prop
+  method weight : float Js.optdef_prop
   (** The relative thickness of the dataset.
       Providing a value for weight will cause the pie or doughnut dataset
       to be drawn with a thickness relative to the sum of all the dataset
@@ -1938,20 +1966,20 @@ and pieDataset = object
   (** {2 Interactions} *)
 
   method hoverBackgroundColor :
-    (pieOptionContext Js.t, Color.t) Scriptable.t Js.prop
+    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc background color when hovered. *)
 
   method hoverBorderColor :
-    (pieOptionContext Js.t, Color.t) Scriptable.t Js.prop
+    (pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc border color when hovered. *)
 
   method hoverBorderWidth :
-    (pieOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+    (pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
   (** Arc border width when hovered (in pixels). *)
 
   (** {2 Border Alignment} *)
 
-  method borderAlign : Pie_border_align.t Js.t Js.prop
+  method borderAlign : Pie_border_align.t Js.optdef_prop
   (** The following values are supported for [borderAlign]:
       ['center'] (default),
       ['inner'].
@@ -1963,20 +1991,26 @@ and pieChart = object
   inherit [pieOptions] chart
 end
 
+val createPieAnimation : unit -> pieAnimation Js.t
+
+val createPieOptions : unit -> pieOptions Js.t
+
+val createPieDataset : float Js.js_array Js.t -> pieDataset Js.t
+
 module Chart : sig
-  type ('a, 'b) typ
+  type 'a typ
 
-  val line : (lineChart, lineOptions) typ
+  val line : lineChart typ
 
-  val bar : (barChart, barOptions) typ
+  val bar : barChart typ
 
-  val horizontal_bar : (barChart, barOptions) typ
+  val horizontal_bar : barOptions typ
 
-  val pie : (pieChart, pieOptions) typ
+  val pie : pieChart typ
 
-  val doughnut : (pieChart, pieOptions) typ
+  val doughnut : pieChart typ
 
-  val make : string -> ('a, 'b) typ
+  val make : string -> 'a typ
 end
 
 (** {1 Type Coercion} *)
@@ -1991,27 +2025,20 @@ end
 
 (** {1 Creating a Chart} *)
 
-val chart_from_canvas : ('a, 'b) Chart.typ
+val chart_from_canvas : 'a Chart.typ
   -> data Js.t
-  -> 'b Js.t
+  -> (_, _) #chartOptions Js.t
   -> Dom_html.canvasElement Js.t
   -> 'a Js.t
 
-val chart_from_ctx : ('a, 'b) Chart.typ
+val chart_from_ctx : 'a Chart.typ
   -> data Js.t
-  -> 'b Js.t
+  -> (_, _) #chartOptions Js.t
   -> Dom_html.canvasRenderingContext2D Js.t
   -> 'a Js.t
 
-val chart_from_id : ('a, 'b) Chart.typ
+val chart_from_id : 'a Chart.typ
   -> data Js.t
-  -> 'b Js.t
+  -> (_, _) #chartOptions Js.t
   -> string
   -> 'a Js.t
-
-val make_update_config :
-  ?duration:int
-  -> ?_lazy:bool
-  -> ?easing:Easing.t
-  -> unit
-  -> updateConfig Js.t
