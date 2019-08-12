@@ -11,4 +11,4 @@
 
 (alias
   (name examples)
-  (deps basic.js Chart.js index.html))
+  (deps basic.js index.html))

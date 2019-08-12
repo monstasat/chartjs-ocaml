@@ -26,7 +26,10 @@ module Indexable = struct
 end
 
 module Scriptable = struct
-  type 'a t
+  type ('a, 'b) t
+
+  let of_fun (x : 'a -> 'b) : ('a, 'b) t Js.t =
+    Obj.magic @@ Js.wrap_callback x
 end
 
 module Line_cap = struct
@@ -112,8 +115,11 @@ module Padding = struct
 
   class type obj = object
     method top : int Js.optdef Js.prop
+
     method right : int Js.optdef Js.prop
+
     method bottom : int Js.optdef Js.prop
+
     method left : int Js.optdef Js.prop
   end
 
@@ -201,27 +207,8 @@ type line_dash = float Js.js_array Js.t
 
 type line_dash_offset = float
 
-module Chart_type = struct
-  type 'a t = Js.js_string Js.t
-
-  (* let line = Js.string "line"
-   * let bar = Js.string "bar"
-   * let horizontal_bar = Js.string "horizontalBar" *)
-
-  (* TODO implement *)
-
-  (* let radar = Js.string "radar"
-   * let doughnut = Js.string "doughnut"
-   * let pie = Js.string "pie"
-   * let polar_area = Js.string "polarArea"
-   * let bubble = Js.string "bubble"
-   * let scatter = Js.string "scatter" *)
-
-  let make s = Js.string s
-end
-
-module Axis_type = struct
-  type t = Js.js_string Js.t
+module Axis = struct
+  type typ = Js.js_string Js.t
 
   let cartesian_category = Js.string "category"
   let cartesian_linear = Js.string "linear"
@@ -302,6 +289,13 @@ module Line_fill = struct
   let start : t Js.t = Js.Unsafe.coerce @@ Js.string "start"
   let _end : t Js.t = Js.Unsafe.coerce @@ Js.string "end"
   let origin : t Js.t = Js.Unsafe.coerce @@ Js.string "origin"
+end
+
+module Pie_border_align = struct
+  type t = Js.js_string Js.t
+
+  let center = Js.string "center"
+  let inner = Js.string "inner"
 end
 
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
@@ -413,7 +407,7 @@ class type cartesianTicks = object
 end
 
 class type ['a] cartesianAxis = object
-  method _type : Axis_type.t Js.optdef Js.prop
+  method _type : Axis.typ Js.optdef Js.prop
 
   method position : Position.t Js.prop
 
@@ -526,7 +520,24 @@ end
 
 class type scales = object
   method xAxes : 'a Js.t Js.js_array Js.t Js.optdef_prop
+
   method yAxes : 'a Js.t Js.js_array Js.t Js.optdef_prop
+end
+
+class type dataset = object
+  method _type : Js.js_string Js.t Js.optdef Js.prop
+
+  method data : 'a Js.js_array Js.t Js.prop
+end
+
+class type data = object
+  method datasets : dataset Js.t Js.js_array Js.t Js.prop
+
+  method labels : Js.js_string Js.t Js.js_array Js.t Js.prop
+
+  method xLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef Js.prop
+
+  method yLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef Js.prop
 end
 
 class type ['chart] optionContext = object
@@ -534,12 +545,12 @@ class type ['chart] optionContext = object
 
   method dataIndex : int Js.optdef Js.readonly_prop
 
-  method dataset : dataset Js.t Js.optdef Js.readonly_prop
+  method dataset : #dataset Js.t Js.optdef Js.readonly_prop
 
   method datasetIndex : int Js.optdef Js.readonly_prop
 end
 
-and ['chart] animationItem = object
+class type ['chart] animationItem = object
   method chart : 'chart Js.t Js.prop
 
   method currentStep : float Js.prop
@@ -554,7 +565,6 @@ and ['chart] animationItem = object
 end
 
 and ['chart] animation = object
-
   method duration : int Js.prop
 
   method easing : Easing.t Js.prop
@@ -564,11 +574,11 @@ and ['chart] animation = object
   method onComplete : ('chart animationItem Js.t -> unit) Js.callback Js.opt Js.prop
 end
 
-and layout = object
+class type layout = object
   method padding : Padding.t Js.prop
 end
 
-and legendItem = object
+class type legendItem = object
   method text : Js.js_string Js.t Js.prop
 
   method fillStyle : Color.t Js.prop
@@ -593,7 +603,6 @@ and legendItem = object
 end
 
 and ['chart] legendLabels = object
-
   method boxWidth : int Js.prop
 
   method fontSize : int Js.prop
@@ -641,7 +650,7 @@ and ['chart] legend = object
   method labels : 'chart legendLabels Js.t Js.prop
 end
 
-and title = object
+class type title = object
   method display : bool Js.t Js.prop
 
   method position : Position.t Js.prop
@@ -661,7 +670,7 @@ and title = object
   method text : Js.js_string Js.t Indexable.t Js.prop
 end
 
-and tooltipItem = object
+class type tooltipItem = object
   method label : Js.js_string Js.t Js.readonly_prop
 
   method value : Js.js_string Js.t Js.readonly_prop
@@ -924,8 +933,7 @@ and ['chart] tooltip = object
   method borderWidth : int Js.prop
 end
 
-and hover = object
-
+class type hover = object
   method mode : Interaction_mode.t Js.prop
 
   method intersect : bool Js.t Js.prop
@@ -933,11 +941,9 @@ and hover = object
   method axis : Hover_axis.t Js.prop
 
   method animationDuration : int Js.prop
-
 end
 
-and pointElement = object
-
+class type pointElement = object
   method radius : int Js.prop
 
   method pointStyle : Point_style.t Js.prop
@@ -955,11 +961,9 @@ and pointElement = object
   method hoverRadius : int Js.prop
 
   method hoverBorderWidth : int Js.prop
-
 end
 
-and lineElement = object
-
+class type lineElement = object
   method tension : float Js.prop
 
   method backgroundColor : Color.t Js.prop
@@ -981,11 +985,9 @@ and lineElement = object
   method fill : Fill.t Js.t Js.prop
 
   method stepped : bool Js.t Js.prop
-
 end
 
-and rectangleElement = object
-
+class type rectangleElement = object
   method backgroundColor : Js.js_string Js.prop
 
   method borderWidth : int Js.prop
@@ -993,11 +995,9 @@ and rectangleElement = object
   method borderColor : Color.t Js.prop
 
   method borderSkipped : Position.t Js.prop
-
 end
 
-and arcElement = object
-
+class type arcElement = object
   method backgroundColor : Color.t Js.prop
 
   method borderAlign : Js.js_string Js.t Js.prop
@@ -1005,11 +1005,9 @@ and arcElement = object
   method borderColor : Color.t Js.prop
 
   method borderWidth : int Js.prop
-
 end
 
-and elements = object
-
+class type elements = object
   method point : pointElement Js.t Js.prop
 
   method line : lineElement Js.t Js.prop
@@ -1017,30 +1015,47 @@ and elements = object
   method rectangle : rectangleElement Js.t Js.prop
 
   method arc : arcElement Js.t Js.prop
-
 end
 
-and chartSize = object
+class type chartSize = object
   method width : int Js.readonly_prop
 
   method height : int Js.readonly_prop
 end
 
-and ['chart] chartOptions = object
+class type updateConfig = object
+  method duration : int Js.optdef Js.prop
 
-  method scales : scales Js.t Js.prop
+  method _lazy : bool Js.t Js.optdef Js.prop
 
-  method animation : 'chart animation Js.t Js.prop
+  method easing : Easing.t Js.optdef Js.prop
+end
 
-  method layout : layout Js.t Js.prop
+class type ['chart,
+            'animation,
+            'layout,
+            'legend,
+            'title,
+            'tooltip,
+            'elements] chartOptions = object
+  constraint 'animation = 'chart #animation
+  constraint 'layout = #layout
+  constraint 'legend = 'chart #legend
+  constraint 'title = #title
+  constraint 'tooltip = 'chart #tooltip
+  constraint 'elements = #elements
 
-  method legend : 'chart legend Js.t Js.prop
+  method animation : 'animation Js.t Js.prop
 
-  method title : title Js.t Js.prop
+  method layout : 'layout Js.t Js.prop
 
-  method tooltip : 'chart tooltip Js.t Js.prop
+  method legend : 'legend Js.t Js.prop
 
-  method elements : elements Js.t Js.prop
+  method title : 'title Js.t Js.prop
+
+  method tooltip : 'tooltip Js.t Js.prop
+
+  method elements : 'elements Js.t Js.prop
 
   method plugins : 'a Js.t Js.prop
 
@@ -1064,55 +1079,30 @@ and ['chart] chartOptions = object
   method events : Js.js_string Js.t Js.js_array Js.t Js.prop
 
   method onHover :
-    ('chart Js.t, Dom_html.event Js.t
+    ('chart Js.t,
+     Dom_html.event Js.t
      -> 'a Js.t Js.js_array Js.t
      -> unit)
       Js.meth_callback Js.opt Js.prop
 
   method onClick :
-    ('chart Js.t, Dom_html.event Js.t
+    ('chart Js.t,
+     Dom_html.event Js.t
      -> 'a Js.t Js.js_array Js.t
      -> unit)
       Js.meth_callback Js.opt Js.prop
-
 end
 
-and dataset = object
-
-  method _type : 'a Chart_type.t Js.optdef Js.prop
-
-end
-
-and data = object
-
-  method datasets : dataset Js.t Js.js_array Js.t Js.prop
-
-  method labels : Js.js_string Js.t Js.js_array Js.t Js.prop
-
-  method xLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef Js.prop
-
-  method yLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef Js.prop
-
-end
-
-and ['a] chartConfig = object
+class type ['a] chartConfig = object
   method data : data Js.t Js.prop
 
   method options : 'a Js.t Js.prop
 
-  method _type : 'a Chart_type.t Js.prop
+  method _type : Js.js_string Js.t Js.prop
 end
 
-and updateConfig = object
-  method duration : int Js.optdef_prop
-
-  method lazy_ : bool Js.t Js.optdef_prop
-
-  method easing : Easing.t Js.optdef_prop
-end
-
-and ['a] chart = object
-  constraint 'a = 'chart #chartOptions
+class type ['a] chart = object('self)
+  method id : int Js.readonly_prop
 
   method height : int Js.readonly_prop
 
@@ -1132,46 +1122,65 @@ and ['a] chart = object
 
   method ctx : Dom_html.canvasRenderingContext2D Js.t Js.readonly_prop
 
-  method data : data Js.t Js.prop
-
-  method options : 'a Js.t
+  method options : 'a Js.t Js.prop
 
   method config : 'a chartConfig Js.t Js.prop
+
+  method data : data Js.t Js.prop
 
   method destroy : unit Js.meth
 
   method update : unit Js.meth
 
-  method update_withConfig : updateConfig Js.t -> unit Js.meth
+  method update_withConfig : #updateConfig Js.t -> unit Js.meth
 
   method reset : unit Js.meth
 
   method render : unit Js.meth
 
-  method render_withConfig : updateConfig Js.t -> unit Js.meth
+  method render_withConfig : #updateConfig Js.t -> unit Js.meth
 
-  method stop : 'options chart Js.t Js.meth
+  method stop : 'self Js.t Js.meth
 
-  method resize : 'options chart Js.t Js.meth
+  method resize : 'self Js.t Js.meth
 
-  method clear : 'options chart Js.t Js.meth
+  method clear : 'self Js.t Js.meth
 
   method toBase64Image : Js.js_string Js.t Js.meth
 
   method generateLegend : Js.js_string Js.t Js.meth
-
 end
 
-class type lineOptions = object
-  inherit [lineChart] chartOptions
+class type lineOptionContext = object
+  method chart : lineChart Js.t Js.readonly_prop
 
+  method dataIndex : int Js.readonly_prop
+
+  method dataset : lineDataset Js.t Js.readonly_prop
+
+  method datasetIndex : int Js.readonly_prop
+end
+
+and lineOptions = object
+  inherit [lineChart,
+           lineChart animation,
+           layout,
+           lineChart legend,
+           title,
+           lineChart tooltip,
+           elements] chartOptions
   method showLines : bool Js.t Js.prop
 
   method spanGaps : bool Js.t Js.prop
 end
 
-and lineDataset = object
+(* and ['a, 'b] lineDataPoint = object
+ *   method x : 'a Js.prop
+ * 
+ *   method y : 'b Js.prop
+ * end *)
 
+and lineDataset = object
   inherit dataset
 
   method label : Js.js_string Js.t Js.prop
@@ -1180,17 +1189,23 @@ and lineDataset = object
 
   method yAxisID : Js.js_string Js.t Js.prop
 
-  method pointBackgroundColor : Color.t Scriptable.t Js.t Js.prop
+  method pointBackgroundColor :
+    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
 
-  method pointBorderColor : Color.t Scriptable.t Js.t Js.prop
+  method pointBorderColor :
+    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
 
-  method pointBorderWidth : int Scriptable.t Js.t Js.prop
+  method pointBorderWidth :
+    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
 
-  method pointHitRadius : int Scriptable.t Js.t Js.prop
+  method pointHitRadius :
+    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
 
-  method pointRadius : int Scriptable.t Js.t Js.prop
+  method pointRadius :
+    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
 
-  method pointRotation : int Scriptable.t Js.t Js.prop
+  method pointRotation :
+    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.prop
 
   method pointStyle : Point_style.t Js.prop
 
@@ -1216,26 +1231,38 @@ and lineDataset = object
 
   method spanGaps : bool Js.t Js.optdef Js.prop
 
-  method pointHoverBackgroundColor : Color.t Scriptable.t Js.t Js.optdef Js.prop
+  method pointHoverBackgroundColor :
+    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.optdef Js.prop
 
-  method pointHoverBorderColor : Color.t Scriptable.t Js.t Js.optdef Js.prop
+  method pointHoverBorderColor :
+    (lineOptionContext Js.t, Color.t) Scriptable.t Js.t Js.optdef Js.prop
 
-  method pointHoverBorderWidth : int Scriptable.t Js.t Js.optdef Js.prop
+  method pointHoverBorderWidth :
+    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.optdef Js.prop
 
-  method pointHoverRadius : int Scriptable.t Js.t Js.optdef Js.prop
+  method pointHoverRadius :
+    (lineOptionContext Js.t, int) Scriptable.t Js.t Js.optdef Js.prop
 
   method cubicInterpolationMode : Interpolation_mode.t Js.prop
 
   method steppedLine : Stepped_line.t Js.t Js.prop
-
 end
 
 and lineChart = object
   inherit [lineOptions] chart
 end
 
-class type barScale = object
+class type barOptionContext = object
+  method chart : lineChart Js.t Js.readonly_prop
 
+  method dataIndex : int Js.readonly_prop
+
+  method dataset : lineDataset Js.t Js.readonly_prop
+
+  method datasetIndex : int Js.readonly_prop
+end
+
+and barScale = object
   method barPercentage : float Js.prop
 
   method categoryPercentage : float Js.prop
@@ -1245,11 +1272,16 @@ class type barScale = object
   method maxBarThickness : float Js.optdef Js.prop
 
   method minBarLength : float Js.optdef Js.prop
-
 end
 
 and barOptions = object
-  inherit [barChart] chartOptions
+  inherit [barChart,
+           barChart animation,
+           layout,
+           barChart legend,
+           title,
+           barChart tooltip,
+           elements] chartOptions
 end
 
 and barDataset = object
@@ -1261,30 +1293,112 @@ and barDataset = object
 
   method yAxisID : Js.js_string Js.t Js.prop
 
-  method backgroundColor : Color.t Scriptable.t Js.t Js.prop
+  method backgroundColor :
+    (barOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
 
-  method borderColor : Color.t Scriptable.t Js.t Js.prop
+  method borderColor :
+    (barOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
 
-  method borderSkipped : Position.t Or_false.t Js.t Scriptable.t Js.t Js.prop
+  method borderSkipped :
+    (barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable.t Js.t Js.prop
 
-  method borderWidth : Padding.t Js.t Or_false.t Js.t Scriptable.t Js.t Js.prop
+  method borderWidth :
+    (barOptionContext Js.t, Padding.t Js.t Or_false.t Js.t) Scriptable.t Js.t Js.prop
 
   method hoverBackgroundColor : Color.t Indexable.t Js.t Js.optdef Js.prop
 
   method hoverBorderColor : Color.t Indexable.t Js.t Js.optdef Js.prop
 
   method hoverBorderWidth : Color.t Indexable.t Js.t Js.prop
-
 end
 
 and barChart = object
   inherit [barOptions] chart
 end
 
-module CoerceTo = struct
+class type pieOptionContext = object
+  method chart : pieChart Js.t Js.readonly_prop
 
-  let unsafe_coerce_chart typ (chart : 'a chart Js.t) =
-    if chart##.config##._type##toLowerCase == Js.string typ
+  method dataIndex : int Js.readonly_prop
+
+  method dataset : pieDataset Js.t Js.readonly_prop
+
+  method datasetIndex : int Js.readonly_prop
+end
+
+and pieAnimation = object
+  inherit [pieChart] animation
+
+  method animateRotate : bool Js.t Js.prop
+
+  method animateScale : bool Js.t Js.prop
+end
+
+and pieOptions = object
+  inherit [pieChart,
+           pieAnimation,
+           layout,
+           pieChart legend,
+           title,
+           pieChart tooltip,
+           elements] chartOptions
+
+  method cutoutPercentage : float Js.prop
+
+  method rotation : float Js.prop
+
+  method circumference : float Js.prop
+end
+
+and pieDataset = object
+  method data : float Js.js_array Js.t Js.prop
+
+  method backgroundColor :
+    (pieOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+
+  method borderColor :
+    (pieOptionContext Js.t, Color.t) Scriptable.t Js.t Js.prop
+
+  method borderWidth :
+    (pieOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+
+  method weight : float Js.prop
+
+  method hoverBackgroundColor :
+    (pieOptionContext Js.t, Color.t) Scriptable.t Js.prop
+
+  method hoverBorderColor :
+    (pieOptionContext Js.t, Color.t) Scriptable.t Js.prop
+
+  method hoverBorderWidth :
+    (pieOptionContext Js.t, int) Scriptable.t Js.t Js.prop
+
+  method borderAlign : Pie_border_align.t Js.t Js.prop
+end
+
+and pieChart = object
+  inherit [pieOptions] chart
+end
+
+module Chart = struct
+  type ('a, 'b) typ = Js.js_string Js.t
+
+  let line = Js.string "line"
+
+  let bar = Js.string "bar"
+
+  let horizontal_bar = Js.string "horizontalBar"
+
+  let pie = Js.string "pie"
+
+  let doughnut = Js.string "doughnut"
+
+  let make s = Js.string s
+end
+
+module CoerceTo = struct
+  let unsafe_coerce_chart typ (chart : 'a #chart Js.t) =
+    if (Js.Unsafe.coerce chart)##.config##._type##toLowerCase == Js.string typ
     then Js.some (Js.Unsafe.coerce chart)
     else Js.null
 
@@ -1293,7 +1407,6 @@ module CoerceTo = struct
   let bar c = unsafe_coerce_chart "bar" c
 
   let horizontal_bar c = unsafe_coerce_chart "horizontalBar" c
-
 end
 
 let chart_constr = Js.Unsafe.global##._Chart
@@ -1322,10 +1435,10 @@ let chart_from_id typ data options (id : string) =
   end in
   new%js chart_constr (Js.string id) config
 
-let make_update_config ?duration ?lazy_ ?easing () : updateConfig Js.t =
+let make_update_config ?duration ?_lazy ?easing () : updateConfig Js.t =
   let iter f = function None -> () | Some x -> f x in
   let (conf : updateConfig Js.t) = Js.Unsafe.obj [||] in
-  iter (fun x -> conf##.duration := x) duration;
-  iter (fun x -> conf##.lazy_ := Js.bool x) lazy_;
-  iter (fun x -> conf##.easing := x) easing;
+  iter (fun x -> conf##.duration := Js.def x) duration;
+  iter (fun x -> conf##._lazy := Js.def @@ Js.bool x) _lazy;
+  iter (fun x -> conf##.easing := Js.def x) easing;
   conf
