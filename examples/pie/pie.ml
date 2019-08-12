@@ -3,17 +3,19 @@ open Chartjs
 
 let () =
   let border_color_fun = fun context ->
-    match context##.dataIndex with
-    | 0 -> Js.string "red"
-    | 1 -> Js.string "blue"
-    | 2 -> Js.string "green"
-    | _ -> Js.string "initial)" in
+    Color.of_string
+    @@ match context##.dataIndex with
+    | 0 -> "red"
+    | 1 -> "blue"
+    | 2 -> "green"
+    | _ -> "initial)" in
   let background_color_fun = fun context ->
-    match context##.dataIndex with
-    | 0 -> Js.string "pink"
-    | 1 -> Js.string "lightblue"
-    | 2 -> Js.string "lightgreen"
-    | _ -> Js.string "initial)" in
+    Color.of_string
+    @@ match context##.dataIndex with
+    | 0 -> "pink"
+    | 1 -> "lightblue"
+    | 2 -> "lightgreen"
+    | _ -> "initial)" in
   let dataset = createPieDataset (Js.array [|40; 15; 20|]) in
   dataset##.borderColor := Scriptable_indexable.of_fun border_color_fun;
   dataset##.backgroundColor := Scriptable_indexable.of_fun background_color_fun;

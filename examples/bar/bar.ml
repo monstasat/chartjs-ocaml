@@ -7,18 +7,18 @@ let () =
   let dataset1 =
     createBarDataset
     @@ Js.array [|10.; 15.; 30.; 20.; 25.; 10.; 7.|] in
-  dataset1##.borderColor := Scriptable_indexable.of_single @@ Js.string "red";
+  dataset1##.borderColor := Scriptable_indexable.of_single @@ Color.of_string "red";
   dataset1##.backgroundColor := (
     Scriptable_indexable.of_single
-    @@ Js.string "rgba(255, 0, 0, 0.4)");
+    @@ Color.of_string "rgba(255, 0, 0, 0.4)");
   dataset1##.label := Js.string "Dataset 1";
   let dataset2 =
     createBarDataset
     @@ Js.array [|20.; 10.; nan; 15.; 5.; 7.; 30.|] in
-  dataset2##.borderColor := Scriptable_indexable.of_single @@ Js.string "blue";
+  dataset2##.borderColor := Scriptable_indexable.of_single @@ Color.of_string "blue";
   dataset2##.backgroundColor := (
     Scriptable_indexable.of_single
-    @@ Js.string "rgba(0, 0, 255, 0.4)");
+    @@ Color.of_string "rgba(0, 0, 255, 0.4)");
   dataset2##.label := Js.string "Dataset 2";
   let data = createData
       ~datasets:[dataset1; dataset2]

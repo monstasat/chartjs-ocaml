@@ -49,6 +49,21 @@ module Scriptable_indexable = struct
 
   let of_fun (x : 'a -> 'b) : ('a, 'b) t Js.t =
     Obj.magic @@ Js.wrap_callback x
+
+  let cast_single (t : ('a, 'b) t Js.t) : 'b Js.opt =
+    if Js.instanceof t Js.array_empty
+    then Js.null
+    else Js.some (Obj.magic t)
+
+  let cast_js_array (t : ('a, 'b) t Js.t) : 'b Js.js_array Js.t Js.opt =
+    if Js.instanceof t Js.array_empty
+    then Js.some (Js.Unsafe.coerce t)
+    else Js.null
+
+  let cast_fun (t : ('a, 'b) t Js.t) : ('c, 'a -> 'b) Js.meth_callback Js.opt =
+    if (Js.typeof t)##toLowerCase == Js.string "function"
+    then Js.some @@ Obj.magic t
+    else Js.null
 end
 
 module Line_cap = struct
@@ -90,63 +105,117 @@ module Interaction_mode = struct
 end
 
 module Point_style = struct
-  type t = Js.js_string Js.t
+  type t
 
-  let circle = Js.string "circle"
+  let circle = Js.Unsafe.coerce @@ Js.string "circle"
 
-  let cross = Js.string "cross"
+  let cross = Js.Unsafe.coerce @@ Js.string "cross"
 
-  let crossRot = Js.string "crossRot"
+  let crossRot = Js.Unsafe.coerce @@ Js.string "crossRot"
 
-  let dash = Js.string "dash"
+  let dash = Js.Unsafe.coerce @@ Js.string "dash"
 
-  let line = Js.string "line"
+  let line = Js.Unsafe.coerce @@ Js.string "line"
 
-  let rect = Js.string "rect"
+  let rect = Js.Unsafe.coerce @@ Js.string "rect"
 
-  let rectRounded = Js.string "rectRounded"
+  let rectRounded = Js.Unsafe.coerce @@ Js.string "rectRounded"
 
-  let rectRot = Js.string "rectRot"
+  let rectRot = Js.Unsafe.coerce @@ Js.string "rectRot"
 
-  let star = Js.string "star"
+  let star = Js.Unsafe.coerce @@ Js.string "star"
 
-  let triangle = Js.string "triangle"
+  let triangle = Js.Unsafe.coerce @@ Js.string "triangle"
+
+  let of_string s = Js.Unsafe.coerce @@ Js.string s
+
+  let of_image = Js.Unsafe.coerce
+
+  let of_video = Js.Unsafe.coerce
+
+  let of_canvas = Js.Unsafe.coerce
+
+  let element f x =
+    Js.Opt.bind (Dom_html.CoerceTo.element (Js.Unsafe.coerce x)) f
+
+  let cast_string x =
+    if (Js.typeof x)##toLowerCase == Js.string "string"
+    then Js.some (Js.to_string @@ Js.Unsafe.coerce x)
+    else Js.null
+
+  let cast_image x = element Dom_html.CoerceTo.img x
+
+  let cast_video x = element Dom_html.CoerceTo.video x
+
+  let cast_canvas x = element Dom_html.CoerceTo.canvas x
 end
 
 module Easing = struct
   type t = Js.js_string Js.t
 
   let linear = Js.string "linear"
+
   let easeInQuad = Js.string "easeInQuad"
+
   let easeOutQuad = Js.string "easeOutQuad"
+
   let easeInOutQuad = Js.string "easeInOutQuad"
+
   let easeInCubic = Js.string "easeInCubic"
+
   let easeOutCubic = Js.string "easeOutCubic"
+
   let easeInOutCubic = Js.string "easeInOutCubic"
+
   let easeInQuart = Js.string "easeInQuart"
+
   let easeOutQuart = Js.string "easeOutQuart"
+
   let easeInOutQuart = Js.string "easeInOutQuart"
+
   let easeInQuint = Js.string "easeInQuint"
+
   let easeOutQuint = Js.string "easeOutQuint"
+
   let easeInOutQuint = Js.string "easeInOutQuint"
+
   let easeInSine = Js.string "easeInSine"
+
   let easeOutSine = Js.string "easeOutSine"
+
   let easeInOutSine = Js.string "easeInOutSine"
+
   let easeInExpo = Js.string "easeInExpo"
+
   let easeOutExpo = Js.string "easeOutExpo"
+
   let easeInOutExpo = Js.string "easeInOutExpo"
+
   let easeInCirc = Js.string "easeInCirc"
+
   let easeOutCirc = Js.string "easeOutCirc"
+
   let easeInOutCirc = Js.string "easeInOutCirc"
+
   let easeInElastic = Js.string "easeInElastic"
+
   let easeOutElastic = Js.string "easeOutElastic"
+
   let easeInOutElastic = Js.string "easeInOutElastic"
+
   let easeInBack = Js.string "easeInBack"
+
   let easeOutBack = Js.string "easeOutBack"
+
   let easeInOutBack = Js.string "easeInOutBack"
+
   let easeInBounce = Js.string "easeInBounce"
+
   let easeOutBounce = Js.string "easeOutBounce"
+
   let easeInOutBounce = Js.string "easeInOutBounce"
+
+  let of_string = Js.string
 end
 
 module Padding = struct
@@ -162,7 +231,7 @@ module Padding = struct
     method left : int Js.optdef_prop
   end
 
-  let obj ?top ?right ?bottom ?left () : t Js.t =
+  let make_object ?top ?right ?bottom ?left () : t Js.t =
     let iter f = function None -> () | Some x -> f x in
     let (obj : obj Js.t) = Js.Unsafe.obj [||] in
     iter (fun x -> obj##.top := x) top;
@@ -171,7 +240,9 @@ module Padding = struct
     iter (fun x -> obj##.left := x) left;
     Js.Unsafe.coerce obj
 
-  let int (x : int) : t Js.t =
+  let of_object = Js.Unsafe.coerce
+
+  let of_int (x : int) : t Js.t =
     Js.Unsafe.coerce @@ Js.number_of_float @@ float_of_int x
 
   let cast_int (x : t Js.t) : int Js.opt =
@@ -183,22 +254,40 @@ module Padding = struct
       @@ Js.Unsafe.coerce x
     | _ -> Js.null
 
-  let cast_obj (x : t Js.t) : obj Js.t Js.opt =
+  let cast_object (x : t Js.t) : obj Js.t Js.opt =
     match Js.to_string @@ Js.typeof x with
     | "object" -> Js.some @@ Js.Unsafe.coerce x
     | _ -> Js.null
 end
 
 module Color = struct
-  type t = Js.js_string Js.t
+  type t
+
+  let of_string s = Js.Unsafe.coerce @@ Js.string s
+
+  let of_canvas_gradient = Js.Unsafe.coerce
+
+  let of_canvas_pattern = Js.Unsafe.coerce
+
+  let cast_string x =
+    if (Js.typeof x)##toLowerCase == Js.string "string"
+    then Js.some (Js.to_string @@ Js.Unsafe.coerce x)
+    else Js.null
+
+  let cast_canvas_gradient _x = Js.null
+
+  let cast_canvas_pattern _x = Js.null
 end
 
 module Position = struct
   type t = Js.js_string Js.t
 
   let left = Js.string "left"
+
   let right = Js.string "right"
+
   let top = Js.string "top"
+
   let bottom = Js.string "bottom"
 end
 
@@ -206,19 +295,37 @@ module Tooltip_position = struct
   type t = Js.js_string Js.t
 
   let average = Js.string "average"
+
   let nearest = Js.string "nearest"
+
+  let of_string = Js.string
 end
 
-(* FIXME *)
 module Line_height = struct
-  type t = float
+  type t
+
+  let of_string s = Js.Unsafe.coerce @@ Js.string s
+
+  let of_float x = Js.Unsafe.coerce @@ Js.number_of_float x
+
+  let cast_string (x : t Js.t) =
+    if (Js.typeof x)##toLowerCase == Js.string "string"
+    then Js.some (Js.to_string @@ Js.Unsafe.coerce x)
+    else Js.null
+
+  let cast_float (x : t Js.t) =
+    if (Js.typeof x)##toLowerCase == Js.string "number"
+    then Js.some (Js.float_of_number @@ Js.Unsafe.coerce x)
+    else Js.null
 end
 
 module Hover_axis = struct
   type t = Js.js_string Js.t
 
   let x = Js.string "x"
+
   let y = Js.string "y"
+
   let xy = Js.string "xy"
 end
 
@@ -226,19 +333,25 @@ module Fill = struct
   type t
 
   let zero : t Js.t = Js.Unsafe.coerce @@ Js.string "zero"
+
   let top : t Js.t = Js.Unsafe.coerce @@ Js.string "top"
+
   let bottom : t Js.t = Js.Unsafe.coerce @@ Js.string "bottom"
+
   let _true : t Js.t = Js.Unsafe.coerce Js._true
+
   let _false : t Js.t = Js.Unsafe.coerce Js._false
 end
 
 module Time = struct
-  type t = float
+  type t = float (* FIXME *)
 end
 
 module Or_false = struct
   type 'a t
+
   let make : 'a. 'a -> 'a t Js.t = fun x -> Obj.magic x
+
   let _false = Js.Unsafe.coerce Js._false
 end
 
@@ -250,9 +363,14 @@ module Axis = struct
   type typ = Js.js_string Js.t
 
   let cartesian_category = Js.string "category"
+
   let cartesian_linear = Js.string "linear"
+
   let cartesian_logarithmic = Js.string "logarithmic"
+
   let cartesian_time = Js.string "time"
+
+  let radial_linear = Js.string "linear"
 
   let make s = Js.string s
 end
@@ -261,7 +379,9 @@ module Time_ticks_source = struct
   type t = Js.js_string Js.t
 
   let auto = Js.string "auto"
+
   let data = Js.string "data"
+
   let labels = Js.string "labels"
 end
 
@@ -269,6 +389,7 @@ module Time_distribution = struct
   type t = Js.js_string Js.t
 
   let linear = Js.string "linear"
+
   let series = Js.string "series"
 end
 
@@ -276,6 +397,7 @@ module Time_bounds = struct
   type t = Js.js_string Js.t
 
   let data = Js.string "data"
+
   let ticks = Js.string "ticks"
 end
 
@@ -283,13 +405,21 @@ module Time_unit = struct
   type t = Js.js_string Js.t
 
   let millisecond = Js.string "millisecond"
+
   let second = Js.string "second"
+
   let minute = Js.string "minute"
+
   let hour = Js.string "hour"
+
   let day = Js.string "day"
+
   let week = Js.string "week"
+
   let month = Js.string "month"
+
   let quarter = Js.string "quarter"
+
   let year = Js.string "year"
 end
 
@@ -297,6 +427,7 @@ module Interpolation_mode = struct
   type t = Js.js_string Js.t
 
   let default = Js.string "default"
+
   let monotone = Js.string "monotone"
 end
 
@@ -304,9 +435,13 @@ module Stepped_line = struct
   type t
 
   let _false : t Js.t = Js.Unsafe.coerce Js._false
+
   let _true : t Js.t = Js.Unsafe.coerce Js._true
+
   let before : t Js.t = Js.Unsafe.coerce @@ Js.string "before"
+
   let after : t Js.t = Js.Unsafe.coerce @@ Js.string "after"
+
   let middle : t Js.t = Js.Unsafe.coerce @@ Js.string "middle"
 end
 
@@ -324,9 +459,13 @@ module Line_fill = struct
     @@ float_of_int x
 
   let _false : t Js.t = Js.Unsafe.coerce Js._false
+
   let _true : t Js.t = Js.Unsafe.coerce Js._true
+
   let start : t Js.t = Js.Unsafe.coerce @@ Js.string "start"
+
   let _end : t Js.t = Js.Unsafe.coerce @@ Js.string "end"
+
   let origin : t Js.t = Js.Unsafe.coerce @@ Js.string "origin"
 end
 
@@ -334,6 +473,7 @@ module Pie_border_align = struct
   type t = Js.js_string Js.t
 
   let center = Js.string "center"
+
   let inner = Js.string "inner"
 end
 
@@ -343,22 +483,30 @@ type ('a, 'b, 'c) tooltip_cb =
   ('a, ('b -> 'c -> Js.js_string Js.t Indexable.t Js.t))
     Js.meth_callback Js.optdef
 
-class type ['a, 'b] dataPoint = object
-  method x : 'a Js.prop
+class type ['x, 'y] dataPoint = object
+  method x : 'x Js.prop
 
-  method y : 'b Js.prop
+  method y : 'y Js.prop
 end
 
-class type ['a, 'b] timeDataPoint = object
-  method t : 'a Js.prop
+class type ['t, 'y] timeDataPoint = object
+  method t : 't Js.prop
 
-  method y : 'b Js.prop
+  method y : 'y Js.prop
+end
+
+class type ['x, 'y, 'r] bubbleDataPoint = object
+  method x : 'x Js.prop
+
+  method y : 'y Js.prop
+
+  method r : 'r Js.prop
 end
 
 class type minorTicks = object
   method callback : 'a tick_cb Js.prop
 
-  method fontColor : Color.t Js.prop
+  method fontColor : Color.t Js.t Js.prop
 
   method fontFamily : Js.js_string Js.t Js.prop
 
@@ -374,7 +522,7 @@ and ticks = object
 
   method display : bool Js.t Js.prop
 
-  method fontColor : Color.t Js.prop
+  method fontColor : Color.t Js.t Js.prop
 
   method fontFamily : Js.js_string Js.t Js.prop
 
@@ -394,9 +542,9 @@ and scaleLabel = object
 
   method labelString : Js.js_string Js.t Js.prop
 
-  method lineHeight : Line_height.t Js.prop
+  method lineHeight : Line_height.t Js.t Js.prop
 
-  method fontColor : Color.t Js.prop
+  method fontColor : Color.t Js.t Js.prop
 
   method fontFamily : Js.js_string Js.t Js.prop
 
@@ -640,7 +788,7 @@ let createLayout () = Js.Unsafe.obj [||]
 class type legendItem = object
   method text : Js.js_string Js.t Js.prop
 
-  method fillStyle : Color.t Js.prop
+  method fillStyle : Color.t Js.t Js.prop
 
   method hidden : bool Js.t Js.prop
 
@@ -654,9 +802,9 @@ class type legendItem = object
 
   method lineWidth : int Js.prop
 
-  method strokeStyle : Color.t Js.prop
+  method strokeStyle : Color.t Js.t Js.prop
 
-  method pointStyle : Js.js_string Js.t Js.optdef_prop
+  method pointStyle : Point_style.t Js.t Js.optdef_prop
 
   method datasetIndex : int Js.prop
 end
@@ -668,7 +816,7 @@ class type ['chart] legendLabels = object('self)
 
   method fontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method fontColor : Color.t Js.optdef_prop
+  method fontColor : Color.t Js.t Js.optdef_prop
 
   method fontFamily : Js.js_string Js.t Js.optdef_prop
 
@@ -738,7 +886,7 @@ class type title = object
 
   method padding : int Js.prop
 
-  method lineHeight : Line_height.t Js.optdef_prop
+  method lineHeight : Line_height.t Js.t Js.optdef_prop
 
   method text : Js.js_string Js.t Indexable.t Js.t Js.prop
 end
@@ -796,7 +944,7 @@ and tooltipModel = object
 
   method afterBody : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
 
-  method bodyFontColor : Color.t Js.readonly_prop
+  method bodyFontColor : Color.t Js.t Js.readonly_prop
 
   method __bodyFontFamily : Js.js_string Js.t Js.readonly_prop
 
@@ -810,7 +958,7 @@ and tooltipModel = object
 
   method title : Js.js_string Js.t Indexable.t Js.readonly_prop
 
-  method titleFontColor : Color.t Js.readonly_prop
+  method titleFontColor : Color.t Js.t Js.readonly_prop
 
   method __titleFontFamily : Js.js_string Js.t Js.readonly_prop
 
@@ -826,7 +974,7 @@ and tooltipModel = object
 
   method footer : Js.js_string Js.t Indexable.t Js.readonly_prop
 
-  method footerFontColor : Color.t Js.readonly_prop
+  method footerFontColor : Color.t Js.t Js.readonly_prop
 
   method __footerFontFamily : Js.js_string Js.t Js.readonly_prop
 
@@ -846,19 +994,19 @@ and tooltipModel = object
 
   method cornerRadius : int Js.readonly_prop
 
-  method backgroundColor : Color.t Js.readonly_prop
+  method backgroundColor : Color.t Js.t Js.readonly_prop
 
-  method labelColors : Color.t Js.js_array Js.t Js.readonly_prop
+  method labelColors : Color.t Js.t Js.js_array Js.t Js.readonly_prop
 
-  method labelTextColors : Color.t Js.js_array Js.t Js.readonly_prop
+  method labelTextColors : Color.t Js.t Js.js_array Js.t Js.readonly_prop
 
   method opacity : float Js.readonly_prop
 
-  method legendColorBackground : Color.t Js.readonly_prop
+  method legendColorBackground : Color.t Js.t Js.readonly_prop
 
   method displayColors : bool Js.t Js.readonly_prop
 
-  method borderColor : Color.t Js.readonly_prop
+  method borderColor : Color.t Js.t Js.readonly_prop
 
   method borderWidth : int Js.readonly_prop
 end
@@ -948,7 +1096,7 @@ and ['chart] tooltip = object('self)
     ('self,
      tooltipItem Js.t
      -> tooltipItem Js.t
-     -> data Js.t (* FIXME *)
+     -> data Js.t
      -> int) Js.meth_callback Js.optdef_prop
 
   method filter :
@@ -957,7 +1105,7 @@ and ['chart] tooltip = object('self)
      -> data Js.t
      -> bool Js.t) Js.meth_callback Js.optdef_prop
 
-  method backgroundColor : Color.t Js.prop
+  method backgroundColor : Color.t Js.t Js.prop
 
   method titleFontFamily : Js.js_string Js.t Js.optdef_prop
 
@@ -965,7 +1113,7 @@ and ['chart] tooltip = object('self)
 
   method titleFontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method titleFontColor : Color.t Js.optdef_prop
+  method titleFontColor : Color.t Js.t Js.optdef_prop
 
   method titleSpacing : int Js.prop
 
@@ -977,7 +1125,7 @@ and ['chart] tooltip = object('self)
 
   method bodyFontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method bodyFontColor : Color.t Js.optdef_prop
+  method bodyFontColor : Color.t Js.t Js.optdef_prop
 
   method bodySpacing : int Js.prop
 
@@ -987,7 +1135,7 @@ and ['chart] tooltip = object('self)
 
   method footerFontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method footerFontColor : Color.t Js.optdef_prop
+  method footerFontColor : Color.t Js.t Js.optdef_prop
 
   method footerSpacing : int Js.prop
 
@@ -1003,11 +1151,11 @@ and ['chart] tooltip = object('self)
 
   method cornerRadius : int Js.prop
 
-  method multyKeyBackground : Color.t Js.prop
+  method multyKeyBackground : Color.t Js.t Js.prop
 
   method displayColors : bool Js.t Js.prop
 
-  method borderColor : Color.t Js.prop
+  method borderColor : Color.t Js.t Js.prop
 
   method borderWidth : int Js.prop
 end
@@ -1029,15 +1177,15 @@ let createHover () = Js.Unsafe.obj [||]
 class type pointElement = object
   method radius : int Js.prop
 
-  method pointStyle : Point_style.t Js.prop
+  method pointStyle : Point_style.t Js.t Js.prop
 
-  method rotation : int Js.prop
+  method rotation : int Js.optdef_prop
 
-  method backgroundColor : Color.t Js.prop
+  method backgroundColor : Color.t Js.t Js.prop
 
   method borderWidth : int Js.prop
 
-  method borderColor : Color.t Js.prop
+  method borderColor : Color.t Js.t Js.prop
 
   method hitRadius : int Js.prop
 
@@ -1049,11 +1197,11 @@ end
 class type lineElement = object
   method tension : float Js.prop
 
-  method backgroundColor : Color.t Js.prop
+  method backgroundColor : Color.t Js.t Js.prop
 
   method borderWidth : int Js.prop
 
-  method borderColor : Color.t Js.prop
+  method borderColor : Color.t Js.t Js.prop
 
   method borderCapStyle : Line_cap.t Js.prop
 
@@ -1067,7 +1215,7 @@ class type lineElement = object
 
   method fill : Fill.t Js.t Js.prop
 
-  method stepped : bool Js.t Js.prop
+  method stepped : bool Js.t Js.optdef_prop
 end
 
 class type rectangleElement = object
@@ -1075,17 +1223,17 @@ class type rectangleElement = object
 
   method borderWidth : int Js.prop
 
-  method borderColor : Color.t Js.prop
+  method borderColor : Color.t Js.t Js.prop
 
   method borderSkipped : Position.t Js.prop
 end
 
 class type arcElement = object
-  method backgroundColor : Color.t Js.prop
+  method backgroundColor : Color.t Js.t Js.prop
 
   method borderAlign : Js.js_string Js.t Js.prop
 
-  method borderColor : Color.t Js.prop
+  method borderColor : Color.t Js.t Js.prop
 
   method borderWidth : int Js.prop
 end
@@ -1269,10 +1417,10 @@ and ['a] lineDataset = object
   method yAxisID : Js.js_string Js.t Js.optdef_prop
 
   method pointBackgroundColor :
-    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointBorderColor :
-    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointBorderWidth :
     ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
@@ -1286,13 +1434,13 @@ and ['a] lineDataset = object
   method pointRotation :
     ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method pointStyle : Point_style.t Js.optdef_prop
+  method pointStyle : Point_style.t Js.t Js.optdef_prop
 
-  method backgroundColor : Color.t Js.optdef_prop
+  method backgroundColor : Color.t Js.t Js.optdef_prop
 
   method borderCapStyle : Line_cap.t Js.optdef_prop
 
-  method borderColor : Color.t Js.optdef_prop
+  method borderColor : Color.t Js.t Js.optdef_prop
 
   method borderDash : line_dash Js.optdef_prop
 
@@ -1311,10 +1459,10 @@ and ['a] lineDataset = object
   method spanGaps : bool Js.t Js.optdef_prop
 
   method pointHoverBackgroundColor :
-    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointHoverBorderColor :
-    ('a lineOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method pointHoverBorderWidth :
     ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
@@ -1374,10 +1522,10 @@ and ['a] barDataset = object
   method yAxisID : Js.js_string Js.t Js.optdef_prop
 
   method backgroundColor :
-    ('a barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a barOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderColor :
-    ('a barOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a barOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderSkipped :
     ('a barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable_indexable.t Js.t
@@ -1387,11 +1535,11 @@ and ['a] barDataset = object
     ('a barOptionContext Js.t, Padding.t Js.t) Scriptable_indexable.t
       Js.t Js.optdef_prop
 
-  method hoverBackgroundColor : Color.t Indexable.t Js.t Js.optdef_prop
+  method hoverBackgroundColor : Color.t Js.t Indexable.t Js.t Js.optdef_prop
 
-  method hoverBorderColor : Color.t Indexable.t Js.t Js.optdef_prop
+  method hoverBorderColor : Color.t Js.t Indexable.t Js.t Js.optdef_prop
 
-  method hoverBorderWidth : Color.t Indexable.t Js.t Js.optdef_prop
+  method hoverBorderWidth : Color.t Js.t Indexable.t Js.t Js.optdef_prop
 end
 
 and barChart = object
@@ -1439,10 +1587,10 @@ and ['a] pieDataset = object
   method data : 'a Js.js_array Js.t Js.prop
 
   method backgroundColor :
-    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderColor :
-    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderWidth :
     ('a pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
@@ -1450,10 +1598,10 @@ and ['a] pieDataset = object
   method weight : float Js.optdef_prop
 
   method hoverBackgroundColor :
-    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method hoverBorderColor :
-    ('a pieOptionContext Js.t, Color.t) Scriptable_indexable.t Js.t Js.optdef_prop
+    ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method hoverBorderWidth :
     ('a pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
@@ -1500,7 +1648,11 @@ module CoerceTo = struct
 
   let bar c = unsafe_coerce_chart "bar" c
 
-  let horizontal_bar c = unsafe_coerce_chart "horizontalBar" c
+  let horizontalBar c = unsafe_coerce_chart "horizontalBar" c
+
+  let pie c = unsafe_coerce_chart "pie" c
+
+  let doughnut c = unsafe_coerce_chart "doughnut" c
 end
 
 let chart_constr = Js.Unsafe.global##._Chart
