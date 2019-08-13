@@ -365,22 +365,6 @@ type line_dash = float Js.js_array Js.t
 
 type line_dash_offset = float
 
-module Axis = struct
-  type typ = Js.js_string Js.t
-
-  let cartesian_category = Js.string "category"
-
-  let cartesian_linear = Js.string "linear"
-
-  let cartesian_logarithmic = Js.string "logarithmic"
-
-  let cartesian_time = Js.string "time"
-
-  let radial_linear = Js.string "linear"
-
-  let make s = Js.string s
-end
-
 module Time_ticks_source = struct
   type t = Js.js_string Js.t
 
@@ -518,6 +502,25 @@ module Time_parser = struct
     else Js.null
 end
 
+module Bar_thickness = struct
+  type t
+
+  let flex = Js.Unsafe.coerce @@ Js.string "flex"
+
+  let of_float x = Js.Unsafe.coerce @@ Js.number_of_float x
+
+  let of_int x = of_float @@ float_of_int x
+
+  let is_flex x =
+    (Js.typeof x)##toLowerCase == Js.string "string"
+    && (Js.Unsafe.coerce x == Js.string "flex")
+
+  let cast_number x =
+    if (Js.typeof x)##toLowerCase == Js.string "number"
+    then Js.some (Js.Unsafe.coerce x)
+    else Js.null
+end
+
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
 
 type ('a, 'b, 'c) tooltip_cb =
@@ -648,7 +651,7 @@ and gridLines = object
 end
 
 class type axis = object
-  method _type : Axis.typ Js.optdef_prop
+  method _type : Js.js_string Js.t Js.prop
 
   method display : Axis_display.t Js.t Js.prop
 
@@ -742,7 +745,7 @@ let createCategoryCartesianTicks () = Js.Unsafe.obj [||]
 
 let createCategoryCartesianAxis () =
   let (axis : categoryCartesianAxis Js.t) = Js.Unsafe.obj [||] in
-  axis##._type := Axis.cartesian_category;
+  axis##._type := Js.string "category";
   axis
 
 class type linearCartesianTicks = object
@@ -771,7 +774,7 @@ let createLinearCartesianTicks () = Js.Unsafe.obj [||]
 
 let createLinearCartesianAxis () =
   let (axis : linearCartesianAxis Js.t) = Js.Unsafe.obj [||] in
-  axis##._type := Axis.cartesian_linear;
+  axis##._type := Js.string "linear";
   axis
 
 class type logarithmicCartesianTicks = object
@@ -788,7 +791,7 @@ let createLogarithmicCartesianTicks () = Js.Unsafe.obj [||]
 
 let createLogarithmicCartesianAxis () =
   let (axis : logarithmicCartesianAxis Js.t) = Js.Unsafe.obj [||] in
-  axis##._type := Axis.cartesian_logarithmic;
+  axis##._type := Js.string "logarithmic";
   axis
 
 class type timeDisplayFormats = object
@@ -857,7 +860,7 @@ let createTimeCartesianOptions () = Js.Unsafe.obj [||]
 
 let createTimeCartesianAxis () =
   let (axis : timeCartesianAxis Js.t) = Js.Unsafe.obj [||] in
-  axis##._type := Axis.cartesian_time;
+  axis##._type := Js.string "time";
   axis
 
 class type dataset = object
@@ -1640,6 +1643,46 @@ let createLineDataset data : 'a lineDataset Js.t =
   lineDataset##.data := data;
   lineDataset
 
+class type barAxis = object
+  method barPercentage : float Js.prop
+
+  method categoryPercentage : float Js.prop
+
+  method barThickness : Bar_thickness.t Js.t Js.optdef_prop
+
+  method maxBarThickness : float Js.optdef_prop
+
+  method minBarLength : float Js.optdef_prop
+
+  method stacked : bool Js.t Js.optdef_prop
+end
+
+class type cateroryBarAxis = object
+  inherit categoryCartesianAxis
+  inherit barAxis
+end
+
+class type linearBarAxis = object
+  inherit linearCartesianAxis
+  inherit barAxis
+end
+
+class type logarithmicBarAxis = object
+  inherit logarithmicCartesianAxis
+  inherit barAxis
+end
+
+class type timeBarAxis = object
+  inherit timeCartesianAxis
+  inherit barAxis
+end
+
+class type barScales = object
+  method xAxes : #barAxis Js.t Js.js_array Js.t Js.prop
+
+  method yAxes : #barAxis Js.t Js.js_array Js.t Js.prop
+end
+
 class type ['a] barOptionContext = object
   method chart : barChart Js.t Js.readonly_prop
 
@@ -1650,20 +1693,10 @@ class type ['a] barOptionContext = object
   method datasetIndex : int Js.readonly_prop
 end
 
-and barScale = object
-  method barPercentage : float Js.prop
-
-  method categoryPercentage : float Js.prop
-
-  method barThickness : float Js.optdef_prop (* FIXME *)
-
-  method maxBarThickness : float Js.optdef_prop
-
-  method minBarLength : float Js.optdef_prop
-end
-
 and barOptions = object
   inherit [barChart, barChart animation] chartOptions
+
+  method scales : barScales Js.t Js.prop
 end
 
 and ['a] barDataset = object
@@ -1694,11 +1727,28 @@ and ['a] barDataset = object
   method hoverBorderColor : Color.t Js.t Indexable.t Js.t Js.optdef_prop
 
   method hoverBorderWidth : Color.t Js.t Indexable.t Js.t Js.optdef_prop
+
+  method stack : Js.js_string Js.t Js.optdef_prop
 end
 
 and barChart = object
   inherit [barOptions] chart
 end
+
+let createCategoryBarAxis () = Js.Unsafe.obj [||]
+
+let createLinearBarAxis () = Js.Unsafe.obj [||]
+
+let createLogarithmicBarAxis () = Js.Unsafe.obj [||]
+
+let createTimeBarAxis () = Js.Unsafe.obj [||]
+
+let createBarScales ?xAxes ?yAxes () =
+  let iter f = function None -> () | Some x -> f x in
+  let (scales : barScales Js.t) = Js.Unsafe.obj [||] in
+  iter (fun x -> scales##.xAxes := Js.array @@ Array.of_list x) xAxes;
+  iter (fun x -> scales##.yAxes := Js.array @@ Array.of_list x) yAxes;
+  scales
 
 let createBarOptions () = Js.Unsafe.obj [||]
 
@@ -1776,6 +1826,22 @@ let createPieDataset data : 'a pieDataset Js.t =
   pieDataset##.data := data;
   pieDataset
 
+module Axis = struct
+  type 'a typ = Js.js_string Js.t
+
+  let cartesian_category = Js.string "category"
+
+  let cartesian_linear = Js.string "linear"
+
+  let cartesian_logarithmic = Js.string "logarithmic"
+
+  let cartesian_time = Js.string "time"
+
+  (* let radial_linear = Js.string "linear" *)
+
+  let make s = Js.string s
+end
+
 module Chart = struct
   type 'a typ = Js.js_string Js.t
 
@@ -1807,7 +1873,25 @@ module CoerceTo = struct
   let pie c = unsafe_coerce_chart "pie" c
 
   let doughnut c = unsafe_coerce_chart "doughnut" c
+
+  let unsafe_coerce_axis typ (axis : #axis Js.t) =
+    if axis##._type##toLowerCase == Js.string typ
+    then Js.some (Js.Unsafe.coerce axis)
+    else Js.null
+
+  let cartesianCategory a = unsafe_coerce_axis "category" a
+
+  let cartesianLinear a = unsafe_coerce_axis "linear" a
+
+  let cartesianLogarithmic a = unsafe_coerce_axis "logarithmic" a
+
+  let cartesianTime a = unsafe_coerce_axis "time" a
 end
+
+let create_axis (typ : 'a Axis.typ) =
+  let (axis : #axis Js.t) = Js.Unsafe.obj [||] in
+  axis##._type := typ;
+  Js.Unsafe.coerce axis
 
 let chart_constr = Js.Unsafe.global##._Chart
 

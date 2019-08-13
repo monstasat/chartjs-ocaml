@@ -358,22 +358,6 @@ type line_dash = float Js.js_array Js.t
 type line_dash_offset = float
 (** @see <https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineDashOffset> *)
 
-module Axis : sig
-  type typ
-
-  val cartesian_category : typ
-
-  val cartesian_linear : typ
-
-  val cartesian_logarithmic : typ
-
-  val cartesian_time : typ
-
-  val radial_linear : typ
-
-  val make : string -> typ
-end
-
 module Time_ticks_source : sig
   type t
 
@@ -512,6 +496,20 @@ module Time_parser : sig
   val cast_string : t Js.t -> string Js.opt
 
   val cast_fun : t Js.t -> ('a -> 'b Js.t) Js.callback Js.opt
+end
+
+module Bar_thickness : sig
+  type t
+
+  val flex : t Js.t
+
+  val of_int : int -> t Js.t
+
+  val of_float : float -> t Js.t
+
+  val is_flex : t Js.t -> bool
+
+  val cast_number : t Js.t -> Js.number Js.t Js.opt
 end
 
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
@@ -695,7 +693,7 @@ and gridLines = object
 end
 
 class type axis = object
-  method _type : Axis.typ Js.optdef_prop
+  method _type : Js.js_string Js.t Js.prop
   (** Type of scale being employed
       Custom scales can be created and registered with a string key.
       This allows changing the type of an axis for a chart. *)
@@ -2068,6 +2066,56 @@ val createLineDataset : 'a Js.js_array Js.t -> 'a lineDataset Js.t
 
 (** {2 Bar Chart} *)
 
+class type barAxis = object
+  method barPercentage : float Js.prop
+  (** Percent (0-1) of the available width each bar should be within
+      the category width. 1.0 will take the whole category width and
+      put the bars right next to each other. *)
+
+  method categoryPercentage : float Js.prop
+  (** Percent (0-1) of the available width each category should be within
+      the sample width. *)
+
+  method barThickness : Bar_thickness.t Js.t Js.optdef_prop
+  (** Manually set width of each bar in pixels. If set to 'flex',
+      it computes "optimal" sample widths that globally arrange bars side by side.
+      If not set (default), bars are equally sized based on the smallest interval. *)
+
+  method maxBarThickness : float Js.optdef_prop
+  (** Set this to ensure that bars are not sized thicker than this. *)
+
+  method minBarLength : float Js.optdef_prop
+  (** Set this to ensure that bars have a minimum length in pixels. *)
+
+  method stacked : bool Js.t Js.optdef_prop
+end
+
+class type cateroryBarAxis = object
+  inherit categoryCartesianAxis
+  inherit barAxis
+end
+
+class type linearBarAxis = object
+  inherit linearCartesianAxis
+  inherit barAxis
+end
+
+class type logarithmicBarAxis = object
+  inherit logarithmicCartesianAxis
+  inherit barAxis
+end
+
+class type timeBarAxis = object
+  inherit timeCartesianAxis
+  inherit barAxis
+end
+
+class type barScales = object
+  method xAxes : #barAxis Js.t Js.js_array Js.t Js.prop
+
+  method yAxes : #barAxis Js.t Js.js_array Js.t Js.prop
+end
+
 class type ['a] barOptionContext = object
   method chart : barChart Js.t Js.readonly_prop
 
@@ -2078,30 +2126,10 @@ class type ['a] barOptionContext = object
   method datasetIndex : int Js.readonly_prop
 end
 
-and barScale = object
-  method barPercentage : float Js.prop
-  (** Percent (0-1) of the available width each bar should be within
-      the category width. 1.0 will take the whole category width and
-      put the bars right next to each other. *)
-
-  method categoryPercentage : float Js.prop
-  (** Percent (0-1) of the available width each category should be within
-      the sample width. *)
-
-  method barThickness : float Js.optdef_prop (* FIXME *)
-  (** Manually set width of each bar in pixels. If set to 'flex',
-      it computes "optimal" sample widths that globally arrange bars side by side.
-      If not set (default), bars are equally sized based on the smallest interval. *)
-
-  method maxBarThickness : float Js.optdef_prop
-  (** Set this to ensure that bars are not sized thicker than this. *)
-
-  method minBarLength : float Js.optdef_prop
-  (** Set this to ensure that bars have a minimum length in pixels. *)
-end
-
 and barOptions = object
   inherit [barChart, barChart animation] chartOptions
+
+  method scales : barScales Js.t Js.prop
 end
 
 and ['a] barDataset = object
@@ -2166,11 +2194,28 @@ and ['a] barDataset = object
   method hoverBorderWidth : Color.t Js.t Indexable.t Js.t Js.optdef_prop
   (** The bar border width when hovered (in pixels). *)
 
+  method stack : Js.js_string Js.t Js.optdef_prop
+  (** The ID of the group to which this dataset belongs to
+      (when stacked, each group will be a separate stack). *)
 end
 
 and barChart = object
   inherit [barOptions] chart
 end
+
+val createCategoryBarAxis : unit -> cateroryBarAxis Js.t
+
+val createLinearBarAxis : unit -> linearBarAxis Js.t
+
+val createLogarithmicBarAxis : unit -> logarithmicBarAxis Js.t
+
+val createTimeBarAxis : unit -> timeBarAxis Js.t
+
+val createBarScales :
+     ?xAxes:#barAxis Js.t list
+  -> ?yAxes:#barAxis Js.t list
+  -> unit
+  -> barScales Js.t
 
 val createBarOptions : unit -> barOptions Js.t
 
@@ -2270,6 +2315,20 @@ val createPieOptions : unit -> pieOptions Js.t
 
 val createPieDataset : 'a Js.js_array Js.t -> 'a pieDataset Js.t
 
+module Axis : sig
+  type 'a typ
+
+  val cartesian_category : categoryCartesianAxis typ
+
+  val cartesian_linear : linearCartesianAxis typ
+
+  val cartesian_logarithmic : logarithmicCartesianAxis typ
+
+  val cartesian_time : timeCartesianAxis typ
+
+  val make : string -> 'a typ
+end
+
 module Chart : sig
   type 'a typ
 
@@ -2298,7 +2357,19 @@ module CoerceTo : sig
   val pie : 'a #chart Js.t -> pieChart Js.t Js.opt
 
   val doughnut : 'a #chart Js.t -> pieChart Js.t Js.opt
+
+  val cartesianCategory : #axis Js.t -> categoryCartesianAxis Js.t Js.opt
+
+  val cartesianLinear : #axis Js.t -> linearCartesianAxis Js.t Js.opt
+
+  val cartesianLogarithmic : #axis Js.t -> logarithmicCartesianAxis Js.t Js.opt
+
+  val cartesianTime : #axis Js.t -> timeCartesianAxis Js.t Js.opt
 end
+
+(** {1 Creating an Axis} *)
+
+val create_axis : 'a Axis.typ -> 'a Js.t
 
 (** {1 Creating a Chart} *)
 
