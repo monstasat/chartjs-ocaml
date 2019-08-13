@@ -20,16 +20,19 @@ let () =
     Scriptable_indexable.of_single
     @@ Color.of_string "rgba(0, 0, 255, 0.4)");
   dataset2##.label := Js.string "Dataset 2";
+  let labels =
+    List.map Js.string
+      [ "January"
+      ; "February"
+      ; "March"
+      ; "April"
+      ; "May"
+      ; "June"
+      ; "July"
+      ] in
   let data = createData
       ~datasets:[dataset1; dataset2]
-      ~labels:[ "January"
-              ; "February"
-              ; "March"
-              ; "April"
-              ; "May"
-              ; "June"
-              ; "July"
-              ]
+      ~labels
       () in
   (* Initialize title *)
   let title = createTitle () in

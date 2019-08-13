@@ -23,16 +23,19 @@ let () =
   dataset2##.pointStyle := Point_style.rectRot;
   dataset2##.pointRadius := Scriptable_indexable.of_single 10;
   dataset2##.pointBorderWidth := Scriptable_indexable.of_single 2;
+  let labels =
+    List.map Js.string
+      [ "January"
+      ; "February"
+      ; "March"
+      ; "April"
+      ; "May"
+      ; "June"
+      ; "July"
+      ] in
   let data = createData
       ~datasets:[dataset1; dataset2]
-      ~labels:[ "January"
-              ; "February"
-              ; "March"
-              ; "April"
-              ; "May"
-              ; "June"
-              ; "July"
-              ]
+      ~labels
       () in
   (* Initialize legend *)
   let legend_labels = createLegendLabels () in
@@ -64,11 +67,9 @@ let () =
   tooltips##.backgroundColor := Color.of_string "lime";
   tooltips##.titleFontStyle := Js.string "italic";
   (* Initialize scales *)
-  let axis = createAxis () in
-  let xAxes = Js.array [|axis|] in
-  let scales = Js.Unsafe.obj [||] in
+  let axis = createCategoryCartesianAxis () in
+  let scales = createLineScales ~xAxes:[axis] () in
   axis##.display := Axis_display.auto;
-  scales##.xAxes := xAxes;
   (* Initialize other options *)
   let options = createLineOptions () in
   (Js.Unsafe.coerce options)##.scales := scales;

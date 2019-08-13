@@ -500,6 +500,12 @@ module Axis_display : sig
   val is_auto : t Js.t -> bool
 end
 
+module Time_parser : sig
+  type t
+
+  val of_string : string -> t Js.t
+end
+
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
 
 type ('a, 'b, 'c) tooltip_cb =
@@ -525,6 +531,12 @@ class type ['x, 'y, 'r] bubbleDataPoint = object
 
   method r : 'r Js.prop
 end
+
+val createDataPoint : x:'a -> y:'b -> ('a, 'b) dataPoint Js.t
+
+val createTimeDataPoint : t:'a -> y:'b -> ('a, 'b) timeDataPoint Js.t
+
+val createBubbleDataPoint : x:'a -> y:'b -> r:'c -> ('a, 'b, 'c) bubbleDataPoint Js.t
 
 (** {1 Axes} *)
 
@@ -803,12 +815,14 @@ class type ['a] cartesianAxis = object
   (** Tick configuration. *)
 end
 
+val createCartesianAxis : unit -> 'a cartesianAxis Js.t
+
 (** {3 Category axis} *)
 
-class type categoryTicks = object
+class type categoryCartesianTicks = object
   inherit cartesianTicks
 
-  method labels : Js.js_string Js.t Js.prop
+  method labels : Js.js_string Js.t Js.optdef_prop
   (** An array of labels to display. *)
 
   method min : Js.js_string Js.t Js.optdef_prop
@@ -818,11 +832,15 @@ class type categoryTicks = object
   (** The maximum item to display. *)
 end
 
-and categoryAxis = [categoryTicks] cartesianAxis
+class type categoryCartesianAxis = [categoryCartesianTicks] cartesianAxis
+
+val createCategoryCartesianTicks : unit -> categoryCartesianTicks Js.t
+
+val createCategoryCartesianAxis : unit -> categoryCartesianAxis Js.t
 
 (** {3 Linear axis} *)
 
-class type linearTicks = object
+class type linearCartesianTicks = object
   inherit cartesianTicks
 
   method beginAtZero : bool Js.t Js.optdef_prop
@@ -853,11 +871,15 @@ class type linearTicks = object
   (** Adjustment used when calculating the minimum data value. *)
 end
 
-and linearAxis = [linearTicks] cartesianAxis
+class type linearCartesianAxis = [linearCartesianTicks] cartesianAxis
+
+val createLinearCartesianTicks : unit -> linearCartesianTicks Js.t
+
+val createLinearCartesianAxis : unit -> linearCartesianAxis Js.t
 
 (** {3 Logarithmic axis} *)
 
-class type logarithmicTicks = object
+class type logarithmicCartesianTicks = object
   inherit cartesianTicks
 
   method min : float Js.optdef_prop
@@ -869,7 +891,11 @@ class type logarithmicTicks = object
       overrides maximum value from data. *)
 end
 
-and logarithmicAxis = [logarithmicTicks] cartesianAxis
+class type logarithmicCartesianAxis = [logarithmicCartesianTicks] cartesianAxis
+
+val createLogarithmicCartesianTicks : unit -> logarithmicCartesianTicks Js.t
+
+val createLogarithmicCartesianAxis : unit -> logarithmicCartesianAxis Js.t
 
 (** {3 Time axis} *)
 
@@ -896,7 +922,7 @@ class type timeDisplayFormats = object
   method year : Js.js_string Js.t Js.prop
 end
 
-and timeTicks = object
+class type timeCartesianTicks = object
   inherit cartesianTicks
 
   method source : Time_ticks_source.t Js.prop
@@ -906,7 +932,7 @@ and timeTicks = object
       [labels]: generates ticks from user given data.labels values ONLY *)
 end
 
-and timeOptions = object
+class type timeCartesianOptions = object
   method displayFormats : timeDisplayFormats Js.t Js.optdef_prop
   (** Sets how different time units are displayed. *)
 
@@ -920,7 +946,7 @@ and timeOptions = object
   method min : Time.t Js.optdef_prop
   (** If defined, this will override the data minimum *)
 
-  method _parser : unit Js.optdef_prop (* FIXME *)
+  method _parser : Time_parser.t Js.t Js.optdef_prop
   (** Custom parser for dates. *)
 
   method round : Time_unit.t Or_false.t Js.t Js.prop
@@ -939,10 +965,10 @@ and timeOptions = object
   (** The minimum display format to be used for a time unit. *)
 end
 
-and timeAxis = object
-  inherit [timeTicks] cartesianAxis
+class type timeCartesianAxis = object
+  inherit [timeCartesianTicks] cartesianAxis
 
-  method time : timeOptions Js.t Js.prop
+  method time : timeCartesianOptions Js.t Js.prop
 
   method distribution : Time_distribution.t Js.prop
   (** The distribution property controls the data distribution along the scale:
@@ -956,11 +982,13 @@ and timeAxis = object
       [ticks]: makes sure ticks are fully visible, data outside are truncated *)
 end
 
-class type scales = object
-  method xAxes : 'a Js.t Js.js_array Js.t Js.optdef_prop
+val createTimeDisplayFormats : unit -> timeDisplayFormats Js.t
 
-  method yAxes : 'a Js.t Js.js_array Js.t Js.optdef_prop
-end
+val createTimeCartesianTicks : unit -> timeCartesianTicks Js.t
+
+val createTimeCartesianOptions : unit -> timeCartesianOptions Js.t
+
+val createTimeCartesianAxis : unit -> timeCartesianAxis Js.t
 
 class type dataset = object
   method _type : Js.js_string Js.t Js.optdef_prop
@@ -968,21 +996,23 @@ class type dataset = object
   method label : Js.js_string Js.t Js.optdef_prop
 end
 
+val coerce_dataset : #dataset Js.t -> dataset Js.t
+
 class type data = object
   method datasets : dataset Js.t Js.js_array Js.t Js.prop
 
-  method labels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
+  method labels : 'a Js.js_array Js.t Js.optdef_prop
 
-  method xLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
+  method xLabels : 'a Js.js_array Js.t Js.optdef_prop
 
-  method yLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
+  method yLabels : 'a Js.js_array Js.t Js.optdef_prop
 end
 
 val createData :
   ?datasets:#dataset Js.t list
-  -> ?labels:string list
-  -> ?xLabels:string list
-  -> ?yLabels:string list
+  -> ?labels:'a list
+  -> ?xLabels:'a list
+  -> ?yLabels:'a list
   -> unit
   -> data Js.t
 
@@ -1874,8 +1904,16 @@ class type ['a] lineOptionContext = object
   method datasetIndex : int Js.readonly_prop
 end
 
+and lineScales = object
+  method xAxes : #cartesianTicks #cartesianAxis Js.t Js.js_array Js.t Js.prop
+
+  method yAxes : #cartesianTicks #cartesianAxis Js.t Js.js_array Js.t Js.prop
+end
+
 and lineOptions = object
   inherit [lineChart, lineChart animation] chartOptions
+
+  method scales : lineScales Js.t Js.prop
 
   method showLines : bool Js.t Js.prop
   (** If [false], the lines between points are not drawn. *)
@@ -2004,12 +2042,17 @@ and ['a] lineDataset = object
       ['middle']: Step-middle Interpolation
       If the [steppedLine] value is set to anything other than [false],
       [lineTension] will be ignored.*)
-
 end
 
 and lineChart = object
   inherit [lineOptions] chart
 end
+
+val createLineScales :
+     ?xAxes:#cartesianTicks #cartesianAxis Js.t list
+  -> ?yAxes:#cartesianTicks #cartesianAxis Js.t list
+  -> unit
+  -> lineScales Js.t
 
 val createLineOptions : unit -> lineOptions Js.t
 

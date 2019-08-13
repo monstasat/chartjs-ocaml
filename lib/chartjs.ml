@@ -494,6 +494,12 @@ module Axis_display = struct
     && (Js.Unsafe.coerce x == Js.string "auto")
 end
 
+module Time_parser = struct
+  type t
+
+  let of_string s = Js.Unsafe.coerce @@ Js.string s
+end
+
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
 
 type ('a, 'b, 'c) tooltip_cb =
@@ -519,6 +525,25 @@ class type ['x, 'y, 'r] bubbleDataPoint = object
 
   method r : 'r Js.prop
 end
+
+let createDataPoint ~x ~y =
+  object%js
+    val mutable x = x
+    val mutable y = y
+  end
+
+let createTimeDataPoint ~t ~y =
+  object%js
+    val mutable t = t
+    val mutable y = y
+  end
+
+let createBubbleDataPoint ~x ~y ~r =
+  object%js
+    val mutable x = x
+    val mutable y = y
+    val mutable r = r
+  end
 
 class type minorTicks = object
   method callback : 'a tick_cb Js.prop
@@ -679,21 +704,30 @@ class type ['a] cartesianAxis = object
   method ticks : (#cartesianTicks as 'a) Js.t Js.prop
 end
 
+let createCartesianAxis () = Js.Unsafe.obj [||]
+
 (** {3 Category axis} *)
 
-class type categoryTicks = object
+class type categoryCartesianTicks = object
   inherit cartesianTicks
 
-  method labels : Js.js_string Js.t Js.prop
+  method labels : Js.js_string Js.t Js.optdef_prop
 
   method min : Js.js_string Js.t Js.optdef_prop
 
   method max : Js.js_string Js.t Js.optdef_prop
 end
 
-and categoryAxis = [categoryTicks] cartesianAxis
+class type categoryCartesianAxis = [categoryCartesianTicks] cartesianAxis
 
-class type linearTicks = object
+let createCategoryCartesianTicks () = Js.Unsafe.obj [||]
+
+let createCategoryCartesianAxis () =
+  let (axis : categoryCartesianAxis Js.t) = Js.Unsafe.obj [||] in
+  axis##._type := Axis.cartesian_category;
+  axis
+
+class type linearCartesianTicks = object
   inherit cartesianTicks
 
   method beginAtZero : bool Js.t Js.optdef_prop
@@ -713,9 +747,16 @@ class type linearTicks = object
   method suggestedMin : float Js.optdef_prop
 end
 
-and linearAxis = [linearTicks] cartesianAxis
+class type linearCartesianAxis = [linearCartesianTicks] cartesianAxis
 
-class type logarithmicTicks = object
+let createLinearCartesianTicks () = Js.Unsafe.obj [||]
+
+let createLinearCartesianAxis () =
+  let (axis : linearCartesianAxis Js.t) = Js.Unsafe.obj [||] in
+  axis##._type := Axis.cartesian_linear;
+  axis
+
+class type logarithmicCartesianTicks = object
   inherit cartesianTicks
 
   method min : float Js.optdef_prop
@@ -723,27 +764,42 @@ class type logarithmicTicks = object
   method max : float Js.optdef_prop
 end
 
-and logarithmicAxis = [logarithmicTicks] cartesianAxis
+class type logarithmicCartesianAxis = [logarithmicCartesianTicks] cartesianAxis
+
+let createLogarithmicCartesianTicks () = Js.Unsafe.obj [||]
+
+let createLogarithmicCartesianAxis () =
+  let (axis : logarithmicCartesianAxis Js.t) = Js.Unsafe.obj [||] in
+  axis##._type := Axis.cartesian_logarithmic;
+  axis
 
 class type timeDisplayFormats = object
   method millisecond : Js.js_string Js.t Js.prop
+
   method second : Js.js_string Js.t Js.prop
+
   method minute : Js.js_string Js.t Js.prop
+
   method hour : Js.js_string Js.t Js.prop
+
   method day : Js.js_string Js.t Js.prop
+
   method week : Js.js_string Js.t Js.prop
+
   method month : Js.js_string Js.t Js.prop
+
   method quarter : Js.js_string Js.t Js.prop
+
   method year : Js.js_string Js.t Js.prop
 end
 
-and timeTicks = object
+class type timeCartesianTicks = object
   inherit cartesianTicks
 
   method source : Time_ticks_source.t Js.prop
 end
 
-and timeOptions = object
+class type timeCartesianOptions = object
   method displayFormats : timeDisplayFormats Js.t Js.optdef_prop
 
   method isoWeekday : bool Js.t Js.prop
@@ -752,7 +808,7 @@ and timeOptions = object
 
   method min : Time.t Js.optdef_prop
 
-  method _parser : unit Js.optdef_prop (* FIXME *)
+  method _parser : Time_parser.t Js.t Js.optdef_prop
 
   method round : Time_unit.t Or_false.t Js.t Js.prop
 
@@ -765,21 +821,26 @@ and timeOptions = object
   method minUnit : Time_unit.t Js.prop
 end
 
-and timeAxis = object
-  inherit [timeTicks] cartesianAxis
+class type timeCartesianAxis = object
+  inherit [timeCartesianTicks] cartesianAxis
 
-  method time : timeOptions Js.t Js.prop
+  method time : timeCartesianOptions Js.t Js.prop
 
   method distribution : Time_distribution.t Js.prop
 
   method bounds : Time_bounds.t Js.prop
 end
 
-class type scales = object
-  method xAxes : 'a Js.t Js.js_array Js.t Js.optdef_prop
+let createTimeDisplayFormats () = Js.Unsafe.obj [||]
 
-  method yAxes : 'a Js.t Js.js_array Js.t Js.optdef_prop
-end
+let createTimeCartesianTicks () = Js.Unsafe.obj [||]
+
+let createTimeCartesianOptions () = Js.Unsafe.obj [||]
+
+let createTimeCartesianAxis () =
+  let (axis : timeCartesianAxis Js.t) = Js.Unsafe.obj [||] in
+  axis##._type := Axis.cartesian_time;
+  axis
 
 class type dataset = object
   method _type : Js.js_string Js.t Js.optdef_prop
@@ -787,19 +848,21 @@ class type dataset = object
   method label : Js.js_string Js.t Js.optdef_prop
 end
 
+let coerce_dataset x = (x :> dataset Js.t)
+
 class type data = object
   method datasets : dataset Js.t Js.js_array Js.t Js.prop
 
-  method labels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
+  method labels : 'a Js.js_array Js.t Js.optdef_prop
 
-  method xLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
+  method xLabels : 'a Js.js_array Js.t Js.optdef_prop
 
-  method yLabels : Js.js_string Js.t Js.js_array Js.t Js.optdef_prop
+  method yLabels : 'a Js.js_array Js.t Js.optdef_prop
 end
 
 let createData ?(datasets = []) ?labels ?xLabels ?yLabels () =
   let iter f = function None -> () | Some x -> f x in
-  let map_labels x = Js.array @@ Array.of_list @@ List.map Js.string x in
+  let map_labels x = Js.array @@ Array.of_list x in
   let (obj : data Js.t) = Js.Unsafe.obj [||] in
   iter (fun x -> obj##.labels := map_labels x) labels;
   iter (fun x -> obj##.xLabels := map_labels x) xLabels;
@@ -1457,8 +1520,16 @@ class type ['a] lineOptionContext = object
   method datasetIndex : int Js.readonly_prop
 end
 
+and lineScales = object
+  method xAxes : #cartesianTicks #cartesianAxis Js.t Js.js_array Js.t Js.prop
+
+  method yAxes : #cartesianTicks #cartesianAxis Js.t Js.js_array Js.t Js.prop
+end
+
 and lineOptions = object
   inherit [lineChart, lineChart animation] chartOptions
+
+  method scales : lineScales Js.t Js.prop
 
   method showLines : bool Js.t Js.prop
 
@@ -1536,6 +1607,13 @@ end
 and lineChart = object
   inherit [lineOptions] chart
 end
+
+let createLineScales ?xAxes ?yAxes () =
+  let iter f = function None -> () | Some x -> f x in
+  let (scales : lineScales Js.t) = Js.Unsafe.obj [||] in
+  iter (fun x -> scales##.xAxes := Js.array @@ Array.of_list x) xAxes;
+  iter (fun x -> scales##.yAxes := Js.array @@ Array.of_list x) yAxes;
+  scales
 
 let createLineOptions () = Js.Unsafe.obj [||]
 
