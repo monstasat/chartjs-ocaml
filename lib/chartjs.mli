@@ -755,6 +755,16 @@ class type axis = object
   (** Callback that runs at the end of the update process. *)
 end
 
+val createMinorTicks : unit -> minorTicks Js.t
+
+val createMajorTicks : unit -> majorTicks Js.t
+
+val createTicks : unit -> ticks Js.t
+
+val createScaleLabel : unit -> scaleLabel Js.t
+
+val createGridLines : unit -> gridLines Js.t
+
 val createAxis : unit -> axis Js.t
 
 (** {2 Cartesian axes} *)

@@ -1,9 +1,0 @@
-(library
-  (name chartjs_streaming)
-  (public_name chartjs.streaming)
-  (libraries gen_js_api chartjs))
-
-(rule
-  (targets chartjs_streaming.ml)
-  (deps chartjs_streaming.mli)
-  (action (run ocamlfind gen_js_api/gen_js_api %{deps})))

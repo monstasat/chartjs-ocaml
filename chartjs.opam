@@ -17,7 +17,6 @@ build: [
 depends: [
   "ocaml" {>= "4.06.0"}
   "dune" {build}
-  "ppxfind" {build}
-  "gen_js_api"
-  "ptime"
+  "js_of_ocaml"
+  "js_of_ocaml-ppx"
 ]

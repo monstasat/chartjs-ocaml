@@ -689,6 +689,16 @@ class type axis = object
   method afterUpdate : ('a Js.t -> unit) Js.callback Js.optdef_prop
 end
 
+let createMinorTicks () = Js.Unsafe.obj [||]
+
+let createMajorTicks () = Js.Unsafe.obj [||]
+
+let createTicks () = Js.Unsafe.obj [||]
+
+let createScaleLabel () = Js.Unsafe.obj [||]
+
+let createGridLines () = Js.Unsafe.obj [||]
+
 let createAxis () = Js.Unsafe.obj [||]
 
 class type cartesianTicks = object
