@@ -274,9 +274,15 @@ module Color = struct
     then Js.some (Js.to_string @@ Js.Unsafe.coerce x)
     else Js.null
 
-  let cast_canvas_gradient _x = Js.null
+  let cast_canvas_gradient x =
+    if Js.instanceof x Js.Unsafe.global##.canvasGradient
+    then Js.some (Js.Unsafe.coerce x)
+    else Js.null
 
-  let cast_canvas_pattern _x = Js.null
+  let cast_canvas_pattern x =
+    if Js.instanceof x Js.Unsafe.global##.canvasPattern
+    then Js.some (Js.Unsafe.coerce x)
+    else Js.null
 end
 
 module Position = struct
@@ -498,6 +504,18 @@ module Time_parser = struct
   type t
 
   let of_string s = Js.Unsafe.coerce @@ Js.string s
+
+  let of_fun f = Obj.magic @@ Js.wrap_callback f
+
+  let cast_string x =
+    if (Js.typeof x)##toLowerCase == Js.string "string"
+    then Js.some (Js.to_string @@ Js.Unsafe.coerce x)
+    else Js.null
+
+  let cast_fun (t : t Js.t) : ('a -> 'b Js.t) Js.callback Js.opt =
+    if (Js.typeof t)##toLowerCase == Js.string "function"
+    then Js.some @@ Obj.magic t
+    else Js.null
 end
 
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback

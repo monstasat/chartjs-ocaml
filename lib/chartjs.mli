@@ -504,6 +504,14 @@ module Time_parser : sig
   type t
 
   val of_string : string -> t Js.t
+  (** A custom format to be used by Moment.js to parse the date. *)
+
+  val of_fun : ('a -> 'b Js.t) -> t Js.t
+  (** A function must return a Moment.js object given the appropriate data value. *)
+
+  val cast_string : t Js.t -> string Js.opt
+
+  val cast_fun : t Js.t -> ('a -> 'b Js.t) Js.callback Js.opt
 end
 
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
