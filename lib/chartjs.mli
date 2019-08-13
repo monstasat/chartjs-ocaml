@@ -339,9 +339,28 @@ module Fill : sig
   val _false : t Js.t
 end
 
-(* FIXME remove *)
 module Time : sig
-  type t = float
+  type t
+
+  val of_float_s : float -> t Js.t
+
+  val of_int_s : int -> t Js.t
+
+  val of_string : string -> t Js.t
+
+  val of_array : int array -> t Js.t
+
+  val of_js_array : int Js.js_array Js.t -> t Js.t
+
+  val of_date : Js.date Js.t -> t Js.t
+
+  val cast_float_s : t Js.t -> float Js.opt
+
+  val cast_string : t Js.t -> string Js.opt
+
+  val cast_js_array : t Js.t -> int Js.js_array Js.t Js.opt
+
+  val cast_date : t Js.t -> Js.date Js.t Js.opt
 end
 
 module Or_false : sig
@@ -677,7 +696,7 @@ and gridLines = object
   method zeroLineWidth : int Js.prop
   (** Stroke width of the grid line for the first index (index 0). *)
 
-  method zeroLineColor : int Js.prop
+  method zeroLineColor : Color.t Js.t Js.prop
   (** Stroke color of the grid line for the first index (index 0). *)
 
   method zeroLineBorderDash : line_dash Js.prop
@@ -763,7 +782,24 @@ val createTicks : unit -> ticks Js.t
 
 val createScaleLabel : unit -> scaleLabel Js.t
 
-val createGridLines : unit -> gridLines Js.t
+val createGridLines :
+     ?display:bool
+  -> ?circular:bool
+  -> ?color:Color.t Js.t Indexable.t Js.t
+  -> ?borderDash:line_dash
+  -> ?borderDashOffset:line_dash_offset
+  -> ?lineWidth:int Indexable.t Js.t
+  -> ?drawBorder:bool
+  -> ?drawOnChartArea:bool
+  -> ?drawTicks:bool
+  -> ?tickMarkLength:int
+  -> ?zeroLineWidth:int
+  -> ?zeroLineColor:Color.t Js.t
+  -> ?zeroLineBorderDash:line_dash
+  -> ?zeroLineBorderDashOffset:line_dash_offset
+  -> ?offsetGridLines:bool
+  -> unit
+  -> gridLines Js.t
 
 val createAxis : unit -> axis Js.t
 
@@ -956,10 +992,10 @@ class type timeCartesianOptions = object
   (** If [true] and the unit is set to 'week', then the first day
       of the week will be Monday. Otherwise, it will be Sunday. *)
 
-  method max : Time.t Js.optdef_prop
+  method max : Time.t Js.t Js.optdef_prop
   (** If defined, this will override the data maximum *)
 
-  method min : Time.t Js.optdef_prop
+  method min : Time.t Js.t Js.optdef_prop
   (** If defined, this will override the data minimum *)
 
   method _parser : Time_parser.t Js.t Js.optdef_prop

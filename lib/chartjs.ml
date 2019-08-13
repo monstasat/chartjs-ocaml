@@ -1,5 +1,7 @@
 open Js_of_ocaml
 
+let iter f = function None -> () | Some x -> f x
+
 module Indexable = struct
   type 'a t
 
@@ -232,7 +234,6 @@ module Padding = struct
   end
 
   let make_object ?top ?right ?bottom ?left () : t Js.t =
-    let iter f = function None -> () | Some x -> f x in
     let (obj : obj Js.t) = Js.Unsafe.obj [||] in
     iter (fun x -> obj##.top := x) top;
     iter (fun x -> obj##.right := x) right;
@@ -350,7 +351,44 @@ module Fill = struct
 end
 
 module Time = struct
-  type t = float (* FIXME *)
+  type t
+
+  let of_float_s x =
+    Js.Unsafe.coerce
+    @@ Js.number_of_float
+    @@ x *. 1000.
+
+  let of_int_s x = of_float_s @@ float_of_int x
+
+  let of_string s = Js.Unsafe.coerce @@ Js.string s
+
+  let of_array x =
+    Js.Unsafe.coerce
+    @@ Js.array x
+
+  let of_js_array = Js.Unsafe.coerce
+
+  let of_date = Js.Unsafe.coerce
+
+  let cast_float_s x =
+    if (Js.typeof x)##toLowerCase == Js.string "number"
+    then Js.some ((Js.float_of_number @@ Js.Unsafe.coerce x) /. 1000.)
+    else Js.null
+
+  let cast_string x =
+    if (Js.typeof x)##toLowerCase == Js.string "string"
+    then Js.some (Js.to_string @@ Js.Unsafe.coerce x)
+    else Js.null
+
+  let cast_js_array x =
+    if (Js.typeof x)##toLowerCase == Js.string "array"
+    then Js.some (Js.Unsafe.coerce x)
+    else Js.null
+
+  let cast_date x =
+    if Js.instanceof x Js.date_now
+    then Js.some (Js.Unsafe.coerce x)
+    else Js.null
 end
 
 module Or_false = struct
@@ -550,19 +588,23 @@ end
 let createDataPoint ~x ~y =
   object%js
     val mutable x = x
+
     val mutable y = y
   end
 
 let createTimeDataPoint ~t ~y =
   object%js
     val mutable t = t
+
     val mutable y = y
   end
 
 let createBubbleDataPoint ~x ~y ~r =
   object%js
     val mutable x = x
+
     val mutable y = y
+
     val mutable r = r
   end
 
@@ -641,7 +683,7 @@ and gridLines = object
 
   method zeroLineWidth : int Js.prop
 
-  method zeroLineColor : int Js.prop
+  method zeroLineColor : Color.t Js.t Js.prop
 
   method zeroLineBorderDash : line_dash Js.prop
 
@@ -697,7 +739,27 @@ let createTicks () = Js.Unsafe.obj [||]
 
 let createScaleLabel () = Js.Unsafe.obj [||]
 
-let createGridLines () = Js.Unsafe.obj [||]
+let createGridLines ?display ?circular ?color ?borderDash ?borderDashOffset
+    ?lineWidth ?drawBorder ?drawOnChartArea ?drawTicks ?tickMarkLength
+    ?zeroLineWidth ?zeroLineColor ?zeroLineBorderDash ?zeroLineBorderDashOffset
+    ?offsetGridLines () =
+  let (obj : gridLines Js.t) = Js.Unsafe.obj [||] in
+  iter (fun x -> obj##.display := Js.bool x) display;
+  iter (fun x -> obj##.circular := Js.bool x) circular;
+  iter (fun x -> obj##.color := x) color;
+  iter (fun x -> obj##.borderDash := x) borderDash;
+  iter (fun x -> obj##.borderDashOffset := x) borderDashOffset;
+  iter (fun x -> obj##.lineWidth := x) lineWidth;
+  iter (fun x -> obj##.drawBorder := Js.bool x) drawBorder;
+  iter (fun x -> obj##.drawOnChartArea := Js.bool x) drawOnChartArea;
+  iter (fun x -> obj##.drawTicks := Js.bool x) drawTicks;
+  iter (fun x -> obj##.tickMarkLength := x) tickMarkLength;
+  iter (fun x -> obj##.zeroLineWidth := x) zeroLineWidth;
+  iter (fun x -> obj##.zeroLineColor := x) zeroLineColor;
+  iter (fun x -> obj##.zeroLineBorderDash := x) zeroLineBorderDash;
+  iter (fun x -> obj##.zeroLineBorderDashOffset := x) zeroLineBorderDashOffset;
+  iter (fun x -> obj##.offsetGridLines := Js.bool x) offsetGridLines;
+  obj
 
 let createAxis () = Js.Unsafe.obj [||]
 
@@ -835,9 +897,9 @@ class type timeCartesianOptions = object
 
   method isoWeekday : bool Js.t Js.prop
 
-  method max : Time.t Js.optdef_prop
+  method max : Time.t Js.t Js.optdef_prop
 
-  method min : Time.t Js.optdef_prop
+  method min : Time.t Js.t Js.optdef_prop
 
   method _parser : Time_parser.t Js.t Js.optdef_prop
 
@@ -892,7 +954,6 @@ class type data = object
 end
 
 let createData ?(datasets = []) ?labels ?xLabels ?yLabels () =
-  let iter f = function None -> () | Some x -> f x in
   let map_labels x = Js.array @@ Array.of_list x in
   let (obj : data Js.t) = Js.Unsafe.obj [||] in
   iter (fun x -> obj##.labels := map_labels x) labels;
@@ -1425,7 +1486,6 @@ class type updateConfig = object
 end
 
 let createUpdateConfig ?duration ?_lazy ?easing () : updateConfig Js.t =
-  let iter f = function None -> () | Some x -> f x in
   let (conf : updateConfig Js.t) = Js.Unsafe.obj [||] in
   iter (fun x -> conf##.duration := x) duration;
   iter (fun x -> conf##._lazy := Js.bool x) _lazy;
@@ -1640,7 +1700,6 @@ and lineChart = object
 end
 
 let createLineScales ?xAxes ?yAxes () =
-  let iter f = function None -> () | Some x -> f x in
   let (scales : lineScales Js.t) = Js.Unsafe.obj [||] in
   iter (fun x -> scales##.xAxes := Js.array @@ Array.of_list x) xAxes;
   iter (fun x -> scales##.yAxes := Js.array @@ Array.of_list x) yAxes;
@@ -1754,7 +1813,6 @@ let createLogarithmicBarAxis () = Js.Unsafe.obj [||]
 let createTimeBarAxis () = Js.Unsafe.obj [||]
 
 let createBarScales ?xAxes ?yAxes () =
-  let iter f = function None -> () | Some x -> f x in
   let (scales : barScales Js.t) = Js.Unsafe.obj [||] in
   iter (fun x -> scales##.xAxes := Js.array @@ Array.of_list x) xAxes;
   iter (fun x -> scales##.yAxes := Js.array @@ Array.of_list x) yAxes;
