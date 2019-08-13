@@ -339,6 +339,7 @@ module Fill : sig
   val _false : t Js.t
 end
 
+(* FIXME remove *)
 module Time : sig
   type t = float
 end
@@ -487,6 +488,18 @@ module Pie_border_align : sig
   (** Guarantees that all the borders do not overlap. *)
 end
 
+module Axis_display : sig
+  type t
+
+  val of_bool : bool -> t Js.t
+
+  val auto : t Js.t
+
+  val cast_bool : t Js.t -> bool Js.opt
+
+  val is_auto : t Js.t -> bool
+end
+
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
 
 type ('a, 'b, 'c) tooltip_cb =
@@ -524,16 +537,16 @@ class type minorTicks = object
   (** Returns the string representation of the tick value
       as it should be displayed on the chart. *)
 
-  method fontColor : Color.t Js.t Js.prop
+  method fontColor : Color.t Js.t Js.optdef_prop
   (** Font color for tick labels. *)
 
-  method fontFamily : Js.js_string Js.t Js.prop
+  method fontFamily : Js.js_string Js.t Js.optdef_prop
   (** Font family for the tick labels, follows CSS font-family options. *)
 
-  method fontSize : int Js.prop
+  method fontSize : int Js.optdef_prop
   (** Font size for the tick labels. *)
 
-  method fontStyle : Js.js_string Js.t Js.prop
+  method fontStyle : Js.js_string Js.t Js.optdef_prop
   (** Font style for the tick labels, follows CSS font-style options
       (i.e. normal, italic, oblique, initial, inherit). *)
 end
@@ -555,16 +568,16 @@ and ticks = object
   method display : bool Js.t Js.prop
   (** If [true], show tick marks. *)
 
-  method fontColor : Color.t Js.t Js.prop
+  method fontColor : Color.t Js.t Js.optdef_prop
   (** Font color for tick labels. *)
 
-  method fontFamily : Js.js_string Js.t Js.prop
+  method fontFamily : Js.js_string Js.t Js.optdef_prop
   (** Font family for the tick labels, follows CSS font-family options. *)
 
-  method fontSize : int Js.prop
+  method fontSize : int Js.optdef_prop
   (** Font size for the tick labels. *)
 
-  method fontStyle : Js.js_string Js.t Js.prop
+  method fontStyle : Js.js_string Js.t Js.optdef_prop
   (** Font style for the tick labels, follows CSS font-style options
       (i.e. normal, italic, oblique, initial, inherit). *)
 
@@ -661,9 +674,72 @@ and gridLines = object
       This is set to true for a category scale in a bar chart by default. *)
 end
 
-(** {2 Cartesian axes} *)
+class type axis = object
+  method _type : Axis.typ Js.optdef_prop
+  (** Type of scale being employed
+      Custom scales can be created and registered with a string key.
+      This allows changing the type of an axis for a chart. *)
 
-(** {3 Base types for cartesian axis} *)
+  method display : Axis_display.t Js.t Js.prop
+  (** Controls the axis global visibility
+      (visible when [true], hidden when [false]).
+      When display is ['auto'], the axis is visible only
+      if at least one associated dataset is visible. *)
+
+  method weight : float Js.optdef_prop
+  (** The weight used to sort the axis.
+      Higher weights are further away from the chart area. *)
+
+  method beforeUpdate : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback called before the update process starts. *)
+
+  method beforeSetDimensions : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs before dimensions are set. *)
+
+  method afterSetDimensions : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs after dimensions are set. *)
+
+  method beforeDataLimits : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs before data limits are determined. *)
+
+  method afterDataLimits : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs after data limits are determined. *)
+
+  method beforeBuildTicks : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs before ticks are created. *)
+
+  method afterBuildTicks :
+    ('a Js.t
+     -> 'tick Js.js_array Js.t
+     -> 'tick Js.js_array Js.t) Js.callback Js.optdef_prop
+  (** Callback that runs after ticks are created. Useful for filtering ticks.
+      @return the filtered ticks. *)
+
+  method beforeTickToLabelConversion : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs before ticks are converted into strings. *)
+
+  method afterTickToLabelConversion : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs after ticks are converted into strings. *)
+
+  method beforeCalculateTickRotation : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs before tick rotation is determined. *)
+
+  method afterCalculateTickRotation : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs after tick rotation is determined. *)
+
+  method beforeFit : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs before the scale fits to the canvas. *)
+
+  method afterFit : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs after the scale fits to the canvas. *)
+
+  method afterUpdate : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  (** Callback that runs at the end of the update process. *)
+end
+
+val createAxis : unit -> axis Js.t
+
+(** {2 Cartesian axes} *)
 
 class type cartesianTicks = object
   inherit ticks
@@ -703,10 +779,7 @@ class type cartesianTicks = object
 end
 
 class type ['a] cartesianAxis = object
-  method _type : Axis.typ Js.optdef_prop
-  (** Type of scale being employed.
-      Custom scales can be created and registered with a string key.
-      This allows changing the type of an axis for a chart. *)
+  inherit axis
 
   method position : Position.t Js.prop
   (** Position of the axis in the chart.

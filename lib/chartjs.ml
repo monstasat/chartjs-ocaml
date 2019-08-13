@@ -477,6 +477,23 @@ module Pie_border_align = struct
   let inner = Js.string "inner"
 end
 
+module Axis_display = struct
+  type t
+
+  let of_bool x = Js.Unsafe.coerce @@ Js.bool x
+
+  let auto = Js.Unsafe.coerce @@ Js.string "auto"
+
+  let cast_bool x =
+    if (Js.typeof x)##toLowerCase == Js.string "boolean"
+    then Js.some (Js.to_bool @@ Js.Unsafe.coerce x)
+    else Js.null
+
+  let is_auto x =
+    ((Js.typeof x)##toLowerCase == Js.string "string")
+    && (Js.Unsafe.coerce x == Js.string "auto")
+end
+
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
 
 type ('a, 'b, 'c) tooltip_cb =
@@ -506,13 +523,13 @@ end
 class type minorTicks = object
   method callback : 'a tick_cb Js.prop
 
-  method fontColor : Color.t Js.t Js.prop
+  method fontColor : Color.t Js.t Js.optdef_prop
 
-  method fontFamily : Js.js_string Js.t Js.prop
+  method fontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method fontSize : int Js.prop
+  method fontSize : int Js.optdef_prop
 
-  method fontStyle : Js.js_string Js.t Js.prop
+  method fontStyle : Js.js_string Js.t Js.optdef_prop
 end
 
 and majorTicks = minorTicks
@@ -522,13 +539,13 @@ and ticks = object
 
   method display : bool Js.t Js.prop
 
-  method fontColor : Color.t Js.t Js.prop
+  method fontColor : Color.t Js.t Js.optdef_prop
 
-  method fontFamily : Js.js_string Js.t Js.prop
+  method fontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method fontSize : int Js.prop
+  method fontSize : int Js.optdef_prop
 
-  method fontStyle : Js.js_string Js.t Js.prop
+  method fontStyle : Js.js_string Js.t Js.optdef_prop
 
   method reverse : bool Js.t Js.prop
 
@@ -587,6 +604,47 @@ and gridLines = object
   method offsetGridLines : bool Js.t Js.prop
 end
 
+class type axis = object
+  method _type : Axis.typ Js.optdef_prop
+
+  method display : Axis_display.t Js.t Js.prop
+
+  method weight : float Js.optdef_prop
+
+  method beforeUpdate : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method beforeSetDimensions : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method afterSetDimensions : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method beforeDataLimits : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method afterDataLimits : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method beforeBuildTicks : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method afterBuildTicks :
+    ('a Js.t
+     -> 'tick Js.js_array Js.t
+     -> 'tick Js.js_array Js.t) Js.callback Js.optdef_prop
+
+  method beforeTickToLabelConversion : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method afterTickToLabelConversion : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method beforeCalculateTickRotation : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method afterCalculateTickRotation : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method beforeFit : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method afterFit : ('a Js.t -> unit) Js.callback Js.optdef_prop
+
+  method afterUpdate : ('a Js.t -> unit) Js.callback Js.optdef_prop
+end
+
+let createAxis () = Js.Unsafe.obj [||]
+
 class type cartesianTicks = object
   inherit ticks
 
@@ -606,7 +664,7 @@ class type cartesianTicks = object
 end
 
 class type ['a] cartesianAxis = object
-  method _type : Axis.typ Js.optdef_prop
+  inherit axis
 
   method position : Position.t Js.prop
 

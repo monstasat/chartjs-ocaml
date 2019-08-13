@@ -43,16 +43,8 @@ let () =
   legend_labels##.fontFamily := Js.string "monospace";
   legend_labels##.padding := 20;
   legend_labels##.usePointStyle := Js._true;
-  legend_labels##.filter := Js.wrap_meth_callback (fun _labels item data ->
-      print_endline "filter called";
-      log item;
-      log data;
-      Js._true);
   legend##.fullWidth := Js._false;
   legend##.reverse := Js._true;
-  legend##.onHover := Js.wrap_meth_callback (fun _ _ item ->
-      log item;
-      print_endline "hover legend");
   legend##.labels := legend_labels;
   (* Initialize title *)
   let title = createTitle () in
@@ -71,18 +63,19 @@ let () =
   tooltips##.intersect := Js._false;
   tooltips##.backgroundColor := Color.of_string "lime";
   tooltips##.titleFontStyle := Js.string "italic";
-  tooltips##.itemSort := Js.wrap_meth_callback (fun _self a b data ->
-      print_endline "tooltip item sorting fun called";
-      log _self;
-      log a;
-      log b;
-      log data;
-      0);
+  (* Initialize scales *)
+  let axis = createAxis () in
+  let xAxes = Js.array [|axis|] in
+  let scales = Js.Unsafe.obj [||] in
+  axis##.display := Axis_display.auto;
+  scales##.xAxes := xAxes;
   (* Initialize other options *)
   let options = createLineOptions () in
+  (Js.Unsafe.coerce options)##.scales := scales;
   options##.legend := legend;
   options##.title := title;
   options##.tooltips := tooltips;
   options##.maintainAspectRatio := Js._false;
+  log options;
   let chart = chart_from_id Chart.line (Js.Unsafe.coerce data) options "chart" in
   Js.Unsafe.global##.chart := chart
