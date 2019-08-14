@@ -19,4 +19,5 @@ depends: [
   "dune" {build}
   "js_of_ocaml"
   "js_of_ocaml-ppx"
+  "chartjs"
 ]

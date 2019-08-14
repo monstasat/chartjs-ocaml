@@ -7,6 +7,6 @@
 ## Plugins
   
   * [ ] Crosshair
-  * [ ] Datalabels
-  * [ ] Streaming
+  * [X] Datalabels
+  * [X] Streaming
   * [ ] Deferred

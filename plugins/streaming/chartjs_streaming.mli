@@ -53,7 +53,7 @@ class type streaming = object
       Note that onRefresh callback is called even when this is set to [true]. *)
 end
 
-val createUpdateConfig : unit -> updateConfig Js.t
+val create_update_config : ?preservation:bool -> unit -> updateConfig Js.t
 
 val create :
      ?duration:int

@@ -4,46 +4,46 @@ open Chartjs
 let log x : unit = Js.Unsafe.global##.console##log x
 
 let () =
-  let dataset1 =
-    createBarDataset
-    @@ Js.array [|10.; 15.; 30.; 20.; 25.; 10.; 7.|] in
+  (* Create first dataset. *)
+  let dataset1 = create_bar_dataset () in
+  dataset1##.data := Js.array [|10.; 15.; 30.; 20.; 25.; 10.; 7.|];
+  dataset1##.label := Js.string "Dataset 1";
   dataset1##.borderColor := Scriptable_indexable.of_single @@ Color.of_string "red";
   dataset1##.backgroundColor := (
     Scriptable_indexable.of_single
     @@ Color.of_string "rgba(255, 0, 0, 0.4)");
-  dataset1##.label := Js.string "Dataset 1";
-  let dataset2 =
-    createBarDataset
-    @@ Js.array [|20.; 10.; nan; 15.; 5.; 7.; 30.|] in
+  (* Create second dataset. *)
+  let dataset2 = create_bar_dataset () in
+  dataset2##.data := Js.array [|20.; 10.; nan; 15.; 5.; 7.; 30.|];
+  dataset2##.label := Js.string "Dataset 2";
   dataset2##.borderColor := Scriptable_indexable.of_single @@ Color.of_string "blue";
   dataset2##.backgroundColor := (
     Scriptable_indexable.of_single
     @@ Color.of_string "rgba(0, 0, 255, 0.4)");
-  dataset2##.label := Js.string "Dataset 2";
+  (* Create chart data. *)
   let labels =
-    List.map Js.string
-      [ "January"
-      ; "February"
-      ; "March"
-      ; "April"
-      ; "May"
-      ; "June"
-      ; "July"
-      ] in
-  let data = createData
-      ~datasets:[dataset1; dataset2]
-      ~labels
-      () in
+    Array.map Js.string
+      [| "January"
+       ; "February"
+       ; "March"
+       ; "April"
+       ; "May"
+       ; "June"
+       ; "July"
+      |] in
+  let data = create_data () in
+  data##.datasets := Js.array [|dataset1; dataset2|];
+  data##.labels := Js.array labels;
   (* Initialize title *)
-  let title = createTitle () in
+  let title = create_title () in
   title##.display := Js._true;
   title##.text := Indexable.of_single @@ Js.string "Bar Chart";
   (* Initialize tooltips *)
-  let tooltips = createTooltip () in
+  let tooltips = create_tooltip () in
   tooltips##.mode := Interaction_mode.index;
   tooltips##.intersect := Js._false;
   (* Initialize other options *)
-  let options = createBarOptions () in
+  let options = create_bar_options () in
   options##.title := title;
   options##.tooltips := tooltips;
   options##.maintainAspectRatio := Js._false;

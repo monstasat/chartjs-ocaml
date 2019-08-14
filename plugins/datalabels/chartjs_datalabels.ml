@@ -135,6 +135,8 @@ class type datalabels = object
   method textShadowColor : Color.t Js.t prop Js.optdef_prop
 end
 
+let create () = Js.Unsafe.obj [||]
+
 let of_dataset dataset =
   (Js.Unsafe.coerce dataset)##.datalabels
 

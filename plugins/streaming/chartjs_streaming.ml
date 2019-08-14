@@ -26,7 +26,11 @@ class type streaming = object
   method pause : bool Js.t Js.optdef_prop
 end
 
-let createUpdateConfig () = Js.Unsafe.obj [||]
+let create_update_config ?preservation () =
+  let (obj : updateConfig Js.t) = Js.Unsafe.obj [||] in
+  match preservation with
+  | None -> obj
+  | Some p -> obj##.preservation := Js.bool p; obj
 
 let create ?duration ?ttl ?delay ?refresh ?onRefresh ?frameRate ?pause () =
   let iter f = function None -> () | Some x -> f x in

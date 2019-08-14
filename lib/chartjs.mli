@@ -543,25 +543,23 @@ class type ['x, 'y] dataPoint = object
   method y : 'y Js.prop
 end
 
-class type ['t, 'y] timeDataPoint = object
+class type ['t, 'y] dataPointT = object
   method t : 't Js.prop
 
   method y : 'y Js.prop
 end
 
-class type ['x, 'y, 'r] bubbleDataPoint = object
-  method x : 'x Js.prop
-
-  method y : 'y Js.prop
+class type ['x, 'y, 'r] dataPointR = object
+  inherit ['x, 'y] dataPoint
 
   method r : 'r Js.prop
 end
 
-val createDataPoint : x:'a -> y:'b -> ('a, 'b) dataPoint Js.t
+val create_data_point : x:'a -> y:'b -> ('a, 'b) dataPoint Js.t
 
-val createTimeDataPoint : t:'a -> y:'b -> ('a, 'b) timeDataPoint Js.t
+val create_data_point_t : t:'a -> y:'b -> ('a, 'b) dataPointT Js.t
 
-val createBubbleDataPoint : x:'a -> y:'b -> r:'c -> ('a, 'b, 'c) bubbleDataPoint Js.t
+val create_data_point_r : x:'a -> y:'b -> r:'c -> ('a, 'b, 'c) dataPointR Js.t
 
 (** {1 Axes} *)
 
@@ -774,34 +772,15 @@ class type axis = object
   (** Callback that runs at the end of the update process. *)
 end
 
-val createMinorTicks : unit -> minorTicks Js.t
+val create_minor_ticks : unit -> minorTicks Js.t
 
-val createMajorTicks : unit -> majorTicks Js.t
+val create_major_ticks : unit -> majorTicks Js.t
 
-val createTicks : unit -> ticks Js.t
+val create_ticks : unit -> ticks Js.t
 
-val createScaleLabel : unit -> scaleLabel Js.t
+val create_scale_label : unit -> scaleLabel Js.t
 
-val createGridLines :
-     ?display:bool
-  -> ?circular:bool
-  -> ?color:Color.t Js.t Indexable.t Js.t
-  -> ?borderDash:line_dash
-  -> ?borderDashOffset:line_dash_offset
-  -> ?lineWidth:int Indexable.t Js.t
-  -> ?drawBorder:bool
-  -> ?drawOnChartArea:bool
-  -> ?drawTicks:bool
-  -> ?tickMarkLength:int
-  -> ?zeroLineWidth:int
-  -> ?zeroLineColor:Color.t Js.t
-  -> ?zeroLineBorderDash:line_dash
-  -> ?zeroLineBorderDashOffset:line_dash_offset
-  -> ?offsetGridLines:bool
-  -> unit
-  -> gridLines Js.t
-
-val createAxis : unit -> axis Js.t
+val create_grid_lines : unit -> gridLines Js.t
 
 (** {2 Cartesian axes} *)
 
@@ -867,7 +846,7 @@ class type ['a] cartesianAxis = object
   (** Tick configuration. *)
 end
 
-val createCartesianAxis : unit -> 'a cartesianAxis Js.t
+val create_cartesian_axis : unit -> 'a cartesianAxis Js.t
 
 (** {3 Category axis} *)
 
@@ -886,9 +865,9 @@ end
 
 class type categoryCartesianAxis = [categoryCartesianTicks] cartesianAxis
 
-val createCategoryCartesianTicks : unit -> categoryCartesianTicks Js.t
+val create_category_cartesian_ticks : unit -> categoryCartesianTicks Js.t
 
-val createCategoryCartesianAxis : unit -> categoryCartesianAxis Js.t
+val create_category_cartesian_axis : unit -> categoryCartesianAxis Js.t
 
 (** {3 Linear axis} *)
 
@@ -925,9 +904,9 @@ end
 
 class type linearCartesianAxis = [linearCartesianTicks] cartesianAxis
 
-val createLinearCartesianTicks : unit -> linearCartesianTicks Js.t
+val create_linear_cartesian_ticks : unit -> linearCartesianTicks Js.t
 
-val createLinearCartesianAxis : unit -> linearCartesianAxis Js.t
+val create_linear_cartesian_axis : unit -> linearCartesianAxis Js.t
 
 (** {3 Logarithmic axis} *)
 
@@ -945,9 +924,9 @@ end
 
 class type logarithmicCartesianAxis = [logarithmicCartesianTicks] cartesianAxis
 
-val createLogarithmicCartesianTicks : unit -> logarithmicCartesianTicks Js.t
+val create_logarithmic_cartesian_ticks : unit -> logarithmicCartesianTicks Js.t
 
-val createLogarithmicCartesianAxis : unit -> logarithmicCartesianAxis Js.t
+val create_logarithmic_cartesian_axis : unit -> logarithmicCartesianAxis Js.t
 
 (** {3 Time axis} *)
 
@@ -1034,13 +1013,13 @@ class type timeCartesianAxis = object
       [ticks]: makes sure ticks are fully visible, data outside are truncated *)
 end
 
-val createTimeDisplayFormats : unit -> timeDisplayFormats Js.t
+val create_time_display_formats : unit -> timeDisplayFormats Js.t
 
-val createTimeCartesianTicks : unit -> timeCartesianTicks Js.t
+val create_time_cartesian_ticks : unit -> timeCartesianTicks Js.t
 
-val createTimeCartesianOptions : unit -> timeCartesianOptions Js.t
+val create_time_cartesian_options : unit -> timeCartesianOptions Js.t
 
-val createTimeCartesianAxis : unit -> timeCartesianAxis Js.t
+val create_time_cartesian_axis : unit -> timeCartesianAxis Js.t
 
 class type dataset = object
   method _type : Js.js_string Js.t Js.optdef_prop
@@ -1051,7 +1030,7 @@ end
 val coerce_dataset : #dataset Js.t -> dataset Js.t
 
 class type data = object
-  method datasets : dataset Js.t Js.js_array Js.t Js.prop
+  method datasets : #dataset Js.t Js.js_array Js.t Js.prop
 
   method labels : 'a Js.js_array Js.t Js.optdef_prop
 
@@ -1060,13 +1039,7 @@ class type data = object
   method yLabels : 'a Js.js_array Js.t Js.optdef_prop
 end
 
-val createData :
-  ?datasets:#dataset Js.t list
-  -> ?labels:'a list
-  -> ?xLabels:'a list
-  -> ?yLabels:'a list
-  -> unit
-  -> data Js.t
+val create_data : unit -> data Js.t
 
 (** {1 Chart configuration} *)
 
@@ -1106,7 +1079,7 @@ class type ['chart] animation = object
   (** Callback called at the end of an animation. *)
 end
 
-val createAnimation : unit -> 'a animation Js.t
+val create_animation : unit -> 'a animation Js.t
 
 (** {2 Layout} *)
 
@@ -1115,7 +1088,7 @@ class type layout = object
   (** The padding to add inside the chart. *)
 end
 
-val createLayout : unit -> layout Js.t
+val create_layout : unit -> layout Js.t
 
 (** {2 Legend} *)
 
@@ -1235,9 +1208,9 @@ class type ['chart] legend = object
   (** Legend label configuration. *)
 end
 
-val createLegendLabels : unit -> 'a legendLabels Js.t
+val create_legend_labels : unit -> 'a legendLabels Js.t
 
-val createLegend : unit -> 'a legend Js.t
+val create_legend : unit -> 'a legend Js.t
 
 (** {2 Title} *)
 
@@ -1273,7 +1246,7 @@ class type title = object
       text is rendered on multiple lines. *)
 end
 
-val createTitle : unit -> title Js.t
+val create_title : unit -> title Js.t
 
 (** {2 Tooltip} *)
 
@@ -1590,7 +1563,7 @@ and ['chart] tooltip = object('self)
   (** Size of the border. *)
 end
 
-val createTooltip : unit -> 'a tooltip Js.t
+val create_tooltip : unit -> 'a tooltip Js.t
 
 (** {2 Interactions} *)
 
@@ -1611,7 +1584,7 @@ class type hover = object
   (** Duration in milliseconds it takes to animate hover style changes. *)
 end
 
-val createHover : unit -> hover Js.t
+val create_hover : unit -> hover Js.t
 
 (** {2 Elements} *)
 
@@ -1723,15 +1696,15 @@ class type elements = object
   (** Arcs are used in the polar area, doughnut and pie charts. *)
 end
 
-val createPointElement : unit -> pointElement Js.t
+val create_point_element : unit -> pointElement Js.t
 
-val createLineElement : unit -> lineElement Js.t
+val create_line_element : unit -> lineElement Js.t
 
-val createRectangleElement : unit -> rectangleElement Js.t
+val create_rectangle_element : unit -> rectangleElement Js.t
 
-val createArcElement : unit -> arcElement Js.t
+val create_arc_element : unit -> arcElement Js.t
 
-val createElements : unit -> elements Js.t
+val create_elements : unit -> elements Js.t
 
 (** {2 Options} *)
 
@@ -1751,7 +1724,7 @@ end
 
 (** {2 Chart} *)
 
-val createUpdateConfig :
+val create_update_config :
   ?duration:int
   -> ?_lazy:bool
   -> ?easing:Easing.t
@@ -1778,6 +1751,8 @@ class type ['chart, 'animation] chartOptions = object
 
   method title : title Js.t Js.prop
   (** The chart title defines text to draw at the top of the chart. *)
+
+  method hover : hover Js.t Js.prop
 
   method tooltips : 'chart tooltip Js.t Js.prop
 
@@ -2100,15 +2075,11 @@ and lineChart = object
   inherit [lineOptions] chart
 end
 
-val createLineScales :
-     ?xAxes:#cartesianTicks #cartesianAxis Js.t list
-  -> ?yAxes:#cartesianTicks #cartesianAxis Js.t list
-  -> unit
-  -> lineScales Js.t
+val create_line_scales : unit -> lineScales Js.t
 
-val createLineOptions : unit -> lineOptions Js.t
+val create_line_options : unit -> lineOptions Js.t
 
-val createLineDataset : 'a Js.js_array Js.t -> 'a lineDataset Js.t
+val create_line_dataset : unit -> 'a lineDataset Js.t
 
 (** {2 Bar Chart} *)
 
@@ -2249,23 +2220,19 @@ and barChart = object
   inherit [barOptions] chart
 end
 
-val createCategoryBarAxis : unit -> cateroryBarAxis Js.t
+val create_category_bar_axis : unit -> cateroryBarAxis Js.t
 
-val createLinearBarAxis : unit -> linearBarAxis Js.t
+val create_linear_bar_axis : unit -> linearBarAxis Js.t
 
-val createLogarithmicBarAxis : unit -> logarithmicBarAxis Js.t
+val create_logarithmic_bar_axis : unit -> logarithmicBarAxis Js.t
 
-val createTimeBarAxis : unit -> timeBarAxis Js.t
+val create_time_bar_axis : unit -> timeBarAxis Js.t
 
-val createBarScales :
-     ?xAxes:#barAxis Js.t list
-  -> ?yAxes:#barAxis Js.t list
-  -> unit
-  -> barScales Js.t
+val create_bar_scales : unit -> barScales Js.t
 
-val createBarOptions : unit -> barOptions Js.t
+val create_bar_options : unit -> barOptions Js.t
 
-val createBarDataset : 'a Js.js_array Js.t -> 'a barDataset Js.t
+val create_bar_dataset : unit -> 'a barDataset Js.t
 
 (** {2 Pie Chart} *)
 
@@ -2355,11 +2322,11 @@ and pieChart = object
   inherit [pieOptions] chart
 end
 
-val createPieAnimation : unit -> pieAnimation Js.t
+val create_pie_animation : unit -> pieAnimation Js.t
 
-val createPieOptions : unit -> pieOptions Js.t
+val create_pie_options : unit -> pieOptions Js.t
 
-val createPieDataset : 'a Js.js_array Js.t -> 'a pieDataset Js.t
+val create_pie_dataset : unit -> 'a pieDataset Js.t
 
 module Axis : sig
   type 'a typ

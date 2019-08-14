@@ -159,6 +159,8 @@ class type datalabels = object
   method textShadowColor : Color.t Js.t prop Js.optdef_prop
 end
 
+val create : unit -> datalabels Js.t
+
 (** {1 Positioning}
 
     {2 Anchoring}

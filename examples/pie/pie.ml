@@ -16,18 +16,20 @@ let () =
     | 1 -> "lightblue"
     | 2 -> "lightgreen"
     | _ -> "initial)" in
-  let dataset = createPieDataset (Js.array [|40; 15; 20|]) in
+  (* Create dataset. *)
+  let dataset = create_pie_dataset () in
+  dataset##.data := Js.array [|40; 15; 20|];
   dataset##.borderColor := Scriptable_indexable.of_fun border_color_fun;
   dataset##.backgroundColor := Scriptable_indexable.of_fun background_color_fun;
   dataset##.borderWidth := Scriptable_indexable.of_single 5;
   dataset##.label := Js.string "Dataset 1";
-  let data = createData
-      ~datasets:[dataset]
-      ~labels:["first"; "second"; "third"]
-      () in
-  let legend = createLegend () in
-  let animation = createPieAnimation () in
-  let options = createPieOptions () in
+  (* Create chart data. *)
+  let data = create_data () in
+  data##.datasets := Js.array [|dataset|];
+  data##.labels := Js.array @@ Array.map Js.string [|"first"; "second"; "third"|];
+  let legend = create_legend () in
+  let animation = create_pie_animation () in
+  let options = create_pie_options () in
   animation##.animateScale := Js._true;
   animation##.animateRotate := Js._true;
   legend##.position := Position.left;
@@ -38,6 +40,5 @@ let () =
   options##.cutoutPercentage := 20.;
   options##.animation := animation;
   options##.legend := legend;
-  let pie = chart_from_id Chart.doughnut (Js.Unsafe.coerce data) options "chart" in
-  Js.Unsafe.global##.chart := pie;
-  Dom.appendChild Dom_html.document##.body pie##.canvas
+  let pie = chart_from_id Chart.doughnut data options "chart" in
+  Js.Unsafe.global##.chart := pie

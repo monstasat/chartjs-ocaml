@@ -571,35 +571,33 @@ class type ['x, 'y] dataPoint = object
   method y : 'y Js.prop
 end
 
-class type ['t, 'y] timeDataPoint = object
+class type ['t, 'y] dataPointT = object
   method t : 't Js.prop
 
   method y : 'y Js.prop
 end
 
-class type ['x, 'y, 'r] bubbleDataPoint = object
-  method x : 'x Js.prop
-
-  method y : 'y Js.prop
+class type ['x, 'y, 'r] dataPointR = object
+  inherit ['x, 'y] dataPoint
 
   method r : 'r Js.prop
 end
 
-let createDataPoint ~x ~y =
+let create_data_point ~x ~y =
   object%js
     val mutable x = x
 
     val mutable y = y
   end
 
-let createTimeDataPoint ~t ~y =
+let create_data_point_t ~t ~y =
   object%js
     val mutable t = t
 
     val mutable y = y
   end
 
-let createBubbleDataPoint ~x ~y ~r =
+let create_data_point_r ~x ~y ~r =
   object%js
     val mutable x = x
 
@@ -731,37 +729,15 @@ class type axis = object
   method afterUpdate : ('a Js.t -> unit) Js.callback Js.optdef_prop
 end
 
-let createMinorTicks () = Js.Unsafe.obj [||]
+let create_minor_ticks () = Js.Unsafe.obj [||]
 
-let createMajorTicks () = Js.Unsafe.obj [||]
+let create_major_ticks () = Js.Unsafe.obj [||]
 
-let createTicks () = Js.Unsafe.obj [||]
+let create_ticks () = Js.Unsafe.obj [||]
 
-let createScaleLabel () = Js.Unsafe.obj [||]
+let create_scale_label () = Js.Unsafe.obj [||]
 
-let createGridLines ?display ?circular ?color ?borderDash ?borderDashOffset
-    ?lineWidth ?drawBorder ?drawOnChartArea ?drawTicks ?tickMarkLength
-    ?zeroLineWidth ?zeroLineColor ?zeroLineBorderDash ?zeroLineBorderDashOffset
-    ?offsetGridLines () =
-  let (obj : gridLines Js.t) = Js.Unsafe.obj [||] in
-  iter (fun x -> obj##.display := Js.bool x) display;
-  iter (fun x -> obj##.circular := Js.bool x) circular;
-  iter (fun x -> obj##.color := x) color;
-  iter (fun x -> obj##.borderDash := x) borderDash;
-  iter (fun x -> obj##.borderDashOffset := x) borderDashOffset;
-  iter (fun x -> obj##.lineWidth := x) lineWidth;
-  iter (fun x -> obj##.drawBorder := Js.bool x) drawBorder;
-  iter (fun x -> obj##.drawOnChartArea := Js.bool x) drawOnChartArea;
-  iter (fun x -> obj##.drawTicks := Js.bool x) drawTicks;
-  iter (fun x -> obj##.tickMarkLength := x) tickMarkLength;
-  iter (fun x -> obj##.zeroLineWidth := x) zeroLineWidth;
-  iter (fun x -> obj##.zeroLineColor := x) zeroLineColor;
-  iter (fun x -> obj##.zeroLineBorderDash := x) zeroLineBorderDash;
-  iter (fun x -> obj##.zeroLineBorderDashOffset := x) zeroLineBorderDashOffset;
-  iter (fun x -> obj##.offsetGridLines := Js.bool x) offsetGridLines;
-  obj
-
-let createAxis () = Js.Unsafe.obj [||]
+let create_grid_lines () = Js.Unsafe.obj [||]
 
 class type cartesianTicks = object
   inherit ticks
@@ -797,7 +773,7 @@ class type ['a] cartesianAxis = object
   method ticks : (#cartesianTicks as 'a) Js.t Js.prop
 end
 
-let createCartesianAxis () = Js.Unsafe.obj [||]
+let create_cartesian_axis () = Js.Unsafe.obj [||]
 
 (** {3 Category axis} *)
 
@@ -813,9 +789,9 @@ end
 
 class type categoryCartesianAxis = [categoryCartesianTicks] cartesianAxis
 
-let createCategoryCartesianTicks () = Js.Unsafe.obj [||]
+let create_category_cartesian_ticks () = Js.Unsafe.obj [||]
 
-let createCategoryCartesianAxis () =
+let create_category_cartesian_axis () =
   let (axis : categoryCartesianAxis Js.t) = Js.Unsafe.obj [||] in
   axis##._type := Js.string "category";
   axis
@@ -842,9 +818,9 @@ end
 
 class type linearCartesianAxis = [linearCartesianTicks] cartesianAxis
 
-let createLinearCartesianTicks () = Js.Unsafe.obj [||]
+let create_linear_cartesian_ticks () = Js.Unsafe.obj [||]
 
-let createLinearCartesianAxis () =
+let create_linear_cartesian_axis () =
   let (axis : linearCartesianAxis Js.t) = Js.Unsafe.obj [||] in
   axis##._type := Js.string "linear";
   axis
@@ -859,9 +835,9 @@ end
 
 class type logarithmicCartesianAxis = [logarithmicCartesianTicks] cartesianAxis
 
-let createLogarithmicCartesianTicks () = Js.Unsafe.obj [||]
+let create_logarithmic_cartesian_ticks () = Js.Unsafe.obj [||]
 
-let createLogarithmicCartesianAxis () =
+let create_logarithmic_cartesian_axis () =
   let (axis : logarithmicCartesianAxis Js.t) = Js.Unsafe.obj [||] in
   axis##._type := Js.string "logarithmic";
   axis
@@ -924,13 +900,13 @@ class type timeCartesianAxis = object
   method bounds : Time_bounds.t Js.prop
 end
 
-let createTimeDisplayFormats () = Js.Unsafe.obj [||]
+let create_time_display_formats () = Js.Unsafe.obj [||]
 
-let createTimeCartesianTicks () = Js.Unsafe.obj [||]
+let create_time_cartesian_ticks () = Js.Unsafe.obj [||]
 
-let createTimeCartesianOptions () = Js.Unsafe.obj [||]
+let create_time_cartesian_options () = Js.Unsafe.obj [||]
 
-let createTimeCartesianAxis () =
+let create_time_cartesian_axis () =
   let (axis : timeCartesianAxis Js.t) = Js.Unsafe.obj [||] in
   axis##._type := Js.string "time";
   axis
@@ -944,7 +920,7 @@ end
 let coerce_dataset x = (x :> dataset Js.t)
 
 class type data = object
-  method datasets : dataset Js.t Js.js_array Js.t Js.prop
+  method datasets : #dataset Js.t Js.js_array Js.t Js.prop
 
   method labels : 'a Js.js_array Js.t Js.optdef_prop
 
@@ -953,18 +929,7 @@ class type data = object
   method yLabels : 'a Js.js_array Js.t Js.optdef_prop
 end
 
-let createData ?(datasets = []) ?labels ?xLabels ?yLabels () =
-  let map_labels x = Js.array @@ Array.of_list x in
-  let (obj : data Js.t) = Js.Unsafe.obj [||] in
-  iter (fun x -> obj##.labels := map_labels x) labels;
-  iter (fun x -> obj##.xLabels := map_labels x) xLabels;
-  iter (fun x -> obj##.yLabels := map_labels x) yLabels;
-  let datasets =
-    Js.array
-    @@ Array.of_list
-    @@ List.map (fun x -> (x :> dataset Js.t)) datasets in
-  obj##.datasets := datasets;
-  obj
+let create_data () = Js.Unsafe.obj [||]
 
 class type ['chart] animationItem = object
   method chart : 'chart Js.t Js.readonly_prop
@@ -990,13 +955,13 @@ class type ['chart] animation = object
   method onComplete : ('chart animationItem Js.t -> unit) Js.callback Js.opt Js.prop
 end
 
-let createAnimation () = Js.Unsafe.obj [||]
+let create_animation () = Js.Unsafe.obj [||]
 
 class type layout = object
   method padding : Padding.t Js.prop
 end
 
-let createLayout () = Js.Unsafe.obj [||]
+let create_layout () = Js.Unsafe.obj [||]
 
 class type legendItem = object
   method text : Js.js_string Js.t Js.prop
@@ -1078,9 +1043,9 @@ class type ['chart] legend = object
   method labels : 'chart legendLabels Js.t Js.prop
 end
 
-let createLegendLabels () = Js.Unsafe.obj [||]
+let create_legend_labels () = Js.Unsafe.obj [||]
 
-let createLegend () = Js.Unsafe.obj [||]
+let create_legend () = Js.Unsafe.obj [||]
 
 class type title = object
   method display : bool Js.t Js.prop
@@ -1104,7 +1069,7 @@ class type title = object
   method text : Js.js_string Js.t Indexable.t Js.t Js.prop
 end
 
-let createTitle () = Js.Unsafe.obj [||]
+let create_title () = Js.Unsafe.obj [||]
 
 class type tooltipItem = object
   method label : Js.js_string Js.t Js.readonly_prop
@@ -1373,7 +1338,7 @@ and ['chart] tooltip = object('self)
   method borderWidth : int Js.prop
 end
 
-let createTooltip () = Js.Unsafe.obj [||]
+let create_tooltip () = Js.Unsafe.obj [||]
 
 class type hover = object
   method mode : Interaction_mode.t Js.prop
@@ -1385,7 +1350,7 @@ class type hover = object
   method animationDuration : int Js.prop
 end
 
-let createHover () = Js.Unsafe.obj [||]
+let create_hover () = Js.Unsafe.obj [||]
 
 class type pointElement = object
   method radius : int Js.prop
@@ -1461,15 +1426,15 @@ class type elements = object
   method arc : arcElement Js.t Js.prop
 end
 
-let createPointElement () = Js.Unsafe.obj [||]
+let create_point_element () = Js.Unsafe.obj [||]
 
-let createLineElement () = Js.Unsafe.obj [||]
+let create_line_element () = Js.Unsafe.obj [||]
 
-let createRectangleElement () = Js.Unsafe.obj [||]
+let create_rectangle_element () = Js.Unsafe.obj [||]
 
-let createArcElement () = Js.Unsafe.obj [||]
+let create_arc_element () = Js.Unsafe.obj [||]
 
-let createElements () = Js.Unsafe.obj [||]
+let create_elements () = Js.Unsafe.obj [||]
 
 class type chartSize = object
   method width : int Js.readonly_prop
@@ -1485,7 +1450,7 @@ class type updateConfig = object
   method easing : Easing.t Js.optdef_prop
 end
 
-let createUpdateConfig ?duration ?_lazy ?easing () : updateConfig Js.t =
+let create_update_config ?duration ?_lazy ?easing () : updateConfig Js.t =
   let (conf : updateConfig Js.t) = Js.Unsafe.obj [||] in
   iter (fun x -> conf##.duration := x) duration;
   iter (fun x -> conf##._lazy := Js.bool x) _lazy;
@@ -1502,6 +1467,8 @@ class type ['chart, 'animation] chartOptions = object
   method legend : 'chart legend Js.t Js.prop
 
   method title : title Js.t Js.prop
+
+  method hover : hover Js.t Js.prop
 
   method tooltips : 'chart tooltip Js.t Js.prop
 
@@ -1699,18 +1666,11 @@ and lineChart = object
   inherit [lineOptions] chart
 end
 
-let createLineScales ?xAxes ?yAxes () =
-  let (scales : lineScales Js.t) = Js.Unsafe.obj [||] in
-  iter (fun x -> scales##.xAxes := Js.array @@ Array.of_list x) xAxes;
-  iter (fun x -> scales##.yAxes := Js.array @@ Array.of_list x) yAxes;
-  scales
+let create_line_scales () = Js.Unsafe.obj [||]
 
-let createLineOptions () = Js.Unsafe.obj [||]
+let create_line_options () = Js.Unsafe.obj [||]
 
-let createLineDataset data : 'a lineDataset Js.t =
-  let (lineDataset : 'a lineDataset Js.t) = Js.Unsafe.obj [||] in
-  lineDataset##.data := data;
-  lineDataset
+let create_line_dataset () = Js.Unsafe.obj [||]
 
 class type barAxis = object
   method barPercentage : float Js.prop
@@ -1804,26 +1764,19 @@ and barChart = object
   inherit [barOptions] chart
 end
 
-let createCategoryBarAxis () = Js.Unsafe.obj [||]
+let create_category_bar_axis () = Js.Unsafe.obj [||]
 
-let createLinearBarAxis () = Js.Unsafe.obj [||]
+let create_linear_bar_axis () = Js.Unsafe.obj [||]
 
-let createLogarithmicBarAxis () = Js.Unsafe.obj [||]
+let create_logarithmic_bar_axis () = Js.Unsafe.obj [||]
 
-let createTimeBarAxis () = Js.Unsafe.obj [||]
+let create_time_bar_axis () = Js.Unsafe.obj [||]
 
-let createBarScales ?xAxes ?yAxes () =
-  let (scales : barScales Js.t) = Js.Unsafe.obj [||] in
-  iter (fun x -> scales##.xAxes := Js.array @@ Array.of_list x) xAxes;
-  iter (fun x -> scales##.yAxes := Js.array @@ Array.of_list x) yAxes;
-  scales
+let create_bar_scales () = Js.Unsafe.obj [||]
 
-let createBarOptions () = Js.Unsafe.obj [||]
+let create_bar_options () = Js.Unsafe.obj [||]
 
-let createBarDataset data : 'a barDataset Js.t =
-  let (barDataset : 'a barDataset Js.t) = Js.Unsafe.obj [||] in
-  barDataset##.data := data;
-  barDataset
+let create_bar_dataset () = Js.Unsafe.obj [||]
 
 class type ['a] pieOptionContext = object
   method chart : pieChart Js.t Js.readonly_prop
@@ -1885,14 +1838,11 @@ and pieChart = object
   inherit [pieOptions] chart
 end
 
-let createPieAnimation () = Js.Unsafe.obj [||]
+let create_pie_animation () = Js.Unsafe.obj [||]
 
-let createPieOptions () = Js.Unsafe.obj [||]
+let create_pie_options () = Js.Unsafe.obj [||]
 
-let createPieDataset data : 'a pieDataset Js.t =
-  let (pieDataset : 'a pieDataset Js.t) = Js.Unsafe.coerce @@ Js.Unsafe.obj [||] in
-  pieDataset##.data := data;
-  pieDataset
+let create_pie_dataset () = Js.Unsafe.obj [||]
 
 module Axis = struct
   type 'a typ = Js.js_string Js.t
