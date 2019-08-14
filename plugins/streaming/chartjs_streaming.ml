@@ -46,7 +46,7 @@ let of_axis axis =
 let of_chart chart =
   (Js.Unsafe.coerce chart)##.options##.plugins##.streaming
 
-let global () =
+let of_global () =
   Js.Unsafe.global##._Chart##.defaults##.global##.plugins##.streaming
 
 let set_per_axis axis plugin =

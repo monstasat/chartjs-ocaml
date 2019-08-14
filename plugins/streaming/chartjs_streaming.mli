@@ -70,7 +70,7 @@ val of_axis : #Chartjs.axis Js.t -> streaming Js.t Js.optdef
 
 val of_chart : 'a #Chartjs.chart Js.t -> streaming Js.t Js.optdef
 
-val global : unit -> streaming Js.t
+val of_global : unit -> streaming Js.t
 
 val set_per_axis : #Chartjs.axis Js.t -> streaming Js.t -> unit
 
