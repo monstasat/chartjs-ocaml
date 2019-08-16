@@ -68,7 +68,7 @@ end
 class type optionContext = object
   method active : bool Js.t Js.readonly_prop
 
-  method chart : 'a chart Js.t Js.readonly_prop
+  method chart : chart Js.t Js.readonly_prop
 
   method dataIndex : int Js.readonly_prop
 

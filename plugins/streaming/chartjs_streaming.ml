@@ -19,7 +19,7 @@ class type streaming = object
 
   method refresh : int Js.optdef_prop
 
-  method onRefresh : ('a Chartjs.chart -> unit) Js.callback Js.opt Js.optdef_prop
+  method onRefresh : (Chartjs.chart -> unit) Js.callback Js.opt Js.optdef_prop
 
   method frameRate : float Js.optdef_prop
 

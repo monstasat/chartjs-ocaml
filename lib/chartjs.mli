@@ -821,12 +821,12 @@ class type cartesianTicks = object
       axis, this applies in the vertical (Y) direction. *)
 end
 
-class type ['a] cartesianAxis = object
+class type cartesianAxis = object
   inherit axis
 
   method position : Position.t Js.prop
   (** Position of the axis in the chart.
-      Possible values are: 'top', 'left', 'bottom', 'right' *)
+      Possible values are: ['top'], ['left'], ['bottom'], ['right'] *)
 
   method offset : bool Js.t Js.prop
   (** If [true], extra space is added to the both edges and the axis
@@ -842,15 +842,13 @@ class type ['a] cartesianAxis = object
   method scaleLabel : scaleLabel Js.t Js.prop
   (** Scale title configuration. *)
 
-  method ticks : 'a. (#cartesianTicks as 'a) Js.t Js.prop
-  (** Tick configuration. *)
+  method _ticks : cartesianTicks Js.t Js.prop
+  (** Ticks configuration. *)
 end
 
-class type basicCartesianAxis = [cartesianTicks] cartesianAxis
+val coerce_cartesian_axis : #cartesianAxis Js.t -> cartesianAxis Js.t
 
-val coerce_cartesian_axis : 'a #cartesianAxis Js.t -> basicCartesianAxis Js.t
-
-val create_cartesian_axis : unit -> 'a cartesianAxis Js.t
+val create_cartesian_axis : unit -> cartesianAxis Js.t
 
 (** {3 Category axis} *)
 
@@ -867,7 +865,11 @@ class type categoryCartesianTicks = object
   (** The maximum item to display. *)
 end
 
-class type categoryCartesianAxis = [categoryCartesianTicks] cartesianAxis
+class type categoryCartesianAxis = object
+  inherit cartesianAxis
+
+  method ticks : categoryCartesianTicks Js.t Js.prop
+end
 
 val create_category_cartesian_ticks : unit -> categoryCartesianTicks Js.t
 
@@ -906,7 +908,11 @@ class type linearCartesianTicks = object
   (** Adjustment used when calculating the minimum data value. *)
 end
 
-class type linearCartesianAxis = [linearCartesianTicks] cartesianAxis
+class type linearCartesianAxis = object
+  inherit cartesianAxis
+
+  method ticks : linearCartesianTicks Js.t Js.prop
+end
 
 val create_linear_cartesian_ticks : unit -> linearCartesianTicks Js.t
 
@@ -926,7 +932,11 @@ class type logarithmicCartesianTicks = object
       overrides maximum value from data. *)
 end
 
-class type logarithmicCartesianAxis = [logarithmicCartesianTicks] cartesianAxis
+class type logarithmicCartesianAxis = object
+  inherit cartesianAxis
+
+  method ticks : logarithmicCartesianTicks Js.t Js.prop
+end
 
 val create_logarithmic_cartesian_ticks : unit -> logarithmicCartesianTicks Js.t
 
@@ -1001,7 +1011,9 @@ class type timeCartesianOptions = object
 end
 
 class type timeCartesianAxis = object
-  inherit [timeCartesianTicks] cartesianAxis
+  inherit cartesianAxis
+
+  method ticks : timeCartesianTicks Js.t Js.prop
 
   method time : timeCartesianOptions Js.t Js.prop
 
@@ -1047,10 +1059,18 @@ val create_data : unit -> data Js.t
 
 (** {1 Chart configuration} *)
 
+class type updateConfig = object
+  method duration : int Js.optdef_prop
+
+  method _lazy : bool Js.t Js.optdef_prop
+
+  method easing : Easing.t Js.optdef_prop
+end
+
 (** {2 Animation} *)
 
-class type ['chart] animationItem = object
-  method chart : 'chart Js.t Js.readonly_prop
+class type animationItem = object
+  method chart : chart Js.t Js.readonly_prop
   (** Chart object. *)
 
   method currentStep : float Js.readonly_prop
@@ -1059,45 +1079,41 @@ class type ['chart] animationItem = object
   method numSteps : float Js.readonly_prop
   (** Number of animation frames. *)
 
-  method render : 'chart Js.t -> 'chart animationItem Js.t -> unit Js.meth
+  method render : chart Js.t -> animationItem Js.t -> unit Js.meth
   (** Function that renders the chart. *)
 
-  method onAnimationProgress : 'chart animationItem Js.t -> unit Js.meth
+  method onAnimationProgress : animationItem Js.t -> unit Js.meth
   (** User callback. *)
 
-  method onAnimationComplete : 'chart animationItem Js.t -> unit Js.meth
+  method onAnimationComplete : animationItem Js.t -> unit Js.meth
   (** User callback. *)
 end
 
-class type ['chart] animation = object
+and animation = object
   method duration : int Js.prop
   (** The number of milliseconds an animation takes. *)
 
   method easing : Easing.t Js.prop
   (** Easing function to use. *)
 
-  method onProgress : ('chart animationItem Js.t -> unit) Js.callback Js.opt Js.prop
+  method onProgress : (animationItem Js.t -> unit) Js.callback Js.opt Js.prop
   (** Callback called on each step of an animation. *)
 
-  method onComplete : ('chart animationItem Js.t -> unit) Js.callback Js.opt Js.prop
+  method onComplete : (animationItem Js.t -> unit) Js.callback Js.opt Js.prop
   (** Callback called at the end of an animation. *)
 end
 
-val create_animation : unit -> 'a animation Js.t
-
 (** {2 Layout} *)
 
-class type layout = object
+and layout = object
   method padding : Padding.t Js.prop
   (** The padding to add inside the chart. *)
 end
 
-val create_layout : unit -> layout Js.t
-
 (** {2 Legend} *)
 
 (* FIXME this interface differs between Pie and other chart types *)
-class type legendItem = object
+and legendItem = object
   method text : Js.js_string Js.t Js.prop
   (** Label that will be displayed. *)
 
@@ -1133,7 +1149,7 @@ class type legendItem = object
   method datasetIndex : int Js.prop
 end
 
-class type ['chart] legendLabels = object('self)
+and legendLabels = object('self)
   method boxWidth : int Js.prop
   (** Width of coloured box. *)
 
@@ -1153,7 +1169,7 @@ class type ['chart] legendLabels = object('self)
   (** Padding between rows of colored boxes. *)
 
   method generateLabels :
-    ('chart Js.t
+    (chart Js.t
      -> legendItem Js.t Js.js_array Js.t) Js.callback Js.prop
   (** Generates legend items for each thing in the legend.
       Default implementation returns the text + styling for the color box. *)
@@ -1171,7 +1187,7 @@ class type ['chart] legendLabels = object('self)
       (size is based on fontSize, boxWidth is not used in this case). *)
 end
 
-class type ['chart] legend = object
+and legend = object
   method display : bool Js.t Js.prop
   (** Is the legend shown. *)
 
@@ -1184,7 +1200,7 @@ class type ['chart] legend = object
       in day-to-day use. *)
 
   method onClick :
-    ('chart,
+    (chart,
      Dom_html.event Js.t
      -> legendItem Js.t
      -> unit) Js.meth_callback Js.optdef_prop
@@ -1192,7 +1208,7 @@ class type ['chart] legend = object
       registered on a label item *)
 
   method onHover :
-    ('chart,
+    (chart,
      Dom_html.event Js.t
      -> legendItem Js.t
      -> unit) Js.meth_callback Js.optdef_prop
@@ -1200,7 +1216,7 @@ class type ['chart] legend = object
       registered on top of a label item *)
 
   method onLeave :
-    ('chart,
+    (chart,
      Dom_html.event Js.t
      -> legendItem Js.t
      -> unit) Js.meth_callback Js.optdef_prop
@@ -1208,17 +1224,13 @@ class type ['chart] legend = object
   method reverse : bool Js.t Js.prop
   (** Legend will show datasets in reverse order. *)
 
-  method labels : 'chart legendLabels Js.t Js.prop
+  method labels : legendLabels Js.t Js.prop
   (** Legend label configuration. *)
 end
 
-val create_legend_labels : unit -> 'a legendLabels Js.t
-
-val create_legend : unit -> 'a legend Js.t
-
 (** {2 Title} *)
 
-class type title = object
+and title = object
   method display : bool Js.t Js.prop
   (** Is the title shown. *)
 
@@ -1250,11 +1262,9 @@ class type title = object
       text is rendered on multiple lines. *)
 end
 
-val create_title : unit -> title Js.t
-
 (** {2 Tooltip} *)
 
-class type tooltipItem = object
+and tooltipItem = object
   method label : Js.js_string Js.t Js.readonly_prop
   (** Label for the tooltip. *)
 
@@ -1366,88 +1376,88 @@ and tooltipModel = object
   method borderWidth : int Js.readonly_prop
 end
 
-and ['chart] tooltipCallbacks = object
+and tooltipCallbacks = object
   method beforeTitle :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.js_array Js.t,
      data Js.t) tooltip_cb Js.prop
   (** Returns the text to render before the title. *)
 
   method title :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.js_array Js.t,
      data Js.t) tooltip_cb Js.prop
   (** Returns the text to render as the title of the tooltip. *)
 
   method afterTitle :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.js_array Js.t,
      data Js.t) tooltip_cb Js.prop
   (** Returns the text to render after the title. *)
 
   method beforeBody :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.js_array Js.t,
      data Js.t) tooltip_cb Js.prop
   (** Returns the text to render before the body section. *)
 
   method beforeLabel :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.t,
      data Js.t) tooltip_cb Js.prop
   (** Returns the text to render before an individual label.
       This will be called for each item in the tooltip. *)
 
   method label :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.t,
      data Js.t) tooltip_cb Js.prop
   (** Returns the text to render for an individual item in the tooltip. *)
 
   method labelColor :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.t,
-     'chart Js.t) tooltip_cb Js.prop
+     chart Js.t) tooltip_cb Js.prop
   (** Returns the colors to render for the tooltip item. *)
 
   method labelTextColor :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.t,
-     'chart Js.t) tooltip_cb Js.prop
+     chart Js.t) tooltip_cb Js.prop
   (** Returns the colors for the text of the label for the tooltip item. *)
 
   method afterLabel :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.t,
      data Js.t) tooltip_cb Js.prop
   (** Returns text to render after an individual label. *)
 
   method afterBody :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.t Js.js_array Js.t,
      data Js.t) tooltip_cb Js.prop
   (** Returns text to render after the body section. *)
 
   method beforeFooter :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.js_array Js.t,
      data Js.t) tooltip_cb Js.prop
   (** Returns text to render before the footer section. *)
 
   method footer :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.js_array Js.t,
      data Js.t) tooltip_cb Js.prop
   (** Returns text to render as the footer of the tooltip. *)
 
   method afterFooter :
-    ('chart tooltip Js.t,
+    (tooltip Js.t,
      tooltipItem Js.js_array Js.t,
      data Js.t) tooltip_cb Js.prop
     (** Text to render after the footer section. *)
 end
 
-and ['chart] tooltip = object('self)
+and tooltip = object('self)
   method enabled : bool Js.t Js.prop
   (** Are on-canvas tooltips enabled. *)
 
@@ -1465,7 +1475,7 @@ and ['chart] tooltip = object('self)
   method position : Tooltip_position.t Js.prop
   (** The mode for positioning the tooltip. *)
 
-  method callbacks : 'chart tooltipCallbacks Js.t Js.prop
+  method callbacks : tooltipCallbacks Js.t Js.prop
   (** Callbacks. *)
 
   method itemSort :
@@ -1567,15 +1577,9 @@ and ['chart] tooltip = object('self)
   (** Size of the border. *)
 end
 
-val create_tooltip_model : unit -> tooltipModel Js.t
-
-val create_tooltip_callbacks : unit -> 'a tooltipCallbacks Js.t
-
-val create_tooltip : unit -> 'a tooltip Js.t
-
 (** {2 Interactions} *)
 
-class type hover = object
+and hover = object
   method mode : Interaction_mode.t Js.prop
   (** Sets which elements appear in the tooltip. *)
 
@@ -1592,11 +1596,9 @@ class type hover = object
   (** Duration in milliseconds it takes to animate hover style changes. *)
 end
 
-val create_hover : unit -> hover Js.t
-
 (** {2 Elements} *)
 
-class type pointElement = object
+and pointElement = object
   method radius : int Js.prop
   (** Point radius. *)
 
@@ -1625,7 +1627,7 @@ class type pointElement = object
   (** Stroke width when hovered. *)
 end
 
-class type lineElement = object
+and lineElement = object
   method tension : float Js.prop
   (** Bézier curve tension (0 for no Bézier curves). *)
 
@@ -1661,7 +1663,7 @@ class type lineElement = object
   (** [true] to show the line as a stepped line (tension will be ignored). *)
 end
 
-class type rectangleElement = object
+and rectangleElement = object
   method backgroundColor : Js.js_string Js.prop
   (** Bar fill color. *)
 
@@ -1675,7 +1677,7 @@ class type rectangleElement = object
   (** Skipped (excluded) border: 'bottom', 'left', 'top' or 'right'. *)
 end
 
-class type arcElement = object
+and arcElement = object
   method backgroundColor : Color.t Js.t Js.prop
   (** Arc fill color. *)
 
@@ -1689,7 +1691,7 @@ class type arcElement = object
   (** Arc stroke width. *)
 end
 
-class type elements = object
+and elements = object
   method point : pointElement Js.t Js.prop
   (** Point elements are used to represent the points
       in a line chart or a bubble chart. *)
@@ -1704,48 +1706,21 @@ class type elements = object
   (** Arcs are used in the polar area, doughnut and pie charts. *)
 end
 
-val create_point_element : unit -> pointElement Js.t
-
-val create_line_element : unit -> lineElement Js.t
-
-val create_rectangle_element : unit -> rectangleElement Js.t
-
-val create_arc_element : unit -> arcElement Js.t
-
-val create_elements : unit -> elements Js.t
-
 (** {2 Options} *)
 
-class type chartSize = object
+and chartSize = object
   method width : int Js.readonly_prop
 
   method height : int Js.readonly_prop
 end
 
-class type updateConfig = object
-  method duration : int Js.optdef_prop
-
-  method _lazy : bool Js.t Js.optdef_prop
-
-  method easing : Easing.t Js.optdef_prop
-end
-
 (** {2 Chart} *)
-
-val create_update_config :
-  ?duration:int
-  -> ?_lazy:bool
-  -> ?easing:Easing.t
-  -> unit
-  -> updateConfig Js.t
 
 (** The configuration is used to change how the chart behaves.
     There are properties to control styling, fonts, the legend, etc. *)
-class type ['chart, 'animation] chartOptions = object
-  constraint 'animation = 'chart #animation
-  constraint 'elements = #elements
+and chartOptions = object
 
-  method animation : 'animation Js.t Js.prop
+  method _animation : animation Js.t Js.prop
   (** Chart.js animates charts out of the box.
       A number of options are provided to configure how the animation
       looks and how long it takes. *)
@@ -1753,7 +1728,7 @@ class type ['chart, 'animation] chartOptions = object
   method layout : layout Js.t Js.prop
   (** Layout configurations. *)
 
-  method legend : 'chart legend Js.t Js.prop
+  method legend : legend Js.t Js.prop
   (** The chart legend displays data about the datasets
       that are appearing on the chart. *)
 
@@ -1762,7 +1737,7 @@ class type ['chart, 'animation] chartOptions = object
 
   method hover : hover Js.t Js.prop
 
-  method tooltips : 'chart tooltip Js.t Js.prop
+  method tooltips : tooltip Js.t Js.prop
 
   method elements : elements Js.t Js.prop
   (** While chart types provide settings to configure the styling
@@ -1779,7 +1754,7 @@ class type ['chart, 'animation] chartOptions = object
       behavior of a chart. This option allows to define plugins directly in
       the chart [plugins] config (a.k.a. inline plugins). *)
 
-  method legendCallback : ('chart Js.t -> Js.js_string Js.t) Js.callback Js.optdef_prop
+  method legendCallback : (chart Js.t -> Js.js_string Js.t) Js.callback Js.optdef_prop
   (** Sometimes you need a very complex legend. In these cases, it makes sense
       to generate an HTML legend. Charts provide a generateLegend() method on their
       prototype that returns an HTML string for the legend.
@@ -1803,7 +1778,7 @@ class type ['chart, 'animation] chartOptions = object
       attribute or via the style. *)
 
   method onResize :
-    ('chart Js.t
+    (chart Js.t
      -> chartSize Js.t
      -> unit) Js.callback Js.opt Js.optdef_prop
   (** Called when a resize occurs. Gets passed two arguments:
@@ -1817,7 +1792,7 @@ class type ['chart, 'animation] chartOptions = object
       the chart should listen to for tooltips and hovering. *)
 
   method onHover :
-    ('chart Js.t, Dom_html.event Js.t
+    (chart Js.t, Dom_html.event Js.t
      -> 'a Js.t Js.js_array Js.t
      -> unit)
       Js.meth_callback Js.opt Js.optdef_prop
@@ -1826,7 +1801,7 @@ class type ['chart, 'animation] chartOptions = object
       and an array of active elements (bars, points, etc). *)
 
   method onClick :
-    ('chart Js.t, Dom_html.event Js.t
+    (chart Js.t, Dom_html.event Js.t
      -> 'a Js.t Js.js_array Js.t
      -> unit)
       Js.meth_callback Js.opt Js.optdef_prop
@@ -1835,15 +1810,15 @@ class type ['chart, 'animation] chartOptions = object
           and an array of active elements. *)
 end
 
-class type ['a] chartConfig = object
+and chartConfig = object
   method data : data Js.t Js.prop
 
-  method options : 'a Js.t Js.prop
+  method options : chartOptions Js.t Js.prop
 
   method _type : Js.js_string Js.t Js.prop
 end
 
-class type ['a] chart = object('self)
+and chart = object('self)
   method id : int Js.readonly_prop
 
   method height : int Js.readonly_prop
@@ -1864,11 +1839,11 @@ class type ['a] chart = object('self)
 
   method ctx : Dom_html.canvasRenderingContext2D Js.t Js.readonly_prop
 
-  method options : 'a Js.t Js.prop
-
-  method config : 'a chartConfig Js.t Js.prop
-
   method data : data Js.t Js.prop
+
+  method _options : chartOptions Js.t Js.prop
+
+  method _config : chartConfig Js.t Js.prop
 
   (** {2 Chart API}*)
 
@@ -1925,6 +1900,41 @@ class type ['a] chart = object('self)
       The legend is generated from the legendCallback in the options. *)
 end
 
+val create_animation : unit -> animation Js.t
+
+val create_layout : unit -> layout Js.t
+
+val create_legend_labels : unit -> legendLabels Js.t
+
+val create_legend : unit -> legend Js.t
+
+val create_title : unit -> title Js.t
+
+val create_tooltip_model : unit -> tooltipModel Js.t
+
+val create_tooltip_callbacks : unit -> tooltipCallbacks Js.t
+
+val create_tooltip : unit -> tooltip Js.t
+
+val create_hover : unit -> hover Js.t
+
+val create_point_element : unit -> pointElement Js.t
+
+val create_line_element : unit -> lineElement Js.t
+
+val create_rectangle_element : unit -> rectangleElement Js.t
+
+val create_arc_element : unit -> arcElement Js.t
+
+val create_elements : unit -> elements Js.t
+
+val create_update_config :
+  ?duration:int
+  -> ?_lazy:bool
+  -> ?easing:Easing.t
+  -> unit
+  -> updateConfig Js.t
+
 (** {1 Charts} *)
 
 (** {2 Line Chart} *)
@@ -1940,13 +1950,15 @@ class type ['a] lineOptionContext = object
 end
 
 and lineScales = object
-  method xAxes : #cartesianTicks #cartesianAxis Js.t Js.js_array Js.t Js.prop
+  method xAxes : #cartesianAxis Js.t Js.js_array Js.t Js.prop
 
-  method yAxes : #cartesianTicks #cartesianAxis Js.t Js.js_array Js.t Js.prop
+  method yAxes : #cartesianAxis Js.t Js.js_array Js.t Js.prop
 end
 
 and lineOptions = object
-  inherit [lineChart, lineChart animation] chartOptions
+  inherit chartOptions
+
+  method animation : animation Js.t Js.prop
 
   method scales : lineScales Js.t Js.prop
 
@@ -1955,6 +1967,14 @@ and lineOptions = object
 
   method spanGaps : bool Js.t Js.prop
   (** If [false], NaN data causes a break in the line. *)
+end
+
+and lineConfig = object
+  method data : data Js.t Js.prop
+
+  method options : lineOptions Js.t Js.prop
+
+  method _type : Js.js_string Js.t Js.prop
 end
 
 and ['a] lineDataset = object
@@ -2080,7 +2100,11 @@ and ['a] lineDataset = object
 end
 
 and lineChart = object
-  inherit [lineOptions] chart
+  inherit chart
+
+  method options : lineOptions Js.t Js.prop
+
+  method config : lineConfig Js.t Js.prop
 end
 
 val create_line_scales : unit -> lineScales Js.t
@@ -2152,9 +2176,19 @@ class type ['a] barOptionContext = object
 end
 
 and barOptions = object
-  inherit [barChart, barChart animation] chartOptions
+  inherit chartOptions
+
+  method animation : animation Js.t Js.prop
 
   method scales : barScales Js.t Js.prop
+end
+
+and barConfig = object
+  method data : data Js.t Js.prop
+
+  method options : barOptions Js.t Js.prop
+
+  method _type : Js.js_string Js.t Js.prop
 end
 
 and ['a] barDataset = object
@@ -2225,7 +2259,11 @@ and ['a] barDataset = object
 end
 
 and barChart = object
-  inherit [barOptions] chart
+  inherit chart
+
+  method options : barOptions Js.t Js.prop
+
+  method config : barConfig Js.t Js.prop
 end
 
 val create_category_bar_axis : unit -> cateroryBarAxis Js.t
@@ -2255,7 +2293,7 @@ class type ['a] pieOptionContext = object
 end
 
 and pieAnimation = object
-  inherit [pieChart] animation
+  inherit animation
 
   method animateRotate : bool Js.t Js.prop
   (** If [true], the chart will animate in with a rotation animation. *)
@@ -2265,7 +2303,9 @@ and pieAnimation = object
 end
 
 and pieOptions = object
-  inherit [pieChart, pieAnimation] chartOptions
+  inherit chartOptions
+
+  method animation : pieAnimation Js.t Js.prop
 
   method cutoutPercentage : float Js.prop
   (** The percentage of the chart that is cut out of the middle. *)
@@ -2275,6 +2315,14 @@ and pieOptions = object
 
   method circumference : float Js.prop
   (** Sweep to allow arcs to cover. *)
+end
+
+and pieConfig = object
+  method data : data Js.t Js.prop
+
+  method options : pieOptions Js.t Js.prop
+
+  method _type : Js.js_string Js.t Js.prop
 end
 
 and ['a] pieDataset = object
@@ -2327,7 +2375,11 @@ and ['a] pieDataset = object
 end
 
 and pieChart = object
-  inherit [pieOptions] chart
+  inherit chart
+
+  method options : pieOptions Js.t Js.prop
+
+  method config : pieConfig Js.t Js.prop
 end
 
 val create_pie_animation : unit -> pieAnimation Js.t
@@ -2369,15 +2421,15 @@ end
 (** {1 Type Coercion} *)
 
 module CoerceTo : sig
-  val line : 'a #chart Js.t -> lineChart Js.t Js.opt
+  val line : #chart Js.t -> lineChart Js.t Js.opt
 
-  val bar : 'a #chart Js.t -> barChart Js.t Js.opt
+  val bar : #chart Js.t -> barChart Js.t Js.opt
 
-  val horizontalBar : 'a #chart Js.t -> barChart Js.t Js.opt
+  val horizontalBar : #chart Js.t -> barChart Js.t Js.opt
 
-  val pie : 'a #chart Js.t -> pieChart Js.t Js.opt
+  val pie : #chart Js.t -> pieChart Js.t Js.opt
 
-  val doughnut : 'a #chart Js.t -> pieChart Js.t Js.opt
+  val doughnut : #chart Js.t -> pieChart Js.t Js.opt
 
   val cartesianCategory : #axis Js.t -> categoryCartesianAxis Js.t Js.opt
 
@@ -2396,18 +2448,18 @@ val create_axis : 'a Axis.typ -> 'a Js.t
 
 val chart_from_canvas : 'a Chart.typ
   -> data Js.t
-  -> (_, _) #chartOptions Js.t
+  -> #chartOptions Js.t
   -> Dom_html.canvasElement Js.t
   -> 'a Js.t
 
 val chart_from_ctx : 'a Chart.typ
   -> data Js.t
-  -> (_, _) #chartOptions Js.t
+  -> #chartOptions Js.t
   -> Dom_html.canvasRenderingContext2D Js.t
   -> 'a Js.t
 
 val chart_from_id : 'a Chart.typ
   -> data Js.t
-  -> (_, _) #chartOptions Js.t
+  -> #chartOptions Js.t
   -> string
   -> 'a Js.t

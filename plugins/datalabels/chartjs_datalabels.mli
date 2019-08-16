@@ -89,7 +89,7 @@ end
 class type optionContext = object
   method active : bool Js.t Js.readonly_prop
 
-  method chart : 'a chart Js.t Js.readonly_prop
+  method chart : chart Js.t Js.readonly_prop
 
   method dataIndex : int Js.readonly_prop
 
@@ -293,13 +293,13 @@ val create : unit -> datalabels Js.t
 
 val of_dataset : #dataset Js.t -> datalabels Js.t Js.optdef
 
-val of_chart : 'a #chart Js.t -> datalabels Js.t Js.optdef
+val of_chart : #chart Js.t -> datalabels Js.t Js.optdef
 
 val of_global : unit -> datalabels Js.t Js.optdef
 
 val set_per_dataset : #dataset Js.t -> datalabels Js.t -> unit
 
-val set_per_chart : 'a #chart Js.t -> datalabels Js.t -> unit
+val set_per_chart : #chart Js.t -> datalabels Js.t -> unit
 
 val set_globally : datalabels Js.t -> unit
 
