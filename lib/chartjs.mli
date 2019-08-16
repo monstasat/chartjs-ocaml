@@ -842,9 +842,13 @@ class type ['a] cartesianAxis = object
   method scaleLabel : scaleLabel Js.t Js.prop
   (** Scale title configuration. *)
 
-  method ticks : (#cartesianTicks as 'a) Js.t Js.prop
+  method ticks : 'a. (#cartesianTicks as 'a) Js.t Js.prop
   (** Tick configuration. *)
 end
+
+class type basicCartesianAxis = [cartesianTicks] cartesianAxis
+
+val coerce_cartesian_axis : 'a #cartesianAxis Js.t -> basicCartesianAxis Js.t
 
 val create_cartesian_axis : unit -> 'a cartesianAxis Js.t
 
@@ -856,10 +860,10 @@ class type categoryCartesianTicks = object
   method labels : Js.js_string Js.t Js.optdef_prop
   (** An array of labels to display. *)
 
-  method min : Js.js_string Js.t Js.optdef_prop
+  method min : Js.js_string Js.t Js.optdef Js.prop
   (** The minimum item to display. *)
 
-  method max : Js.js_string Js.t Js.optdef_prop
+  method max : Js.js_string Js.t Js.optdef Js.prop
   (** The maximum item to display. *)
 end
 
@@ -877,11 +881,11 @@ class type linearCartesianTicks = object
   method beginAtZero : bool Js.t Js.optdef_prop
   (** If [true], scale will include 0 if it is not already included. *)
 
-  method min : float Js.optdef_prop
+  method min : float Js.optdef Js.prop
   (** User defined minimum number for the scale,
       overrides minimum value from data. *)
 
-  method max : float Js.optdef_prop
+  method max : float Js.optdef Js.prop
   (** User defined maximum number for the scale,
       overrides maximum value from data. *)
 
@@ -895,10 +899,10 @@ class type linearCartesianTicks = object
   method stepSize : int Js.optdef_prop
   (** User defined fixed step size for the scale. *)
 
-  method suggestedMax : float Js.optdef_prop
+  method suggestedMax : float Js.optdef Js.prop
   (** Adjustment used when calculating the maximum data value. *)
 
-  method suggestedMin : float Js.optdef_prop
+  method suggestedMin : float Js.optdef Js.prop
   (** Adjustment used when calculating the minimum data value. *)
 end
 
@@ -913,11 +917,11 @@ val create_linear_cartesian_axis : unit -> linearCartesianAxis Js.t
 class type logarithmicCartesianTicks = object
   inherit cartesianTicks
 
-  method min : float Js.optdef_prop
+  method min : float Js.optdef Js.prop
   (** User defined minimum number for the scale,
       overrides minimum value from data. *)
 
-  method max : float Js.optdef_prop
+  method max : float Js.optdef Js.prop
   (** User defined maximum number for the scale,
       overrides maximum value from data. *)
 end
@@ -1024,7 +1028,7 @@ val create_time_cartesian_axis : unit -> timeCartesianAxis Js.t
 class type dataset = object
   method _type : Js.js_string Js.t Js.optdef_prop
 
-  method label : Js.js_string Js.t Js.optdef_prop
+  method label : Js.js_string Js.t Js.prop
 end
 
 val coerce_dataset : #dataset Js.t -> dataset Js.t
@@ -1562,6 +1566,10 @@ and ['chart] tooltip = object('self)
   method borderWidth : int Js.prop
   (** Size of the border. *)
 end
+
+val create_tooltip_model : unit -> tooltipModel Js.t
+
+val create_tooltip_callbacks : unit -> 'a tooltipCallbacks Js.t
 
 val create_tooltip : unit -> 'a tooltip Js.t
 

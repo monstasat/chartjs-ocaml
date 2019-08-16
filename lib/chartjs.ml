@@ -770,8 +770,13 @@ class type ['a] cartesianAxis = object
 
   method scaleLabel : scaleLabel Js.t Js.prop
 
-  method ticks : (#cartesianTicks as 'a) Js.t Js.prop
+  method ticks : 'a. (#cartesianTicks as 'a) Js.t Js.prop
 end
+
+class type basicCartesianAxis = [cartesianTicks] cartesianAxis
+
+let coerce_cartesian_axis (axis : 'a #cartesianAxis Js.t) =
+  (axis :> basicCartesianAxis Js.t)
 
 let create_cartesian_axis () = Js.Unsafe.obj [||]
 
@@ -782,9 +787,9 @@ class type categoryCartesianTicks = object
 
   method labels : Js.js_string Js.t Js.optdef_prop
 
-  method min : Js.js_string Js.t Js.optdef_prop
+  method min : Js.js_string Js.t Js.optdef Js.prop
 
-  method max : Js.js_string Js.t Js.optdef_prop
+  method max : Js.js_string Js.t Js.optdef Js.prop
 end
 
 class type categoryCartesianAxis = [categoryCartesianTicks] cartesianAxis
@@ -801,9 +806,9 @@ class type linearCartesianTicks = object
 
   method beginAtZero : bool Js.t Js.optdef_prop
 
-  method min : float Js.optdef_prop
+  method min : float Js.optdef Js.prop
 
-  method max : float Js.optdef_prop
+  method max : float Js.optdef Js.prop
 
   method maxTicksLimit : int Js.prop
 
@@ -811,9 +816,9 @@ class type linearCartesianTicks = object
 
   method stepSize : int Js.optdef_prop
 
-  method suggestedMax : float Js.optdef_prop
+  method suggestedMax : float Js.optdef Js.prop
 
-  method suggestedMin : float Js.optdef_prop
+  method suggestedMin : float Js.optdef Js.prop
 end
 
 class type linearCartesianAxis = [linearCartesianTicks] cartesianAxis
@@ -828,9 +833,9 @@ let create_linear_cartesian_axis () =
 class type logarithmicCartesianTicks = object
   inherit cartesianTicks
 
-  method min : float Js.optdef_prop
+  method min : float Js.optdef Js.prop
 
-  method max : float Js.optdef_prop
+  method max : float Js.optdef Js.prop
 end
 
 class type logarithmicCartesianAxis = [logarithmicCartesianTicks] cartesianAxis
@@ -914,7 +919,7 @@ let create_time_cartesian_axis () =
 class type dataset = object
   method _type : Js.js_string Js.t Js.optdef_prop
 
-  method label : Js.js_string Js.t Js.optdef_prop
+  method label : Js.js_string Js.t Js.prop
 end
 
 let coerce_dataset x = (x :> dataset Js.t)
@@ -1337,6 +1342,10 @@ and ['chart] tooltip = object('self)
 
   method borderWidth : int Js.prop
 end
+
+let create_tooltip_model () = Js.Unsafe.obj [||]
+
+let create_tooltip_callbacks () = Js.Unsafe.obj [||]
 
 let create_tooltip () = Js.Unsafe.obj [||]
 
