@@ -1041,6 +1041,8 @@ class type dataset = object
   method _type : Js.js_string Js.t Js.optdef_prop
 
   method label : Js.js_string Js.t Js.prop
+
+  method hidden : bool Js.t Js.optdef_prop
 end
 
 val coerce_dataset : #dataset Js.t -> dataset Js.t
@@ -1472,6 +1474,11 @@ and tooltip = object('self)
       intersects with an element. If [false], the mode will be applied
       at all times. *)
 
+  method axis : Hover_axis.t Js.prop
+  (** Defines which directions are used in calculating distances.
+      Defaults to [x] for index mode and [xy] in [dataset] and [nearest]
+      modes. *)
+
   method position : Tooltip_position.t Js.prop
   (** The mode for positioning the tooltip. *)
 
@@ -1898,6 +1905,12 @@ and chart = object('self)
   method generateLegend : Js.js_string Js.t Js.meth
   (** Returns an HTML string of a legend for that chart.
       The legend is generated from the legendCallback in the options. *)
+
+  method getDatasetMeta : int -> 'a Js.t Js.meth
+  (** Looks for the dataset that matches the current index and returns that metadata.
+      This returned data has all of the metadata that is used to construct the chart.
+      The [data] property of the metadata will contain information about each point,
+      rectangle, etc. depending on the chart type. *)
 end
 
 val create_animation : unit -> animation Js.t

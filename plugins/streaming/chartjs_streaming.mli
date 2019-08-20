@@ -37,7 +37,7 @@ class type streaming = object
   (** Refresh interval of data in milliseconds.
       [onRefresh] callback function will be called at this interval. *)
 
-  method onRefresh : (Chartjs.chart -> unit) Js.callback Js.opt Js.optdef_prop
+  method onRefresh : (Chartjs.chart Js.t -> unit) Js.callback Js.opt Js.optdef_prop
   (** Callback function that will be called at a regular interval.
       The callback takes one argument, a reference to the chart object.
       You can update your datasets here. The chart will be automatically
@@ -60,7 +60,7 @@ val create :
   -> ?ttl:int
   -> ?delay:int
   -> ?refresh:int
-  -> ?onRefresh:(Chartjs.chart -> unit)
+  -> ?onRefresh:(Chartjs.chart Js.t -> unit)
   -> ?frameRate:float
   -> ?pause:bool
   -> unit

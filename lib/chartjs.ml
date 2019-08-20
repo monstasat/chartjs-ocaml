@@ -931,6 +931,8 @@ class type dataset = object
   method _type : Js.js_string Js.t Js.optdef_prop
 
   method label : Js.js_string Js.t Js.prop
+
+  method hidden : bool Js.t Js.optdef_prop
 end
 
 let coerce_dataset x = (x :> dataset Js.t)
@@ -1280,6 +1282,8 @@ and tooltip = object('self)
 
   method intersect : bool Js.t Js.prop
 
+  method axis : Hover_axis.t Js.prop
+
   method position : Tooltip_position.t Js.prop
 
   method callbacks : tooltipCallbacks Js.t Js.prop
@@ -1549,6 +1553,8 @@ and chart = object('self)
   method toBase64Image : Js.js_string Js.t Js.meth
 
   method generateLegend : Js.js_string Js.t Js.meth
+
+  method getDatasetMeta : int -> 'a Js.t Js.meth
 end
 
 let create_animation () = Js.Unsafe.obj [||]
