@@ -279,13 +279,13 @@ end
 module Position : sig
   type t
 
-  val left : t
+  val left : t Js.t
 
-  val right : t
+  val right : t Js.t
 
-  val top : t
+  val top : t Js.t
 
-  val bottom : t
+  val bottom : t Js.t
 end
 
 module Tooltip_position : sig
@@ -824,7 +824,7 @@ end
 class type cartesianAxis = object
   inherit axis
 
-  method position : Position.t Js.prop
+  method position : Position.t Js.t Js.prop
   (** Position of the axis in the chart.
       Possible values are: ['top'], ['left'], ['bottom'], ['right'] *)
 
@@ -1193,7 +1193,7 @@ and legend = object
   method display : bool Js.t Js.prop
   (** Is the legend shown. *)
 
-  method position : Position.t Js.prop
+  method position : Position.t Js.t Js.prop
   (** Position of the legend. *)
 
   method fullWidth : bool Js.t Js.prop
@@ -1236,7 +1236,7 @@ and title = object
   method display : bool Js.t Js.prop
   (** Is the title shown. *)
 
-  method position : Position.t Js.prop
+  method position : Position.t Js.t Js.prop
   (** Position of title. *)
 
   method fontSize : int Js.optdef_prop
@@ -1680,7 +1680,7 @@ and rectangleElement = object
   method borderColor : Color.t Js.t Js.prop
   (** Bar stroke color. *)
 
-  method borderSkipped : Position.t Js.prop
+  method borderSkipped : Position.t Js.t Js.prop
   (** Skipped (excluded) border: 'bottom', 'left', 'top' or 'right'. *)
 end
 
@@ -2228,7 +2228,7 @@ and ['a] barDataset = object
   (** The bar border color. *)
 
   method borderSkipped :
-    ('a barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable_indexable.t Js.t
+    ('a barOptionContext Js.t, Position.t Js.t Or_false.t Js.t) Scriptable_indexable.t Js.t
       Js.optdef_prop
   (** The edge to skip when drawing bar.
       This setting is used to avoid drawing the bar stroke at the base of the fill.

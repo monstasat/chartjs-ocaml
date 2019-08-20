@@ -10,3 +10,5 @@
   * [X] Datalabels
   * [X] Streaming
   * [ ] Deferred
+  * [X] Colorschemes
+  * [ ] Annotation

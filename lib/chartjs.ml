@@ -287,7 +287,7 @@ module Color = struct
 end
 
 module Position = struct
-  type t = Js.js_string Js.t
+  type t = Js.js_string
 
   let left = Js.string "left"
 
@@ -760,7 +760,7 @@ end
 class type cartesianAxis = object
   inherit axis
 
-  method position : Position.t Js.prop
+  method position : Position.t Js.t Js.prop
 
   method offset : bool Js.t Js.prop
 
@@ -1038,7 +1038,7 @@ end
 and legend = object
   method display : bool Js.t Js.prop
 
-  method position : Position.t Js.prop
+  method position : Position.t Js.t Js.prop
 
   method fullWidth : bool Js.t Js.prop
 
@@ -1068,7 +1068,7 @@ end
 and title = object
   method display : bool Js.t Js.prop
 
-  method position : Position.t Js.prop
+  method position : Position.t Js.t Js.prop
 
   method fontSize : int Js.optdef_prop
 
@@ -1417,7 +1417,7 @@ and rectangleElement = object
 
   method borderColor : Color.t Js.t Js.prop
 
-  method borderSkipped : Position.t Js.prop
+  method borderSkipped : Position.t Js.t Js.prop
 end
 
 and arcElement = object
@@ -1792,7 +1792,7 @@ and ['a] barDataset = object
     ('a barOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
   method borderSkipped :
-    ('a barOptionContext Js.t, Position.t Or_false.t Js.t) Scriptable_indexable.t Js.t
+    ('a barOptionContext Js.t, Position.t Js.t Or_false.t Js.t) Scriptable_indexable.t Js.t
       Js.optdef_prop
 
   method borderWidth :
