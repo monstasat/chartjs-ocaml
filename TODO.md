@@ -11,4 +11,4 @@
   * [X] Streaming
   * [ ] Deferred
   * [X] Colorschemes
-  * [ ] Annotation
+  * [X] Annotation
