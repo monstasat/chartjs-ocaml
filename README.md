@@ -5,6 +5,12 @@ and some popular plugins.
 
 [chartjs]: https://github.com/chartjs/Chart.js
 
+Following chart types are currently supported:
+* Line
+* Bar
+* Horizontal bar
+* Pie
+
 ## Installation
 
 ### Opam
