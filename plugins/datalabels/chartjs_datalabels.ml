@@ -85,7 +85,7 @@ class type listeners = object
   method click : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
 end
 
-type 'a prop = (optionContext, 'a) Scriptable_indexable.t Js.t
+type 'a prop = (optionContext Js.t, 'a) Scriptable_indexable.t Js.t
 
 type 'a formatter = ('a -> optionContext Js.t -> Js.js_string Js.t) Js.callback
 
@@ -134,6 +134,10 @@ class type datalabels = object
 
   method textShadowColor : Color.t Js.t prop Js.optdef_prop
 end
+
+let create_font () = Js.Unsafe.obj [||]
+
+let create_listeners () = Js.Unsafe.obj [||]
 
 let create () = Js.Unsafe.obj [||]
 

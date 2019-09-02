@@ -109,7 +109,7 @@ class type listeners = object
   (** The mouse's primary button is pressed and released on a label. *)
 end
 
-type 'a prop = (optionContext, 'a) Scriptable_indexable.t Js.t
+type 'a prop = (optionContext Js.t, 'a) Scriptable_indexable.t Js.t
 
 type 'a formatter = ('a -> optionContext Js.t -> Js.js_string Js.t) Js.callback
 
@@ -158,6 +158,10 @@ class type datalabels = object
 
   method textShadowColor : Color.t Js.t prop Js.optdef_prop
 end
+
+val create_font : unit -> font Js.t
+
+val create_listeners : unit -> listeners Js.t
 
 val create : unit -> datalabels Js.t
 
