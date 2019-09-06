@@ -72,98 +72,102 @@ module Text_align : sig
   (** Alias for ['end']. *)
 end
 
-class type font = object
-  method family : Js.js_string Js.t Js.optdef_prop
+class type font =
+  object
+    method family : Js.js_string Js.t Js.optdef_prop
 
-  method size : int Js.optdef_prop
+    method size : int Js.optdef_prop
 
-  method style : Js.js_string Js.t Js.optdef_prop
+    method style : Js.js_string Js.t Js.optdef_prop
 
-  method weight : Js.js_string Js.t Js.optdef_prop
+    method weight : Js.js_string Js.t Js.optdef_prop
 
-  method lineHeight : Line_height.t Js.t Js.optdef_prop
-end
+    method lineHeight : Line_height.t Js.t Js.optdef_prop
+  end
 
 (** {1 Options} *)
 
-class type optionContext = object
-  method active : bool Js.t Js.readonly_prop
+class type optionContext =
+  object
+    method active : bool Js.t Js.readonly_prop
 
-  method chart : chart Js.t Js.readonly_prop
+    method chart : chart Js.t Js.readonly_prop
 
-  method dataIndex : int Js.readonly_prop
+    method dataIndex : int Js.readonly_prop
 
-  method dataset : dataset Js.t Js.readonly_prop
+    method dataset : dataset Js.t Js.readonly_prop
 
-  method datasetIndex : int Js.readonly_prop
-end
+    method datasetIndex : int Js.readonly_prop
+  end
 
-class type listeners = object
-  method enter : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
-  (** The mouse is moved over a label. *)
+class type listeners =
+  object
+    (** The mouse is moved over a label. *)
+    method enter : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
 
-  method leave : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
-  (** The mouse is moved out of a label. *)
+    (** The mouse is moved out of a label. *)
+    method leave : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
 
-  method click : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
-  (** The mouse's primary button is pressed and released on a label. *)
-end
+    (** The mouse's primary button is pressed and released on a label. *)
+    method click : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
+  end
 
 type 'a prop = (optionContext Js.t, 'a) Scriptable_indexable.t Js.t
 
 type 'a formatter = ('a -> optionContext Js.t -> Js.js_string Js.t) Js.callback
 
-class type datalabels = object
-  method align : Align.t Js.t prop Js.optdef_prop
+class type datalabels =
+  object
+    method align : Align.t Js.t prop Js.optdef_prop
 
-  method anchor : Anchor.t Js.t prop Js.optdef_prop
+    method anchor : Anchor.t Js.t prop Js.optdef_prop
 
-  method backgroundColor : Color.t Js.t Js.opt prop Js.optdef_prop
+    method backgroundColor : Color.t Js.t Js.opt prop Js.optdef_prop
 
-  method borderColor : Color.t Js.t Js.opt prop Js.optdef_prop
+    method borderColor : Color.t Js.t Js.opt prop Js.optdef_prop
 
-  method borderRadius : int prop Js.optdef_prop
+    method borderRadius : int prop Js.optdef_prop
 
-  method borderWidth : int prop Js.optdef_prop
+    method borderWidth : int prop Js.optdef_prop
 
-  method clamp : bool Js.t prop Js.optdef_prop
+    method clamp : bool Js.t prop Js.optdef_prop
 
-  method clip : bool Js.t prop Js.optdef_prop
+    method clip : bool Js.t prop Js.optdef_prop
 
-  method color : Color.t Js.t prop Js.optdef_prop
+    method color : Color.t Js.t prop Js.optdef_prop
 
-  method display : Visibility.t Js.t prop Js.optdef_prop
+    method display : Visibility.t Js.t prop Js.optdef_prop
 
-  method font : font Js.t prop Js.optdef_prop
+    method font : font Js.t prop Js.optdef_prop
 
-  method formatter : 'a formatter Js.opt Js.optdef_prop
+    method formatter : 'a formatter Js.opt Js.optdef_prop
 
-  method listeners : listeners Js.t Js.optdef_prop
+    method listeners : listeners Js.t Js.optdef_prop
 
-  method offset : float prop Js.optdef_prop
+    method offset : float prop Js.optdef_prop
 
-  method opacity : float prop Js.optdef_prop
+    method opacity : float prop Js.optdef_prop
 
-  method padding : Padding.t Js.t prop Js.optdef_prop
+    method padding : Padding.t Js.t prop Js.optdef_prop
 
-  method rotation : float prop Js.optdef_prop
+    method rotation : float prop Js.optdef_prop
 
-  method textAlign : Text_align.t Js.t prop Js.optdef_prop
+    method textAlign : Text_align.t Js.t prop Js.optdef_prop
 
-  method textStrokeColor : Color.t Js.t prop Js.optdef_prop
+    method textStrokeColor : Color.t Js.t prop Js.optdef_prop
 
-  method textStrokeWidth : int prop Js.optdef_prop
+    method textStrokeWidth : int prop Js.optdef_prop
 
-  method textShadowBlur : float prop Js.optdef_prop
+    method textShadowBlur : float prop Js.optdef_prop
 
-  method textShadowColor : Color.t Js.t prop Js.optdef_prop
-end
+    method textShadowColor : Color.t Js.t prop Js.optdef_prop
+  end
 
-val create_font : unit -> font Js.t
+val empty_font : unit -> font Js.t
 
-val create_listeners : unit -> listeners Js.t
+val empty_listeners : unit -> listeners Js.t
 
-val create : unit -> datalabels Js.t
+val empty_datalabels_config : unit -> datalabels Js.t
 
 (** {1 Positioning}
 
@@ -297,13 +301,13 @@ val create : unit -> datalabels Js.t
 
 val of_dataset : #dataset Js.t -> datalabels Js.t Js.optdef
 
-val of_chart : #chart Js.t -> datalabels Js.t Js.optdef
+val of_chart_options : #chartOptions Js.t -> datalabels Js.t Js.optdef
 
 val of_global : unit -> datalabels Js.t Js.optdef
 
-val set_per_dataset : #dataset Js.t -> datalabels Js.t -> unit
+val set_to_dataset : #dataset Js.t -> datalabels Js.t -> unit
 
-val set_per_chart : #chart Js.t -> datalabels Js.t -> unit
+val set_to_chart_options : #chartOptions Js.t -> datalabels Js.t -> unit
 
 val set_globally : datalabels Js.t -> unit
 

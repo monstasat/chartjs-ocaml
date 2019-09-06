@@ -53,22 +53,26 @@ module Line_cap : sig
   type t
   (** @see <https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineCap> *)
 
-  val butt : t
+  val butt : t Js.t
 
-  val round : t
+  val round : t Js.t
 
-  val square : t
+  val square : t Js.t
+
+  val of_string : string -> t Js.t
 end
 
 module Line_join : sig
   type t
   (** @see <https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineJoin> *)
 
-  val round : t
+  val round : t Js.t
 
-  val bevel : t
+  val bevel : t Js.t
 
-  val miter : t
+  val miter : t Js.t
+
+  val of_string : string -> t Js.t
 end
 
 module Interaction_mode : sig
@@ -76,10 +80,10 @@ module Interaction_mode : sig
   (** When configuring interaction with the graph via hover or tooltips,
       a number of different modes are available. *)
 
-  val point : t
+  val point : t Js.t
   (** Finds all of the items that intersect the point. *)
 
-  val nearest : t
+  val nearest : t Js.t
   (** Gets the items that are at the nearest distance to the point.
       The nearest item is determined based on the distance to the center
       of the chart item (point, bar). You can use the [axis] setting to define
@@ -88,7 +92,7 @@ module Interaction_mode : sig
       in the graph. This is very useful for combo charts where points are hidden
       behind bars. *)
 
-  val index : t
+  val index : t Js.t
   (** Finds item at the same index.
       If the [intersect] setting is [true], the first intersecting item is used
       to determine the index in the data. If [intersect] is [false],
@@ -97,23 +101,23 @@ module Interaction_mode : sig
       along the y direction, you can use the [axis] setting introduced in v2.7.0.
       By setting this value to ['y'] on the y direction is used. *)
 
-  val dataset : t
+  val dataset : t Js.t
   (** Finds items in the same dataset.
       If the [intersect] setting is [true], the first intersecting item is used
       to determine the index in the data.
       If [intersect] is [false], the nearest item is used to determine the index. *)
 
-  val x : t
+  val x : t Js.t
   (** Returns all items that would intersect based on the [X] coordinate
       of the position only. Would be useful for a vertical cursor implementation.
       Note that this only applies to cartesian charts. *)
 
-  val y : t
+  val y : t Js.t
   (** Returns all items that would intersect based on the [Y] coordinate
       of the position. This would be useful for a horizontal cursor implementation.
       Note that this only applies to cartesian charts. *)
 
-  val make : string -> t
+  val of_string : string -> t Js.t
 end
 
 module Point_style : sig
@@ -159,69 +163,69 @@ end
 module Easing : sig
   type t
 
-  val linear : t
+  val linear : t Js.t
 
-  val easeInQuad : t
+  val easeInQuad : t Js.t
 
-  val easeOutQuad : t
+  val easeOutQuad : t Js.t
 
-  val easeInOutQuad : t
+  val easeInOutQuad : t Js.t
 
-  val easeInCubic : t
+  val easeInCubic : t Js.t
 
-  val easeOutCubic : t
+  val easeOutCubic : t Js.t
 
-  val easeInOutCubic : t
+  val easeInOutCubic : t Js.t
 
-  val easeInQuart : t
+  val easeInQuart : t Js.t
 
-  val easeOutQuart : t
+  val easeOutQuart : t Js.t
 
-  val easeInOutQuart : t
+  val easeInOutQuart : t Js.t
 
-  val easeInQuint : t
+  val easeInQuint : t Js.t
 
-  val easeOutQuint : t
+  val easeOutQuint : t Js.t
 
-  val easeInOutQuint : t
+  val easeInOutQuint : t Js.t
 
-  val easeInSine : t
+  val easeInSine : t Js.t
 
-  val easeOutSine : t
+  val easeOutSine : t Js.t
 
-  val easeInOutSine : t
+  val easeInOutSine : t Js.t
 
-  val easeInExpo : t
+  val easeInExpo : t Js.t
 
-  val easeOutExpo : t
+  val easeOutExpo : t Js.t
 
-  val easeInOutExpo : t
+  val easeInOutExpo : t Js.t
 
-  val easeInCirc : t
+  val easeInCirc : t Js.t
 
-  val easeOutCirc : t
+  val easeOutCirc : t Js.t
 
-  val easeInOutCirc : t
+  val easeInOutCirc : t Js.t
 
-  val easeInElastic : t
+  val easeInElastic : t Js.t
 
-  val easeOutElastic : t
+  val easeOutElastic : t Js.t
 
-  val easeInOutElastic : t
+  val easeInOutElastic : t Js.t
 
-  val easeInBack : t
+  val easeInBack : t Js.t
 
-  val easeOutBack : t
+  val easeOutBack : t Js.t
 
-  val easeInOutBack : t
+  val easeInOutBack : t Js.t
 
-  val easeInBounce : t
+  val easeInBounce : t Js.t
 
-  val easeOutBounce : t
+  val easeOutBounce : t Js.t
 
-  val easeInOutBounce : t
+  val easeInOutBounce : t Js.t
 
-  val of_string : string -> t
+  val of_string : string -> t Js.t
 end
 
 module Padding : sig
@@ -231,15 +235,16 @@ module Padding : sig
       property defines the left padding. Similarly the [right], [top] and
       [bottom] properties can also be specified. *)
 
-  class type obj = object
-    method top : int Js.optdef_prop
+  class type obj =
+    object
+      method top : int Js.optdef_prop
 
-    method right : int Js.optdef_prop
+      method right : int Js.optdef_prop
 
-    method bottom : int Js.optdef_prop
+      method bottom : int Js.optdef_prop
 
-    method left : int Js.optdef_prop
-  end
+      method left : int Js.optdef_prop
+    end
 
   val make_object : ?top:int -> ?right:int -> ?bottom:int -> ?left:int -> unit -> t Js.t
 
@@ -286,6 +291,8 @@ module Position : sig
   val top : t Js.t
 
   val bottom : t Js.t
+
+  val of_string : string -> t Js.t
 end
 
 module Tooltip_position : sig
@@ -318,11 +325,13 @@ end
 module Hover_axis : sig
   type t
 
-  val x : t
+  val x : t Js.t
 
-  val y : t
+  val y : t Js.t
 
-  val xy : t
+  val xy : t Js.t
+
+  val of_string : string -> t Js.t
 end
 
 module Fill : sig
@@ -337,6 +346,14 @@ module Fill : sig
   val _true : t Js.t
 
   val _false : t Js.t
+
+  val of_bool : bool -> t Js.t
+
+  val of_string : string -> t Js.t
+
+  val cast_bool : t Js.t -> bool Js.opt
+
+  val cast_string : t Js.t -> string Js.opt
 end
 
 module Time : sig
@@ -380,67 +397,77 @@ type line_dash_offset = float
 module Time_ticks_source : sig
   type t
 
-  val auto : t
+  val auto : t Js.t
 
-  val data : t
+  val data : t Js.t
 
-  val labels : t
+  val labels : t Js.t
+
+  val of_string : string -> t Js.t
 end
 
 module Time_distribution : sig
   type t
 
-  val linear : t
+  val linear : t Js.t
   (** Data points are spread according to their time (distances can vary). *)
 
-  val series : t
+  val series : t Js.t
   (** Data points are spread at the same distance from each other. *)
+
+  val of_string : string -> t Js.t
 end
 
 module Time_bounds : sig
   type t
 
-  val data : t
+  val data : t Js.t
   (** Makes sure data are fully visible, labels outside are removed. *)
 
-  val ticks : t
+  val ticks : t Js.t
   (** Makes sure ticks are fully visible, data outside are truncated. *)
+
+  val of_string : string -> t Js.t
 end
 
 module Time_unit : sig
   type t
 
-  val millisecond : t
+  val millisecond : t Js.t
 
-  val second : t
+  val second : t Js.t
 
-  val minute : t
+  val minute : t Js.t
 
-  val hour : t
+  val hour : t Js.t
 
-  val day : t
+  val day : t Js.t
 
-  val week : t
+  val week : t Js.t
 
-  val month : t
+  val month : t Js.t
 
-  val quarter : t
+  val quarter : t Js.t
 
-  val year : t
+  val year : t Js.t
+
+  val of_string : string -> t Js.t
 end
 
 module Interpolation_mode : sig
   type t
 
-  val default : t
+  val default : t Js.t
   (** Default algorithm uses a custom weighted cubic interpolation,
       which produces pleasant curves for all types of datasets. *)
 
-  val monotone : t
+  val monotone : t Js.t
   (** Monotone algorithm is more suited to [y = f(x)] datasets :
       it preserves monotonicity (or piecewise monotonicity) of the dataset
       being interpolated, and ensures local extremums (if any) stay at input
       data points. *)
+
+  val of_string : string -> t Js.t
 end
 
 module Stepped_line : sig
@@ -460,6 +487,10 @@ module Stepped_line : sig
 
   val middle : t Js.t
   (** Step-middle Interpolation. *)
+
+  val of_bool : bool -> t Js.t
+
+  val of_string : string -> t Js.t
 end
 
 module Line_fill : sig
@@ -479,28 +510,34 @@ module Line_fill : sig
   val _end : t Js.t
 
   val origin : t Js.t
+
+  val of_bool : bool -> t Js.t
+
+  val of_string : string -> t Js.t
 end
 
 module Pie_border_align : sig
   type t
 
-  val center : t
+  val center : t Js.t
   (** The borders of arcs next to each other will overlap. *)
 
-  val inner : t
+  val inner : t Js.t
   (** Guarantees that all the borders do not overlap. *)
 end
 
 module Axis_display : sig
   type t
 
-  val of_bool : bool -> t Js.t
-
   val auto : t Js.t
 
   val cast_bool : t Js.t -> bool Js.opt
 
   val is_auto : t Js.t -> bool
+
+  val of_bool : bool -> t Js.t
+
+  val of_string : string -> t Js.t
 end
 
 module Time_parser : sig
@@ -534,26 +571,28 @@ end
 type 'a tick_cb = ('a -> int -> 'a Js.js_array Js.t) Js.callback
 
 type ('a, 'b, 'c) tooltip_cb =
-  ('a, ('b -> 'c -> Js.js_string Js.t Indexable.t Js.t))
-    Js.meth_callback Js.optdef
+  ('a, 'b -> 'c -> Js.js_string Js.t Indexable.t Js.t) Js.meth_callback Js.optdef
 
-class type ['x, 'y] dataPoint = object
-  method x : 'x Js.prop
+class type ['x, 'y] dataPoint =
+  object
+    method x : 'x Js.prop
 
-  method y : 'y Js.prop
-end
+    method y : 'y Js.prop
+  end
 
-class type ['t, 'y] dataPointT = object
-  method t : 't Js.prop
+class type ['t, 'y] dataPointT =
+  object
+    method t : 't Js.prop
 
-  method y : 'y Js.prop
-end
+    method y : 'y Js.prop
+  end
 
-class type ['x, 'y, 'r] dataPointR = object
-  inherit ['x, 'y] dataPoint
+class type ['x, 'y, 'r] dataPointR =
+  object
+    inherit ['x, 'y] dataPoint
 
-  method r : 'r Js.prop
-end
+    method r : 'r Js.prop
+  end
 
 val create_data_point : x:'a -> y:'b -> ('a, 'b) dataPoint Js.t
 
@@ -567,1187 +606,1211 @@ val create_data_point_r : x:'a -> y:'b -> r:'c -> ('a, 'b, 'c) dataPointR Js.t
     in the [minor] key. It defines options for the minor tick marks that are
     generated by the axis. Omitted options are inherited from ticks
     configuration. *)
-class type minorTicks = object
-  method callback : 'a tick_cb Js.prop
-  (** Returns the string representation of the tick value
+class type minorTicks =
+  object
+    (** Returns the string representation of the tick value
       as it should be displayed on the chart. *)
+    method callback : 'a tick_cb Js.prop
 
-  method fontColor : Color.t Js.t Js.optdef_prop
-  (** Font color for tick labels. *)
+    (** Font color for tick labels. *)
+    method fontColor : Color.t Js.t Js.optdef_prop
 
-  method fontFamily : Js.js_string Js.t Js.optdef_prop
-  (** Font family for the tick labels, follows CSS font-family options. *)
+    (** Font family for the tick labels, follows CSS font-family options. *)
+    method fontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method fontSize : int Js.optdef_prop
-  (** Font size for the tick labels. *)
+    (** Font size for the tick labels. *)
+    method fontSize : int Js.optdef_prop
 
-  method fontStyle : Js.js_string Js.t Js.optdef_prop
-  (** Font style for the tick labels, follows CSS font-style options
+    (** Font style for the tick labels, follows CSS font-style options
       (i.e. normal, italic, oblique, initial, inherit). *)
-end
+    method fontStyle : Js.js_string Js.t Js.optdef_prop
+  end
 
+and majorTicks = minorTicks
 (** The majorTick configuration is nested under the ticks configuration
     in the [major] key. It defines options for the major tick marks that are
     generated by the axis. Omitted options are inherited from ticks configuration.
     These options are disabled by default. *)
-and majorTicks = minorTicks
 
 (** The tick configuration is nested under the scale configuration
     in the ticks key. It defines options for the tick marks that are
     generated by the axis.*)
-and ticks = object
-  method callback : 'a tick_cb Js.prop
-  (** Returns the string representation of the tick value as
+and ticks =
+  object
+    (** Returns the string representation of the tick value as
       it should be displayed on the chart. *)
+    method callback : 'a tick_cb Js.prop
 
-  method display : bool Js.t Js.prop
-  (** If [true], show tick marks. *)
+    (** If [true], show tick marks. *)
+    method display : bool Js.t Js.prop
 
-  method fontColor : Color.t Js.t Js.optdef_prop
-  (** Font color for tick labels. *)
+    (** Font color for tick labels. *)
+    method fontColor : Color.t Js.t Js.optdef_prop
 
-  method fontFamily : Js.js_string Js.t Js.optdef_prop
-  (** Font family for the tick labels, follows CSS font-family options. *)
+    (** Font family for the tick labels, follows CSS font-family options. *)
+    method fontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method fontSize : int Js.optdef_prop
-  (** Font size for the tick labels. *)
+    (** Font size for the tick labels. *)
+    method fontSize : int Js.optdef_prop
 
-  method fontStyle : Js.js_string Js.t Js.optdef_prop
-  (** Font style for the tick labels, follows CSS font-style options
+    (** Font style for the tick labels, follows CSS font-style options
       (i.e. normal, italic, oblique, initial, inherit). *)
+    method fontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method reverse : bool Js.t Js.prop
-  (** Reverses order of tick labels. *)
+    (** Reverses order of tick labels. *)
+    method reverse : bool Js.t Js.prop
 
-  method minor : minorTicks Js.t
-  (** Minor ticks configuration. Omitted options are inherited
+    (** Minor ticks configuration. Omitted options are inherited
       from options above. *)
+    method minor : minorTicks Js.t
 
-  method major : majorTicks Js.t
-  (** Major ticks configuration. Omitted options are inherited
+    (** Major ticks configuration. Omitted options are inherited
       from options above.*)
-end
+    method major : majorTicks Js.t
+  end
 
-and scaleLabel = object
-  method display : bool Js.t Js.prop
-  (** If true, display the axis title. *)
+and scaleLabel =
+  object
+    (** If true, display the axis title. *)
+    method display : bool Js.t Js.prop
 
-  method labelString : Js.js_string Js.t Js.prop
-  (** The text for the title. (i.e. "# of People" or "Response Choices"). *)
+    (** The text for the title. (i.e. "# of People" or "Response Choices"). *)
+    method labelString : Js.js_string Js.t Js.prop
 
-  method lineHeight : Line_height.t Js.t Js.prop
-  (** Height of an individual line of text. *)
+    (** Height of an individual line of text. *)
+    method lineHeight : Line_height.t Js.t Js.prop
 
-  method fontColor : Color.t Js.t Js.prop
-  (** Font color for scale title. *)
+    (** Font color for scale title. *)
+    method fontColor : Color.t Js.t Js.prop
 
-  method fontFamily : Js.js_string Js.t Js.prop
-  (** Font family for the scale title, follows CSS font-family options. *)
+    (** Font family for the scale title, follows CSS font-family options. *)
+    method fontFamily : Js.js_string Js.t Js.prop
 
-  method fontSize : int Js.prop
-  (** Font size for scale title. *)
+    (** Font size for scale title. *)
+    method fontSize : int Js.prop
 
-  method fontStyle : Js.js_string Js.t Js.prop
-  (** Font style for the scale title, follows CSS font-style options
+    (** Font style for the scale title, follows CSS font-style options
       (i.e. normal, italic, oblique, initial, inherit) *)
+    method fontStyle : Js.js_string Js.t Js.prop
 
-  method padding : Padding.t Js.t Js.prop
-  (** Padding to apply around scale labels.
+    (** Padding to apply around scale labels.
       Only top and bottom are implemented. *)
-end
+    method padding : Padding.t Js.t Js.prop
+  end
 
-and gridLines = object
-  method display : bool Js.t Js.prop
-  (** If [false], do not display grid lines for this axis. *)
+and gridLines =
+  object
+    (** If [false], do not display grid lines for this axis. *)
+    method display : bool Js.t Js.prop
 
-  method circular : bool Js.t Js.prop
-  (** If [true], gridlines are circular (on radar chart only). *)
+    (** If [true], gridlines are circular (on radar chart only). *)
+    method circular : bool Js.t Js.prop
 
-  method color : Color.t Js.t Indexable.t Js.t Js.prop
-  (** The color of the grid lines. If specified as an array,
+    (** The color of the grid lines. If specified as an array,
       the first color applies to the first grid line, the second
       to the second grid line and so on. *)
+    method color : Color.t Js.t Indexable.t Js.t Js.prop
 
-  method borderDash : line_dash Js.prop
-  (** Length and spacing of dashes on grid lines. *)
+    (** Length and spacing of dashes on grid lines. *)
+    method borderDash : line_dash Js.prop
 
-  method borderDashOffset : line_dash_offset Js.prop
-  (** Offset for line dashes. *)
+    (** Offset for line dashes. *)
+    method borderDashOffset : line_dash_offset Js.prop
 
-  method lineWidth : int Indexable.t Js.t Js.prop
-  (** Stroke width of grid lines. *)
+    (** Stroke width of grid lines. *)
+    method lineWidth : int Indexable.t Js.t Js.prop
 
-  method drawBorder : bool Js.t Js.prop
-  (** If true, draw border at the edge between the axis and the chart area. *)
+    (** If true, draw border at the edge between the axis and the chart area. *)
+    method drawBorder : bool Js.t Js.prop
 
-  method drawOnChartArea : bool Js.t Js.prop
-  (** If true, draw lines on the chart area inside the axis lines.
+    (** If true, draw lines on the chart area inside the axis lines.
       This is useful when there are multiple axes and you need to
       control which grid lines are drawn. *)
+    method drawOnChartArea : bool Js.t Js.prop
 
-  method drawTicks : bool Js.t Js.prop
-  (** If true, draw lines beside the ticks in the axis area beside the chart. *)
+    (** If true, draw lines beside the ticks in the axis area beside the chart. *)
+    method drawTicks : bool Js.t Js.prop
 
-  method tickMarkLength : int Js.prop
-  (** Length in pixels that the grid lines will draw into the axis area. *)
+    (** Length in pixels that the grid lines will draw into the axis area. *)
+    method tickMarkLength : int Js.prop
 
-  method zeroLineWidth : int Js.prop
-  (** Stroke width of the grid line for the first index (index 0). *)
+    (** Stroke width of the grid line for the first index (index 0). *)
+    method zeroLineWidth : int Js.prop
 
-  method zeroLineColor : Color.t Js.t Js.prop
-  (** Stroke color of the grid line for the first index (index 0). *)
+    (** Stroke color of the grid line for the first index (index 0). *)
+    method zeroLineColor : Color.t Js.t Js.prop
 
-  method zeroLineBorderDash : line_dash Js.prop
-  (** Length and spacing of dashes of the grid line
+    (** Length and spacing of dashes of the grid line
       for the first index (index 0). *)
+    method zeroLineBorderDash : line_dash Js.prop
 
-  method zeroLineBorderDashOffset : line_dash_offset Js.prop
-  (** Offset for line dashes of the grid line for the first index (index 0). *)
+    (** Offset for line dashes of the grid line for the first index (index 0). *)
+    method zeroLineBorderDashOffset : line_dash_offset Js.prop
 
-  method offsetGridLines : bool Js.t Js.prop
-  (** If [true], grid lines will be shifted to be between labels.
+    (** If [true], grid lines will be shifted to be between labels.
       This is set to true for a category scale in a bar chart by default. *)
-end
+    method offsetGridLines : bool Js.t Js.prop
+  end
 
-class type axis = object
-  method _type : Js.js_string Js.t Js.prop
-  (** Type of scale being employed
+class type axis =
+  object
+    (** Type of scale being employed
       Custom scales can be created and registered with a string key.
       This allows changing the type of an axis for a chart. *)
+    method _type : Js.js_string Js.t Js.prop
 
-  method display : Axis_display.t Js.t Js.prop
-  (** Controls the axis global visibility
+    (** Controls the axis global visibility
       (visible when [true], hidden when [false]).
       When display is ['auto'], the axis is visible only
       if at least one associated dataset is visible. *)
+    method display : Axis_display.t Js.t Js.prop
 
-  method weight : float Js.optdef_prop
-  (** The weight used to sort the axis.
+    (** The weight used to sort the axis.
       Higher weights are further away from the chart area. *)
+    method weight : float Js.optdef_prop
 
-  method beforeUpdate : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback called before the update process starts. *)
+    (** Callback called before the update process starts. *)
+    method beforeUpdate : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method beforeSetDimensions : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs before dimensions are set. *)
+    (** Callback that runs before dimensions are set. *)
+    method beforeSetDimensions : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method afterSetDimensions : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs after dimensions are set. *)
+    (** Callback that runs after dimensions are set. *)
+    method afterSetDimensions : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method beforeDataLimits : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs before data limits are determined. *)
+    (** Callback that runs before data limits are determined. *)
+    method beforeDataLimits : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method afterDataLimits : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs after data limits are determined. *)
+    (** Callback that runs after data limits are determined. *)
+    method afterDataLimits : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method beforeBuildTicks : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs before ticks are created. *)
+    (** Callback that runs before ticks are created. *)
+    method beforeBuildTicks : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method afterBuildTicks :
-    ('a Js.t
-     -> 'tick Js.js_array Js.t
-     -> 'tick Js.js_array Js.t) Js.callback Js.optdef_prop
-  (** Callback that runs after ticks are created. Useful for filtering ticks.
+    (** Callback that runs after ticks are created. Useful for filtering ticks.
       @return the filtered ticks. *)
+    method afterBuildTicks :
+      ('a Js.t -> 'tick Js.js_array Js.t -> 'tick Js.js_array Js.t) Js.callback
+      Js.optdef_prop
 
-  method beforeTickToLabelConversion : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs before ticks are converted into strings. *)
+    (** Callback that runs before ticks are converted into strings. *)
+    method beforeTickToLabelConversion : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method afterTickToLabelConversion : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs after ticks are converted into strings. *)
+    (** Callback that runs after ticks are converted into strings. *)
+    method afterTickToLabelConversion : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method beforeCalculateTickRotation : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs before tick rotation is determined. *)
+    (** Callback that runs before tick rotation is determined. *)
+    method beforeCalculateTickRotation : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method afterCalculateTickRotation : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs after tick rotation is determined. *)
+    (** Callback that runs after tick rotation is determined. *)
+    method afterCalculateTickRotation : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method beforeFit : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs before the scale fits to the canvas. *)
+    (** Callback that runs before the scale fits to the canvas. *)
+    method beforeFit : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method afterFit : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs after the scale fits to the canvas. *)
+    (** Callback that runs after the scale fits to the canvas. *)
+    method afterFit : ('a Js.t -> unit) Js.callback Js.optdef_prop
 
-  method afterUpdate : ('a Js.t -> unit) Js.callback Js.optdef_prop
-  (** Callback that runs at the end of the update process. *)
-end
+    (** Callback that runs at the end of the update process. *)
+    method afterUpdate : ('a Js.t -> unit) Js.callback Js.optdef_prop
+  end
 
-val create_minor_ticks : unit -> minorTicks Js.t
+val empty_minor_ticks : unit -> minorTicks Js.t
 
-val create_major_ticks : unit -> majorTicks Js.t
+val empty_major_ticks : unit -> majorTicks Js.t
 
-val create_ticks : unit -> ticks Js.t
+val empty_ticks : unit -> ticks Js.t
 
-val create_scale_label : unit -> scaleLabel Js.t
+val empty_scale_label : unit -> scaleLabel Js.t
 
-val create_grid_lines : unit -> gridLines Js.t
+val empty_grid_lines : unit -> gridLines Js.t
 
 (** {2 Cartesian axes} *)
 
-class type cartesianTicks = object
-  inherit ticks
+class type cartesianTicks =
+  object
+    inherit ticks
 
-  method autoSkip : bool Js.t Js.prop
-  (** If [true], automatically calculates how many labels that
+    (** If [true], automatically calculates how many labels that
       can be shown and hides labels accordingly. Turn it off to show all
       labels no matter what. *)
+    method autoSkip : bool Js.t Js.prop
 
-  method autoSkipPadding : int Js.prop
-  (** Padding between the ticks on the horizontal axis when autoSkip is
+    (** Padding between the ticks on the horizontal axis when autoSkip is
       enabled. Note: Only applicable to horizontal scales. *)
+    method autoSkipPadding : int Js.prop
 
-  method labelOffset : int Js.prop
-  (** Distance in pixels to offset the label from the centre point of the
+    (** Distance in pixels to offset the label from the centre point of the
       tick (in the y direction for the x axis, and the x direction for the
       y axis). Note: this can cause labels at the edges to be cropped by the
       edge of the canvas. *)
+    method labelOffset : int Js.prop
 
-  method maxRotation : int Js.prop
-  (** Maximum rotation for tick labels when rotating to condense labels.
+    (** Maximum rotation for tick labels when rotating to condense labels.
       Note: Rotation doesn't occur until necessary.
       Note: Only applicable to horizontal scales. *)
+    method maxRotation : int Js.prop
 
-  method minRotation : int Js.prop
-  (** Minimum rotation for tick labels.
+    (** Minimum rotation for tick labels.
       Note: Only applicable to horizontal scales. *)
+    method minRotation : int Js.prop
 
-  method mirror : bool Js.prop
-  (** Flips tick labels around axis, displaying the labels inside the chart
+    (** Flips tick labels around axis, displaying the labels inside the chart
       instead of outside. Note: Only applicable to vertical scales. *)
+    method mirror : bool Js.prop
 
-  method padding : int Js.prop
-  (** Padding between the tick label and the axis. When set on a vertical axis,
+    (** Padding between the tick label and the axis. When set on a vertical axis,
       this applies in the horizontal (X) direction. When set on a horizontal
       axis, this applies in the vertical (Y) direction. *)
-end
+    method padding : int Js.prop
+  end
 
-class type cartesianAxis = object
-  inherit axis
+class type cartesianAxis =
+  object
+    inherit axis
 
-  method position : Position.t Js.t Js.prop
-  (** Position of the axis in the chart.
+    (** Position of the axis in the chart.
       Possible values are: ['top'], ['left'], ['bottom'], ['right'] *)
+    method position : Position.t Js.t Js.prop
 
-  method offset : bool Js.t Js.prop
-  (** If [true], extra space is added to the both edges and the axis
+    (** If [true], extra space is added to the both edges and the axis
       is scaled to fit into the chart area. This is set to true for a
       category scale in a bar chart by default. *)
+    method offset : bool Js.t Js.prop
 
-  method id : Js.js_string Js.t Js.prop
-  (** The ID is used to link datasets and scale axes together. *)
+    (** The ID is used to link datasets and scale axes together. *)
+    method id : Js.js_string Js.t Js.prop
 
-  method gridLines : gridLines Js.t Js.prop
-  (** Grid line configuration. *)
+    (** Grid line configuration. *)
+    method gridLines : gridLines Js.t Js.prop
 
-  method scaleLabel : scaleLabel Js.t Js.prop
-  (** Scale title configuration. *)
+    (** Scale title configuration. *)
+    method scaleLabel : scaleLabel Js.t Js.prop
 
-  method _ticks : cartesianTicks Js.t Js.prop
-  (** Ticks configuration. *)
-end
+    (** Ticks configuration. *)
+    method _ticks : cartesianTicks Js.t Js.prop
+  end
 
 val coerce_cartesian_axis : #cartesianAxis Js.t -> cartesianAxis Js.t
 
-val create_cartesian_axis : unit -> cartesianAxis Js.t
+val empty_cartesian_axis : unit -> cartesianAxis Js.t
 
 (** {3 Category axis} *)
 
-class type categoryCartesianTicks = object
-  inherit cartesianTicks
+class type categoryTicks =
+  object
+    inherit cartesianTicks
 
-  method labels : Js.js_string Js.t Js.optdef_prop
-  (** An array of labels to display. *)
+    (** An array of labels to display. *)
+    method labels : Js.js_string Js.t Js.optdef_prop
 
-  method min : Js.js_string Js.t Js.optdef Js.prop
-  (** The minimum item to display. *)
+    (** The minimum item to display. *)
+    method min : Js.js_string Js.t Js.optdef Js.prop
 
-  method max : Js.js_string Js.t Js.optdef Js.prop
-  (** The maximum item to display. *)
-end
+    (** The maximum item to display. *)
+    method max : Js.js_string Js.t Js.optdef Js.prop
+  end
 
-class type categoryCartesianAxis = object
-  inherit cartesianAxis
+class type categoryAxis =
+  object
+    inherit cartesianAxis
 
-  method ticks : categoryCartesianTicks Js.t Js.prop
-end
+    method ticks : categoryTicks Js.t Js.prop
+  end
 
-val create_category_cartesian_ticks : unit -> categoryCartesianTicks Js.t
+val empty_category_ticks : unit -> categoryTicks Js.t
 
-val create_category_cartesian_axis : unit -> categoryCartesianAxis Js.t
+val empty_category_axis : unit -> categoryAxis Js.t
 
 (** {3 Linear axis} *)
 
-class type linearCartesianTicks = object
-  inherit cartesianTicks
+class type linearTicks =
+  object
+    inherit cartesianTicks
 
-  method beginAtZero : bool Js.t Js.optdef_prop
-  (** If [true], scale will include 0 if it is not already included. *)
+    (** If [true], scale will include 0 if it is not already included. *)
+    method beginAtZero : bool Js.t Js.optdef_prop
 
-  method min : float Js.optdef Js.prop
-  (** User defined minimum number for the scale,
+    (** User defined minimum number for the scale,
       overrides minimum value from data. *)
+    method min : float Js.optdef Js.prop
 
-  method max : float Js.optdef Js.prop
-  (** User defined maximum number for the scale,
+    (** User defined maximum number for the scale,
       overrides maximum value from data. *)
+    method max : float Js.optdef Js.prop
 
-  method maxTicksLimit : int Js.prop
-  (** Maximum number of ticks and gridlines to show. *)
+    (** Maximum number of ticks and gridlines to show. *)
+    method maxTicksLimit : int Js.prop
 
-  method precision : int Js.optdef_prop
-  (** If defined and stepSize is not specified,
+    (** If defined and stepSize is not specified,
       the step size will be rounded to this many decimal places. *)
+    method precision : int Js.optdef_prop
 
-  method stepSize : int Js.optdef_prop
-  (** User defined fixed step size for the scale. *)
+    (** User defined fixed step size for the scale. *)
+    method stepSize : int Js.optdef_prop
 
-  method suggestedMax : float Js.optdef Js.prop
-  (** Adjustment used when calculating the maximum data value. *)
+    (** Adjustment used when calculating the maximum data value. *)
+    method suggestedMax : float Js.optdef Js.prop
 
-  method suggestedMin : float Js.optdef Js.prop
-  (** Adjustment used when calculating the minimum data value. *)
-end
+    (** Adjustment used when calculating the minimum data value. *)
+    method suggestedMin : float Js.optdef Js.prop
+  end
 
-class type linearCartesianAxis = object
-  inherit cartesianAxis
+class type linearAxis =
+  object
+    inherit cartesianAxis
 
-  method ticks : linearCartesianTicks Js.t Js.prop
-end
+    method ticks : linearTicks Js.t Js.prop
+  end
 
-val create_linear_cartesian_ticks : unit -> linearCartesianTicks Js.t
+val empty_linear_ticks : unit -> linearTicks Js.t
 
-val create_linear_cartesian_axis : unit -> linearCartesianAxis Js.t
+val empty_linear_axis : unit -> linearAxis Js.t
 
 (** {3 Logarithmic axis} *)
 
-class type logarithmicCartesianTicks = object
-  inherit cartesianTicks
+class type logarithmicTicks =
+  object
+    inherit cartesianTicks
 
-  method min : float Js.optdef Js.prop
-  (** User defined minimum number for the scale,
+    (** User defined minimum number for the scale,
       overrides minimum value from data. *)
+    method min : float Js.optdef Js.prop
 
-  method max : float Js.optdef Js.prop
-  (** User defined maximum number for the scale,
+    (** User defined maximum number for the scale,
       overrides maximum value from data. *)
-end
+    method max : float Js.optdef Js.prop
+  end
 
-class type logarithmicCartesianAxis = object
-  inherit cartesianAxis
+class type logarithmicAxis =
+  object
+    inherit cartesianAxis
 
-  method ticks : logarithmicCartesianTicks Js.t Js.prop
-end
+    method ticks : logarithmicTicks Js.t Js.prop
+  end
 
-val create_logarithmic_cartesian_ticks : unit -> logarithmicCartesianTicks Js.t
+val empty_logarithmic_ticks : unit -> logarithmicTicks Js.t
 
-val create_logarithmic_cartesian_axis : unit -> logarithmicCartesianAxis Js.t
+val empty_logarithmic_axis : unit -> logarithmicAxis Js.t
 
 (** {3 Time axis} *)
 
 (** The following display formats are used to configure
     how different time units are formed into strings for
     the axis tick marks. *)
-class type timeDisplayFormats = object
-  method millisecond : Js.js_string Js.t Js.prop
+class type timeDisplayFormats =
+  object
+    method millisecond : Js.js_string Js.t Js.prop
 
-  method second : Js.js_string Js.t Js.prop
+    method second : Js.js_string Js.t Js.prop
 
-  method minute : Js.js_string Js.t Js.prop
+    method minute : Js.js_string Js.t Js.prop
 
-  method hour : Js.js_string Js.t Js.prop
+    method hour : Js.js_string Js.t Js.prop
 
-  method day : Js.js_string Js.t Js.prop
+    method day : Js.js_string Js.t Js.prop
 
-  method week : Js.js_string Js.t Js.prop
+    method week : Js.js_string Js.t Js.prop
 
-  method month : Js.js_string Js.t Js.prop
+    method month : Js.js_string Js.t Js.prop
 
-  method quarter : Js.js_string Js.t Js.prop
+    method quarter : Js.js_string Js.t Js.prop
 
-  method year : Js.js_string Js.t Js.prop
-end
+    method year : Js.js_string Js.t Js.prop
+  end
 
-class type timeCartesianTicks = object
-  inherit cartesianTicks
+class type timeTicks =
+  object
+    inherit cartesianTicks
 
-  method source : Time_ticks_source.t Js.prop
-  (** How ticks are generated.
+    (** How ticks are generated.
       [auto]: generates "optimal" ticks based on scale size and time options
       [data]: generates ticks from data (including labels from data objects)
       [labels]: generates ticks from user given data.labels values ONLY *)
-end
+    method source : Time_ticks_source.t Js.t Js.prop
+  end
 
-class type timeCartesianOptions = object
-  method displayFormats : timeDisplayFormats Js.t Js.optdef_prop
-  (** Sets how different time units are displayed. *)
+class type timeOptions =
+  object
+    (** Sets how different time units are displayed. *)
+    method displayFormats : timeDisplayFormats Js.t Js.optdef_prop
 
-  method isoWeekday : bool Js.t Js.prop
-  (** If [true] and the unit is set to 'week', then the first day
+    (** If [true] and the unit is set to 'week', then the first day
       of the week will be Monday. Otherwise, it will be Sunday. *)
+    method isoWeekday : bool Js.t Js.prop
 
-  method max : Time.t Js.t Js.optdef_prop
-  (** If defined, this will override the data maximum *)
+    (** If defined, this will override the data maximum *)
+    method max : Time.t Js.t Js.optdef_prop
 
-  method min : Time.t Js.t Js.optdef_prop
-  (** If defined, this will override the data minimum *)
+    (** If defined, this will override the data minimum *)
+    method min : Time.t Js.t Js.optdef_prop
 
-  method _parser : Time_parser.t Js.t Js.optdef_prop
-  (** Custom parser for dates. *)
+    (** Custom parser for dates. *)
+    method _parser : Time_parser.t Js.t Js.optdef_prop
 
-  method round : Time_unit.t Or_false.t Js.t Js.prop
-  (** If defined, dates will be rounded to the start of this unit. *)
+    (** If defined, dates will be rounded to the start of this unit. *)
+    method round : Time_unit.t Js.t Or_false.t Js.t Js.prop
 
-  method tooltipFormat : Js.js_string Js.t Js.optdef_prop
-  (** The moment js format string to use for the tooltip. *)
+    (** The moment js format string to use for the tooltip. *)
+    method tooltipFormat : Js.js_string Js.t Js.optdef_prop
 
-  method unit : Time_unit.t Or_false.t Js.t Js.prop
-  (** If defined, will force the unit to be a certain type. *)
+    (** If defined, will force the unit to be a certain type. *)
+    method unit : Time_unit.t Js.t Or_false.t Js.t Js.prop
 
-  method stepSize : int Js.prop
-  (** The number of units between grid lines. *)
+    (** The number of units between grid lines. *)
+    method stepSize : int Js.prop
 
-  method minUnit : Time_unit.t Js.prop
-  (** The minimum display format to be used for a time unit. *)
-end
+    (** The minimum display format to be used for a time unit. *)
+    method minUnit : Time_unit.t Js.t Js.prop
+  end
 
-class type timeCartesianAxis = object
-  inherit cartesianAxis
+class type timeAxis =
+  object
+    inherit cartesianAxis
 
-  method ticks : timeCartesianTicks Js.t Js.prop
+    method ticks : timeTicks Js.t Js.prop
 
-  method time : timeCartesianOptions Js.t Js.prop
+    method time : timeOptions Js.t Js.prop
 
-  method distribution : Time_distribution.t Js.prop
-  (** The distribution property controls the data distribution along the scale:
+    (** The distribution property controls the data distribution along the scale:
       [linear]: data are spread according to their time (distances can vary)
       [series]: data are spread at the same distance from each other *)
+    method distribution : Time_distribution.t Js.t Js.prop
 
-  method bounds : Time_bounds.t Js.prop
-  (** The bounds property controls the scale boundary strategy
+    (** The bounds property controls the scale boundary strategy
       (bypassed by [min]/[max] time options).
       [data]: makes sure data are fully visible, labels outside are removed
       [ticks]: makes sure ticks are fully visible, data outside are truncated *)
-end
+    method bounds : Time_bounds.t Js.t Js.prop
+  end
 
-val create_time_display_formats : unit -> timeDisplayFormats Js.t
+val empty_time_display_formats : unit -> timeDisplayFormats Js.t
 
-val create_time_cartesian_ticks : unit -> timeCartesianTicks Js.t
+val empty_time_ticks : unit -> timeTicks Js.t
 
-val create_time_cartesian_options : unit -> timeCartesianOptions Js.t
+val empty_time_options : unit -> timeOptions Js.t
 
-val create_time_cartesian_axis : unit -> timeCartesianAxis Js.t
+val empty_time_axis : unit -> timeAxis Js.t
 
-class type dataset = object
-  method _type : Js.js_string Js.t Js.optdef_prop
+class type dataset =
+  object
+    method _type : Js.js_string Js.t Js.optdef_prop
 
-  method label : Js.js_string Js.t Js.prop
+    method label : Js.js_string Js.t Js.prop
 
-  method hidden : bool Js.t Js.optdef_prop
-end
+    method hidden : bool Js.t Js.optdef_prop
+  end
 
 val coerce_dataset : #dataset Js.t -> dataset Js.t
 
-class type data = object
-  method datasets : #dataset Js.t Js.js_array Js.t Js.prop
+class type data =
+  object
+    method datasets : #dataset Js.t Js.js_array Js.t Js.prop
 
-  method labels : 'a Js.js_array Js.t Js.optdef_prop
+    method labels : 'a Js.js_array Js.t Js.optdef_prop
 
-  method xLabels : 'a Js.js_array Js.t Js.optdef_prop
+    method xLabels : 'a Js.js_array Js.t Js.optdef_prop
 
-  method yLabels : 'a Js.js_array Js.t Js.optdef_prop
-end
+    method yLabels : 'a Js.js_array Js.t Js.optdef_prop
+  end
 
-val create_data : unit -> data Js.t
+val empty_data : unit -> data Js.t
 
 (** {1 Chart configuration} *)
 
-class type updateConfig = object
-  method duration : int Js.optdef_prop
+class type updateConfig =
+  object
+    method duration : int Js.optdef_prop
 
-  method _lazy : bool Js.t Js.optdef_prop
+    method _lazy : bool Js.t Js.optdef_prop
 
-  method easing : Easing.t Js.optdef_prop
-end
+    method easing : Easing.t Js.optdef_prop
+  end
 
 (** {2 Animation} *)
 
-class type animationItem = object
-  method chart : chart Js.t Js.readonly_prop
-  (** Chart object. *)
+class type animationItem =
+  object
+    (** Chart object. *)
+    method chart : chart Js.t Js.readonly_prop
 
-  method currentStep : float Js.readonly_prop
-  (** Current Animation frame number. *)
+    (** Current Animation frame number. *)
+    method currentStep : float Js.readonly_prop
 
-  method numSteps : float Js.readonly_prop
-  (** Number of animation frames. *)
+    (** Number of animation frames. *)
+    method numSteps : float Js.readonly_prop
 
-  method render : chart Js.t -> animationItem Js.t -> unit Js.meth
-  (** Function that renders the chart. *)
+    (** Function that renders the chart. *)
+    method render : chart Js.t -> animationItem Js.t -> unit Js.meth
 
-  method onAnimationProgress : animationItem Js.t -> unit Js.meth
-  (** User callback. *)
+    (** User callback. *)
+    method onAnimationProgress : animationItem Js.t -> unit Js.meth
 
-  method onAnimationComplete : animationItem Js.t -> unit Js.meth
-  (** User callback. *)
-end
+    (** User callback. *)
+    method onAnimationComplete : animationItem Js.t -> unit Js.meth
+  end
 
-and animation = object
-  method duration : int Js.prop
-  (** The number of milliseconds an animation takes. *)
+and animation =
+  object
+    (** The number of milliseconds an animation takes. *)
+    method duration : int Js.prop
 
-  method easing : Easing.t Js.prop
-  (** Easing function to use. *)
+    (** Easing function to use. *)
+    method easing : Easing.t Js.prop
 
-  method onProgress : (animationItem Js.t -> unit) Js.callback Js.opt Js.prop
-  (** Callback called on each step of an animation. *)
+    (** Callback called on each step of an animation. *)
+    method onProgress : (animationItem Js.t -> unit) Js.callback Js.opt Js.prop
 
-  method onComplete : (animationItem Js.t -> unit) Js.callback Js.opt Js.prop
-  (** Callback called at the end of an animation. *)
-end
+    (** Callback called at the end of an animation. *)
+    method onComplete : (animationItem Js.t -> unit) Js.callback Js.opt Js.prop
+  end
 
 (** {2 Layout} *)
 
-and layout = object
-  method padding : Padding.t Js.prop
-  (** The padding to add inside the chart. *)
-end
+and layout =
+  object
+    (** The padding to add inside the chart. *)
+    method padding : Padding.t Js.prop
+  end (* FIXME this interface differs between Pie and other chart types *)
 
 (** {2 Legend} *)
 
-(* FIXME this interface differs between Pie and other chart types *)
-and legendItem = object
-  method text : Js.js_string Js.t Js.prop
-  (** Label that will be displayed. *)
+and legendItem =
+  object
+    (** Label that will be displayed. *)
+    method text : Js.js_string Js.t Js.prop
+    (* FIXME seems it can be Indexable & Scriptable dependent on chart type *)
 
-  (* FIXME seems it can be Indexable & Scriptable dependent on chart type *)
-  method fillStyle : Color.t Js.t Js.prop
-  (** Fill style of the legend box. *)
+    (** Fill style of the legend box. *)
+    method fillStyle : Color.t Js.t Js.prop
 
-  method hidden : bool Js.t Js.prop
-  (** If [true], this item represents a hidden dataset.
+    (** If [true], this item represents a hidden dataset.
       Label will be rendered with a strike-through effect. *)
+    method hidden : bool Js.t Js.prop
 
-  method lineCap : Line_cap.t Js.optdef_prop
-  (** For box border. *)
+    (** For box border. *)
+    method lineCap : Line_cap.t Js.t Js.optdef_prop
 
-  method lineDash : line_dash Js.optdef_prop
-  (** For box border. *)
+    (** For box border. *)
+    method lineDash : line_dash Js.optdef_prop
 
-  method lineDashOffset : line_dash_offset Js.optdef_prop
-  (** For box border. *)
+    (** For box border. *)
+    method lineDashOffset : line_dash_offset Js.optdef_prop
 
-  method lineJoin : Line_join.t Js.optdef_prop
-  (** For box border. *)
+    (** For box border. *)
+    method lineJoin : Line_join.t Js.t Js.optdef_prop
 
-  method lineWidth : int Js.prop
-  (** Width of box border. *)
+    (** Width of box border. *)
+    method lineWidth : int Js.prop
 
-  method strokeStyle : Color.t Js.t Js.prop
-  (** Stroke style of the legend box. *)
+    (** Stroke style of the legend box. *)
+    method strokeStyle : Color.t Js.t Js.prop
 
-  method pointStyle : Point_style.t Js.t Js.optdef_prop
-  (** Point style of the legend box (only used if usePointStyle is true) *)
+    (** Point style of the legend box (only used if usePointStyle is true) *)
+    method pointStyle : Point_style.t Js.t Js.optdef_prop
 
-  method datasetIndex : int Js.prop
-end
+    method datasetIndex : int Js.prop
+  end
 
-and legendLabels = object('self)
-  method boxWidth : int Js.prop
-  (** Width of coloured box. *)
+and legendLabels =
+  object ('self)
+    (** Width of coloured box. *)
+    method boxWidth : int Js.prop
 
-  method fontSize : int Js.optdef_prop
-  (** Font size of text. *)
+    (** Font size of text. *)
+    method fontSize : int Js.optdef_prop
 
-  method fontStyle : Js.js_string Js.t Js.optdef_prop
-  (** Font style of text. *)
+    (** Font style of text. *)
+    method fontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method fontColor : Color.t Js.t Js.optdef_prop
-  (** Color of text. *)
+    (** Color of text. *)
+    method fontColor : Color.t Js.t Js.optdef_prop
 
-  method fontFamily : Js.js_string Js.t Js.optdef_prop
-  (** Font family of legend text. *)
+    (** Font family of legend text. *)
+    method fontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method padding : int Js.prop
-  (** Padding between rows of colored boxes. *)
+    (** Padding between rows of colored boxes. *)
+    method padding : int Js.prop
 
-  method generateLabels :
-    (chart Js.t
-     -> legendItem Js.t Js.js_array Js.t) Js.callback Js.prop
-  (** Generates legend items for each thing in the legend.
+    (** Generates legend items for each thing in the legend.
       Default implementation returns the text + styling for the color box. *)
+    method generateLabels :
+      (chart Js.t -> legendItem Js.t Js.js_array Js.t) Js.callback Js.prop
 
-  method filter :
-    ('self,
-     legendItem Js.t
-     -> data Js.t
-     -> bool Js.t) Js.meth_callback Js.optdef_prop
-  (** Filters legend items out of the legend. Receives 2 parameters,
+    (** Filters legend items out of the legend. Receives 2 parameters,
       a Legend Item and the chart data. *)
+    method filter :
+      ('self, legendItem Js.t -> data Js.t -> bool Js.t) Js.meth_callback Js.optdef_prop
 
-  method usePointStyle : bool Js.t Js.optdef_prop
-  (** Label style will match corresponding point style
+    (** Label style will match corresponding point style
       (size is based on fontSize, boxWidth is not used in this case). *)
-end
+    method usePointStyle : bool Js.t Js.optdef_prop
+  end
 
-and legend = object
-  method display : bool Js.t Js.prop
-  (** Is the legend shown. *)
+and legend =
+  object
+    (** Is the legend shown. *)
+    method display : bool Js.t Js.prop
 
-  method position : Position.t Js.t Js.prop
-  (** Position of the legend. *)
+    (** Position of the legend. *)
+    method position : Position.t Js.t Js.prop
 
-  method fullWidth : bool Js.t Js.prop
-  (** Marks that this box should take the full width of the canvas
+    (** Marks that this box should take the full width of the canvas
       (pushing down other boxes). This is unlikely to need to be changed
       in day-to-day use. *)
+    method fullWidth : bool Js.t Js.prop
 
-  method onClick :
-    (chart,
-     Dom_html.event Js.t
-     -> legendItem Js.t
-     -> unit) Js.meth_callback Js.optdef_prop
-  (** A callback that is called when a click event is
+    (** A callback that is called when a click event is
       registered on a label item *)
+    method onClick :
+      (chart, Dom_html.event Js.t -> legendItem Js.t -> unit) Js.meth_callback
+      Js.optdef_prop
 
-  method onHover :
-    (chart,
-     Dom_html.event Js.t
-     -> legendItem Js.t
-     -> unit) Js.meth_callback Js.optdef_prop
-  (** A callback that is called when a 'mousemove' event is
+    (** A callback that is called when a 'mousemove' event is
       registered on top of a label item *)
+    method onHover :
+      (chart, Dom_html.event Js.t -> legendItem Js.t -> unit) Js.meth_callback
+      Js.optdef_prop
 
-  method onLeave :
-    (chart,
-     Dom_html.event Js.t
-     -> legendItem Js.t
-     -> unit) Js.meth_callback Js.optdef_prop
+    method onLeave :
+      (chart, Dom_html.event Js.t -> legendItem Js.t -> unit) Js.meth_callback
+      Js.optdef_prop
 
-  method reverse : bool Js.t Js.prop
-  (** Legend will show datasets in reverse order. *)
+    (** Legend will show datasets in reverse order. *)
+    method reverse : bool Js.t Js.prop
 
-  method labels : legendLabels Js.t Js.prop
-  (** Legend label configuration. *)
-end
+    (** Legend label configuration. *)
+    method labels : legendLabels Js.t Js.prop
+  end
 
 (** {2 Title} *)
 
-and title = object
-  method display : bool Js.t Js.prop
-  (** Is the title shown. *)
+and title =
+  object
+    (** Is the title shown. *)
+    method display : bool Js.t Js.prop
 
-  method position : Position.t Js.t Js.prop
-  (** Position of title. *)
+    (** Position of title. *)
+    method position : Position.t Js.t Js.prop
 
-  method fontSize : int Js.optdef_prop
-  (** Font size. *)
+    (** Font size. *)
+    method fontSize : int Js.optdef_prop
 
-  method fontFamily : Js.js_string Js.t Js.optdef_prop
-  (** Font family for the title text. *)
+    (** Font family for the title text. *)
+    method fontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method fontColor : Js.js_string Js.t Js.optdef_prop
-  (** Font color. *)
+    (** Font color. *)
+    method fontColor : Js.js_string Js.t Js.optdef_prop
 
-  method fontStyle : Js.js_string Js.t Js.optdef_prop
-  (** Font style. *)
+    (** Font style. *)
+    method fontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method fullWidth : bool Js.t Js.prop
+    method fullWidth : bool Js.t Js.prop
 
-  method padding : int Js.prop
-  (** Number of pixels to add above and below the title text. *)
+    (** Number of pixels to add above and below the title text. *)
+    method padding : int Js.prop
 
-  method lineHeight : Line_height.t Js.t Js.optdef_prop
-  (** Height of an individual line of text. *)
+    (** Height of an individual line of text. *)
+    method lineHeight : Line_height.t Js.t Js.optdef_prop
 
-  method text : Js.js_string Js.t Indexable.t Js.t Js.prop
-  (** Title text to display. If specified as an array,
+    (** Title text to display. If specified as an array,
       text is rendered on multiple lines. *)
-end
+    method text : Js.js_string Js.t Indexable.t Js.t Js.prop
+  end
 
 (** {2 Tooltip} *)
 
-and tooltipItem = object
-  method label : Js.js_string Js.t Js.readonly_prop
-  (** Label for the tooltip. *)
+and tooltipItem =
+  object
+    (** Label for the tooltip. *)
+    method label : Js.js_string Js.t Js.readonly_prop
 
-  method value : Js.js_string Js.t Js.readonly_prop
-  (** Value for the tooltip. *)
+    (** Value for the tooltip. *)
+    method value : Js.js_string Js.t Js.readonly_prop
 
-  method datasetIndex : int Js.readonly_prop
-  (** Index of the dataset the item comes from. *)
+    (** Index of the dataset the item comes from. *)
+    method datasetIndex : int Js.readonly_prop
 
-  method index : int Js.readonly_prop
-  (** Index of this data item in the dataset. *)
+    (** Index of this data item in the dataset. *)
+    method index : int Js.readonly_prop
 
-  method x : float Js.readonly_prop
-  (** X position of matching point. *)
+    (** X position of matching point. *)
+    method x : float Js.readonly_prop
 
-  method y : float Js.readonly_prop
-  (** Y position of matching point. *)
-end
+    (** Y position of matching point. *)
+    method y : float Js.readonly_prop
+  end
 
-and tooltipBodyLines = object
-  method before : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
+and tooltipBodyLines =
+  object
+    method before : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
 
-  method lines : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
+    method lines : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
 
-  method after : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
-end
+    method after : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
+  end
 
-and tooltipModel = object
+and tooltipModel =
+  object
+    (** The items that we are rendering in the tooltip. *)
+    method dataPoints : tooltipItem Js.t Js.js_array Js.t Js.readonly_prop
 
-  method dataPoints : tooltipItem Js.t Js.js_array Js.t Js.readonly_prop
-  (** The items that we are rendering in the tooltip. *)
+    (** Positioning. *)
 
-  (** Positioning. *)
+    method xPadding : int Js.readonly_prop
 
-  method xPadding : int Js.readonly_prop
-  method yPadding : int Js.readonly_prop
-  method xAlign : Js.js_string Js.t Js.readonly_prop
-  method yAlign : Js.js_string Js.t Js.readonly_prop
+    method yPadding : int Js.readonly_prop
 
-  (** X and Y readonly_properties are the top left of the tooltip. *)
+    method xAlign : Js.js_string Js.t Js.readonly_prop
 
-  method x : float Js.readonly_prop
-  method y : float Js.readonly_prop
-  method width : float Js.readonly_prop
-  method height : float Js.readonly_prop
+    method yAlign : Js.js_string Js.t Js.readonly_prop
 
-  (** Where the tooltip points to. *)
-  method caretX : int Js.readonly_prop
-  method caretY : int Js.readonly_prop
+    (** X and Y readonly_properties are the top left of the tooltip. *)
 
-  (** Body.
+    method x : float Js.readonly_prop
+
+    method y : float Js.readonly_prop
+
+    method width : float Js.readonly_prop
+
+    method height : float Js.readonly_prop
+
+    (** Where the tooltip points to. *)
+    method caretX : int Js.readonly_prop
+
+    method caretY : int Js.readonly_prop
+
+    (** Body.
       The body lines that need to be rendered.
       Each object contains 3 parameters.
       [before] - lines of text before the line with the color square
       [lines] - lines of text to render as the main item with color square
       [after] - lines of text to render after the main lines. *)
 
-  method body : tooltipBodyLines Js.t Js.readonly_prop
-  method beforeBody : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
-  method afterBody : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
-  method bodyFontColor : Color.t Js.t Js.readonly_prop
-  method __bodyFontFamily : Js.js_string Js.t Js.readonly_prop
-  method __bodyFontStyle : Js.js_string Js.t Js.readonly_prop
-  method __bodyAlign : Js.js_string Js.t Js.readonly_prop
-  method bodyFontSize : int Js.readonly_prop
-  method bodySpacing : int Js.readonly_prop
+    method body : tooltipBodyLines Js.t Js.readonly_prop
 
-  (** Title. Lines of text that form the title. *)
+    method beforeBody : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
 
-  method title : Js.js_string Js.t Indexable.t Js.readonly_prop
-  method titleFontColor : Color.t Js.t Js.readonly_prop
-  method __titleFontFamily : Js.js_string Js.t Js.readonly_prop
-  method __titleFontStyle : Js.js_string Js.t Js.readonly_prop
-  method titleFontSize : int Js.readonly_prop
-  method __titleAlign : Js.js_string Js.t Js.readonly_prop
-  method titleSpacing : int Js.readonly_prop
-  method titleMarginBottom : int Js.readonly_prop
+    method afterBody : Js.js_string Js.t Js.js_array Js.t Js.readonly_prop
 
-  (** Footer. Lines of text that form the footer. *)
+    method bodyFontColor : Color.t Js.t Js.readonly_prop
 
-  method footer : Js.js_string Js.t Indexable.t Js.readonly_prop
-  method footerFontColor : Color.t Js.t Js.readonly_prop
-  method __footerFontFamily : Js.js_string Js.t Js.readonly_prop
-  method __footerFontStyle : Js.js_string Js.t Js.readonly_prop
-  method footerFontSize : int Js.readonly_prop
-  method __footerAlign : Js.js_string Js.t Js.readonly_prop
-  method footerSpacing : int Js.readonly_prop
-  method footerMarginTop : int Js.readonly_prop
+    method __bodyFontFamily : Js.js_string Js.t Js.readonly_prop
 
-  (** Appearance. *)
+    method __bodyFontStyle : Js.js_string Js.t Js.readonly_prop
 
-  method caretSize : int Js.readonly_prop
-  method caretPadding : int Js.readonly_prop
-  method cornerRadius : int Js.readonly_prop
-  method backgroundColor : Color.t Js.t Js.readonly_prop
+    method __bodyAlign : Js.js_string Js.t Js.readonly_prop
 
-  method labelColors : Color.t Js.t Js.js_array Js.t Js.readonly_prop
-  (** Colors to render for each item in body. This is the color of the
+    method bodyFontSize : int Js.readonly_prop
+
+    method bodySpacing : int Js.readonly_prop
+
+    (** Title. Lines of text that form the title. *)
+
+    method title : Js.js_string Js.t Indexable.t Js.readonly_prop
+
+    method titleFontColor : Color.t Js.t Js.readonly_prop
+
+    method __titleFontFamily : Js.js_string Js.t Js.readonly_prop
+
+    method __titleFontStyle : Js.js_string Js.t Js.readonly_prop
+
+    method titleFontSize : int Js.readonly_prop
+
+    method __titleAlign : Js.js_string Js.t Js.readonly_prop
+
+    method titleSpacing : int Js.readonly_prop
+
+    method titleMarginBottom : int Js.readonly_prop
+
+    (** Footer. Lines of text that form the footer. *)
+
+    method footer : Js.js_string Js.t Indexable.t Js.readonly_prop
+
+    method footerFontColor : Color.t Js.t Js.readonly_prop
+
+    method __footerFontFamily : Js.js_string Js.t Js.readonly_prop
+
+    method __footerFontStyle : Js.js_string Js.t Js.readonly_prop
+
+    method footerFontSize : int Js.readonly_prop
+
+    method __footerAlign : Js.js_string Js.t Js.readonly_prop
+
+    method footerSpacing : int Js.readonly_prop
+
+    method footerMarginTop : int Js.readonly_prop
+
+    (** Appearance. *)
+
+    method caretSize : int Js.readonly_prop
+
+    method caretPadding : int Js.readonly_prop
+
+    method cornerRadius : int Js.readonly_prop
+
+    method backgroundColor : Color.t Js.t Js.readonly_prop
+
+    (** Colors to render for each item in body. This is the color of the
       squares in the tooltip. *)
+    method labelColors : Color.t Js.t Js.js_array Js.t Js.readonly_prop
 
-  method labelTextColors : Color.t Js.t Js.js_array Js.t Js.readonly_prop
+    method labelTextColors : Color.t Js.t Js.js_array Js.t Js.readonly_prop
 
-  method opacity : float Js.readonly_prop
-  (** Zero opacity is a hidden tooltip. *)
+    (** Zero opacity is a hidden tooltip. *)
+    method opacity : float Js.readonly_prop
 
-  method legendColorBackground : Color.t Js.t Js.readonly_prop
-  method displayColors : bool Js.t Js.readonly_prop
-  method borderColor : Color.t Js.t Js.readonly_prop
-  method borderWidth : int Js.readonly_prop
-end
+    method legendColorBackground : Color.t Js.t Js.readonly_prop
 
-and tooltipCallbacks = object
-  method beforeTitle :
-    (tooltip Js.t,
-     tooltipItem Js.js_array Js.t,
-     data Js.t) tooltip_cb Js.prop
-  (** Returns the text to render before the title. *)
+    method displayColors : bool Js.t Js.readonly_prop
 
-  method title :
-    (tooltip Js.t,
-     tooltipItem Js.js_array Js.t,
-     data Js.t) tooltip_cb Js.prop
-  (** Returns the text to render as the title of the tooltip. *)
+    method borderColor : Color.t Js.t Js.readonly_prop
 
-  method afterTitle :
-    (tooltip Js.t,
-     tooltipItem Js.js_array Js.t,
-     data Js.t) tooltip_cb Js.prop
-  (** Returns the text to render after the title. *)
+    method borderWidth : int Js.readonly_prop
+  end
 
-  method beforeBody :
-    (tooltip Js.t,
-     tooltipItem Js.js_array Js.t,
-     data Js.t) tooltip_cb Js.prop
-  (** Returns the text to render before the body section. *)
+and tooltipCallbacks =
+  object
+    (** Returns the text to render before the title. *)
+    method beforeTitle :
+      (tooltip Js.t, tooltipItem Js.js_array Js.t, data Js.t) tooltip_cb Js.prop
 
-  method beforeLabel :
-    (tooltip Js.t,
-     tooltipItem Js.t,
-     data Js.t) tooltip_cb Js.prop
-  (** Returns the text to render before an individual label.
+    (** Returns the text to render as the title of the tooltip. *)
+    method title :
+      (tooltip Js.t, tooltipItem Js.js_array Js.t, data Js.t) tooltip_cb Js.prop
+
+    (** Returns the text to render after the title. *)
+    method afterTitle :
+      (tooltip Js.t, tooltipItem Js.js_array Js.t, data Js.t) tooltip_cb Js.prop
+
+    (** Returns the text to render before the body section. *)
+    method beforeBody :
+      (tooltip Js.t, tooltipItem Js.js_array Js.t, data Js.t) tooltip_cb Js.prop
+
+    (** Returns the text to render before an individual label.
       This will be called for each item in the tooltip. *)
+    method beforeLabel : (tooltip Js.t, tooltipItem Js.t, data Js.t) tooltip_cb Js.prop
 
-  method label :
-    (tooltip Js.t,
-     tooltipItem Js.t,
-     data Js.t) tooltip_cb Js.prop
-  (** Returns the text to render for an individual item in the tooltip. *)
+    (** Returns the text to render for an individual item in the tooltip. *)
+    method label : (tooltip Js.t, tooltipItem Js.t, data Js.t) tooltip_cb Js.prop
 
-  method labelColor :
-    (tooltip Js.t,
-     tooltipItem Js.t,
-     chart Js.t) tooltip_cb Js.prop
-  (** Returns the colors to render for the tooltip item. *)
+    (** Returns the colors to render for the tooltip item. *)
+    method labelColor : (tooltip Js.t, tooltipItem Js.t, chart Js.t) tooltip_cb Js.prop
 
-  method labelTextColor :
-    (tooltip Js.t,
-     tooltipItem Js.t,
-     chart Js.t) tooltip_cb Js.prop
-  (** Returns the colors for the text of the label for the tooltip item. *)
+    (** Returns the colors for the text of the label for the tooltip item. *)
+    method labelTextColor :
+      (tooltip Js.t, tooltipItem Js.t, chart Js.t) tooltip_cb Js.prop
 
-  method afterLabel :
-    (tooltip Js.t,
-     tooltipItem Js.t,
-     data Js.t) tooltip_cb Js.prop
-  (** Returns text to render after an individual label. *)
+    (** Returns text to render after an individual label. *)
+    method afterLabel : (tooltip Js.t, tooltipItem Js.t, data Js.t) tooltip_cb Js.prop
 
-  method afterBody :
-    (tooltip Js.t,
-     tooltipItem Js.t Js.js_array Js.t,
-     data Js.t) tooltip_cb Js.prop
-  (** Returns text to render after the body section. *)
+    (** Returns text to render after the body section. *)
+    method afterBody :
+      (tooltip Js.t, tooltipItem Js.t Js.js_array Js.t, data Js.t) tooltip_cb Js.prop
 
-  method beforeFooter :
-    (tooltip Js.t,
-     tooltipItem Js.js_array Js.t,
-     data Js.t) tooltip_cb Js.prop
-  (** Returns text to render before the footer section. *)
+    (** Returns text to render before the footer section. *)
+    method beforeFooter :
+      (tooltip Js.t, tooltipItem Js.js_array Js.t, data Js.t) tooltip_cb Js.prop
 
-  method footer :
-    (tooltip Js.t,
-     tooltipItem Js.js_array Js.t,
-     data Js.t) tooltip_cb Js.prop
-  (** Returns text to render as the footer of the tooltip. *)
+    (** Returns text to render as the footer of the tooltip. *)
+    method footer :
+      (tooltip Js.t, tooltipItem Js.js_array Js.t, data Js.t) tooltip_cb Js.prop
 
-  method afterFooter :
-    (tooltip Js.t,
-     tooltipItem Js.js_array Js.t,
-     data Js.t) tooltip_cb Js.prop
     (** Text to render after the footer section. *)
-end
+    method afterFooter :
+      (tooltip Js.t, tooltipItem Js.js_array Js.t, data Js.t) tooltip_cb Js.prop
+  end
 
-and tooltip = object('self)
-  method enabled : bool Js.t Js.prop
-  (** Are on-canvas tooltips enabled. *)
+and tooltip =
+  object ('self)
+    (** Are on-canvas tooltips enabled. *)
+    method enabled : bool Js.t Js.prop
 
-  method custom : (tooltipModel Js.t -> unit) Js.callback Js.opt Js.prop
-  (** Custom tooltip callback. *)
+    (** Custom tooltip callback. *)
+    method custom : (tooltipModel Js.t -> unit) Js.callback Js.opt Js.prop
 
-  method mode : Interaction_mode.t Js.prop
-  (** Sets which elements appear in the tooltip. *)
+    (** Sets which elements appear in the tooltip. *)
+    method mode : Interaction_mode.t Js.t Js.prop
 
-  method intersect : bool Js.t Js.prop
-  (** If [true], the tooltip mode applies only when the mouse position
+    (** If [true], the tooltip mode applies only when the mouse position
       intersects with an element. If [false], the mode will be applied
       at all times. *)
+    method intersect : bool Js.t Js.prop
 
-  method axis : Hover_axis.t Js.prop
-  (** Defines which directions are used in calculating distances.
+    (** Defines which directions are used in calculating distances.
       Defaults to [x] for index mode and [xy] in [dataset] and [nearest]
       modes. *)
+    method axis : Hover_axis.t Js.t Js.prop
 
-  method position : Tooltip_position.t Js.prop
-  (** The mode for positioning the tooltip. *)
+    (** The mode for positioning the tooltip. *)
+    method position : Tooltip_position.t Js.prop
 
-  method callbacks : tooltipCallbacks Js.t Js.prop
-  (** Callbacks. *)
+    (** Callbacks. *)
+    method callbacks : tooltipCallbacks Js.t Js.prop
 
-  method itemSort :
-    ('self,
-     tooltipItem Js.t
-     -> tooltipItem Js.t
-     -> data Js.t
-     -> int) Js.meth_callback Js.optdef_prop
-  (** Sort tooltip items. *)
+    (** Sort tooltip items. *)
+    method itemSort :
+      ('self, tooltipItem Js.t -> tooltipItem Js.t -> data Js.t -> int) Js.meth_callback
+      Js.optdef_prop
 
-  method filter :
-    ('self,
-     tooltipItem Js.t
-     -> data Js.t
-     -> bool Js.t) Js.meth_callback Js.optdef_prop
-  (** Filter tooltip items. *)
+    (** Filter tooltip items. *)
+    method filter :
+      ('self, tooltipItem Js.t -> data Js.t -> bool Js.t) Js.meth_callback Js.optdef_prop
 
-  method backgroundColor : Color.t Js.t Js.prop
-  (** Background color of the tooltip. *)
+    (** Background color of the tooltip. *)
+    method backgroundColor : Color.t Js.t Js.prop
 
-  method titleFontFamily : Js.js_string Js.t Js.optdef_prop
-  (** Title font. *)
+    (** Title font. *)
+    method titleFontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method titleFontSize : int Js.optdef_prop
-  (** Title font size. *)
+    (** Title font size. *)
+    method titleFontSize : int Js.optdef_prop
 
-  method titleFontStyle : Js.js_string Js.t Js.optdef_prop
-  (** Title font style *)
+    (** Title font style *)
+    method titleFontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method titleFontColor : Color.t Js.t Js.optdef_prop
-  (** Title font color *)
+    (** Title font color *)
+    method titleFontColor : Color.t Js.t Js.optdef_prop
 
-  method titleSpacing : int Js.prop
-  (** Spacing to add to top and bottom of each title line. *)
+    (** Spacing to add to top and bottom of each title line. *)
+    method titleSpacing : int Js.prop
 
-  method titleMarginBottom : int Js.prop
-  (** Margin to add on bottom of title section. *)
+    (** Margin to add on bottom of title section. *)
+    method titleMarginBottom : int Js.prop
 
-  method bodyFontFamily : Js.js_string Js.t Js.optdef_prop
-  (** Body line font. *)
+    (** Body line font. *)
+    method bodyFontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method bodyFontSize : int Js.optdef_prop
-  (** Body font size. *)
+    (** Body font size. *)
+    method bodyFontSize : int Js.optdef_prop
 
-  method bodyFontStyle : Js.js_string Js.t Js.optdef_prop
-  (** Body font style. *)
+    (** Body font style. *)
+    method bodyFontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method bodyFontColor : Color.t Js.t Js.optdef_prop
-  (** Body font color. *)
+    (** Body font color. *)
+    method bodyFontColor : Color.t Js.t Js.optdef_prop
 
-  method bodySpacing : int Js.prop
-  (** Spacing to add to top and bottom of each tooltip item. *)
+    (** Spacing to add to top and bottom of each tooltip item. *)
+    method bodySpacing : int Js.prop
 
-  method footerFontFamily : Js.js_string Js.t Js.optdef_prop
-  (** Footer font. *)
+    (** Footer font. *)
+    method footerFontFamily : Js.js_string Js.t Js.optdef_prop
 
-  method footerFontSize : int Js.optdef_prop
-  (** Footer font size. *)
+    (** Footer font size. *)
+    method footerFontSize : int Js.optdef_prop
 
-  method footerFontStyle : Js.js_string Js.t Js.optdef_prop
-  (** Footer font style. *)
+    (** Footer font style. *)
+    method footerFontStyle : Js.js_string Js.t Js.optdef_prop
 
-  method footerFontColor : Color.t Js.t Js.optdef_prop
-  (** Footer font color. *)
+    (** Footer font color. *)
+    method footerFontColor : Color.t Js.t Js.optdef_prop
 
-  method footerSpacing : int Js.prop
-  (** Spacing to add to top and bottom of each footer line. *)
+    (** Spacing to add to top and bottom of each footer line. *)
+    method footerSpacing : int Js.prop
 
-  method footerMarginTop : int Js.prop
-  (** Margin to add before drawing the footer. *)
+    (** Margin to add before drawing the footer. *)
+    method footerMarginTop : int Js.prop
 
-  method xPadding : int Js.prop
-  (** Padding to add on left and right of tooltip. *)
+    (** Padding to add on left and right of tooltip. *)
+    method xPadding : int Js.prop
 
-  method yPadding : int Js.prop
-  (** Padding to add on top and bottom of tooltip. *)
+    (** Padding to add on top and bottom of tooltip. *)
+    method yPadding : int Js.prop
 
-  method caretPadding : int Js.prop
-  (** Extra distance to move the end of the tooltip arrow
+    (** Extra distance to move the end of the tooltip arrow
       away from the tooltip point. *)
+    method caretPadding : int Js.prop
 
-  method caretSize : int Js.prop
-  (** Size, in px, of the tooltip arrow. *)
+    (** Size, in px, of the tooltip arrow. *)
+    method caretSize : int Js.prop
 
-  method cornerRadius : int Js.prop
-  (** Radius of tooltip corner curves. *)
+    (** Radius of tooltip corner curves. *)
+    method cornerRadius : int Js.prop
 
-  method multyKeyBackground : Color.t Js.t Js.prop
-  (** Color to draw behind the colored boxes when multiple
+    (** Color to draw behind the colored boxes when multiple
       items are in the tooltip. *)
+    method multyKeyBackground : Color.t Js.t Js.prop
 
-  method displayColors : bool Js.t Js.prop
-  (** If [true], color boxes are shown in the tooltip. *)
+    (** If [true], color boxes are shown in the tooltip. *)
+    method displayColors : bool Js.t Js.prop
 
-  method borderColor : Color.t Js.t Js.prop
-  (** Color of the border. *)
+    (** Color of the border. *)
+    method borderColor : Color.t Js.t Js.prop
 
-  method borderWidth : int Js.prop
-  (** Size of the border. *)
-end
+    (** Size of the border. *)
+    method borderWidth : int Js.prop
+  end
 
 (** {2 Interactions} *)
 
-and hover = object
-  method mode : Interaction_mode.t Js.prop
-  (** Sets which elements appear in the tooltip. *)
+and hover =
+  object
+    (** Sets which elements appear in the tooltip. *)
+    method mode : Interaction_mode.t Js.t Js.prop
 
-  method intersect : bool Js.t Js.prop
-  (** If true, the hover mode only applies when the mouse
+    (** If true, the hover mode only applies when the mouse
       position intersects an item on the chart. *)
+    method intersect : bool Js.t Js.prop
 
-  method axis : Hover_axis.t Js.prop
-  (** Defines which directions are used in calculating distances.
+    (** Defines which directions are used in calculating distances.
       Defaults to [x] for index mode and [xy] in [dataset] and [nearest]
       modes. *)
+    method axis : Hover_axis.t Js.t Js.prop
 
-  method animationDuration : int Js.prop
-  (** Duration in milliseconds it takes to animate hover style changes. *)
-end
+    (** Duration in milliseconds it takes to animate hover style changes. *)
+    method animationDuration : int Js.prop
+  end
 
 (** {2 Elements} *)
 
-and pointElement = object
-  method radius : int Js.prop
-  (** Point radius. *)
+and pointElement =
+  object
+    (** Point radius. *)
+    method radius : int Js.prop
 
-  method pointStyle : Point_style.t Js.t Js.prop
-  (** Point style. *)
+    (** Point style. *)
+    method pointStyle : Point_style.t Js.t Js.prop
 
-  method rotation : int Js.optdef_prop
-  (** Point rotation (in degrees). *)
+    (** Point rotation (in degrees). *)
+    method rotation : int Js.optdef_prop
 
-  method backgroundColor : Color.t Js.t Js.prop
-  (** Point fill color. *)
+    (** Point fill color. *)
+    method backgroundColor : Color.t Js.t Js.prop
 
-  method borderWidth : int Js.prop
-  (** Point stroke width. *)
+    (** Point stroke width. *)
+    method borderWidth : int Js.prop
 
-  method borderColor : Color.t Js.t Js.prop
-  (** Point stroke color. *)
+    (** Point stroke color. *)
+    method borderColor : Color.t Js.t Js.prop
 
-  method hitRadius : int Js.prop
-  (** Extra radius added to point radius for hit detection. *)
+    (** Extra radius added to point radius for hit detection. *)
+    method hitRadius : int Js.prop
 
-  method hoverRadius : int Js.prop
-  (** Point radius when hovered. *)
+    (** Point radius when hovered. *)
+    method hoverRadius : int Js.prop
 
-  method hoverBorderWidth : int Js.prop
-  (** Stroke width when hovered. *)
-end
+    (** Stroke width when hovered. *)
+    method hoverBorderWidth : int Js.prop
+  end
 
-and lineElement = object
-  method tension : float Js.prop
-  (** Bézier curve tension (0 for no Bézier curves). *)
+and lineElement =
+  object
+    (** Bézier curve tension (0 for no Bézier curves). *)
+    method tension : float Js.prop
 
-  method backgroundColor : Color.t Js.t Js.prop
-  (** Line fill color. *)
+    (** Line fill color. *)
+    method backgroundColor : Color.t Js.t Js.prop
 
-  method borderWidth : int Js.prop
-  (** Line stroke width. *)
+    (** Line stroke width. *)
+    method borderWidth : int Js.prop
 
-  method borderColor : Color.t Js.t Js.prop
-  (** Line stroke color. *)
+    (** Line stroke color. *)
+    method borderColor : Color.t Js.t Js.prop
 
-  method borderCapStyle : Line_cap.t Js.prop
-  (** Line cap style. *)
+    (** Line cap style. *)
+    method borderCapStyle : Line_cap.t Js.t Js.prop
 
-  method borderDash : line_dash Js.prop
-  (** Line dash. *)
+    (** Line dash. *)
+    method borderDash : line_dash Js.prop
 
-  method borderDashOffset : line_dash_offset Js.prop
-  (** Line dash offset. *)
+    (** Line dash offset. *)
+    method borderDashOffset : line_dash_offset Js.prop
 
-  method borderJoinStyle : Line_join.t Js.prop
-  (** Line join style. *)
+    (** Line join style. *)
+    method borderJoinStyle : Line_join.t Js.t Js.prop
 
-  method capBezierPoints : bool Js.t Js.prop
-  (** [true] to keep Bézier control inside the chart,
+    (** [true] to keep Bézier control inside the chart,
       [false] for no restriction.*)
+    method capBezierPoints : bool Js.t Js.prop
 
-  method fill : Fill.t Js.t Js.prop
-  (** Fill location. *)
+    (** Fill location. *)
+    method fill : Fill.t Js.t Js.prop
 
-  method stepped : bool Js.t Js.optdef_prop
-  (** [true] to show the line as a stepped line (tension will be ignored). *)
-end
+    (** [true] to show the line as a stepped line (tension will be ignored). *)
+    method stepped : bool Js.t Js.optdef_prop
+  end
 
-and rectangleElement = object
-  method backgroundColor : Js.js_string Js.prop
-  (** Bar fill color. *)
+and rectangleElement =
+  object
+    (** Bar fill color. *)
+    method backgroundColor : Js.js_string Js.prop
 
-  method borderWidth : int Js.prop
-  (** Bar stroke width. *)
+    (** Bar stroke width. *)
+    method borderWidth : int Js.prop
 
-  method borderColor : Color.t Js.t Js.prop
-  (** Bar stroke color. *)
+    (** Bar stroke color. *)
+    method borderColor : Color.t Js.t Js.prop
 
-  method borderSkipped : Position.t Js.t Js.prop
-  (** Skipped (excluded) border: 'bottom', 'left', 'top' or 'right'. *)
-end
+    (** Skipped (excluded) border: 'bottom', 'left', 'top' or 'right'. *)
+    method borderSkipped : Position.t Js.t Js.prop
+  end
 
-and arcElement = object
-  method backgroundColor : Color.t Js.t Js.prop
-  (** Arc fill color. *)
+and arcElement =
+  object
+    (** Arc fill color. *)
+    method backgroundColor : Color.t Js.t Js.prop
 
-  method borderAlign : Js.js_string Js.t Js.prop
-  (** Arc stroke alignment. *)
+    (** Arc stroke alignment. *)
+    method borderAlign : Js.js_string Js.t Js.prop
 
-  method borderColor : Color.t Js.t Js.prop
-  (** Arc stroke color. *)
+    (** Arc stroke color. *)
+    method borderColor : Color.t Js.t Js.prop
 
-  method borderWidth : int Js.prop
-  (** Arc stroke width. *)
-end
+    (** Arc stroke width. *)
+    method borderWidth : int Js.prop
+  end
 
-and elements = object
-  method point : pointElement Js.t Js.prop
-  (** Point elements are used to represent the points
+and elements =
+  object
+    (** Point elements are used to represent the points
       in a line chart or a bubble chart. *)
+    method point : pointElement Js.t Js.prop
 
-  method line : lineElement Js.t Js.prop
-  (** Line elements are used to represent the line in a line chart. *)
+    (** Line elements are used to represent the line in a line chart. *)
+    method line : lineElement Js.t Js.prop
 
-  method rectangle : rectangleElement Js.t Js.prop
-  (** Rectangle elements are used to represent the bars in a bar chart. *)
+    (** Rectangle elements are used to represent the bars in a bar chart. *)
+    method rectangle : rectangleElement Js.t Js.prop
 
-  method arc : arcElement Js.t Js.prop
-  (** Arcs are used in the polar area, doughnut and pie charts. *)
-end
+    (** Arcs are used in the polar area, doughnut and pie charts. *)
+    method arc : arcElement Js.t Js.prop
+  end
 
 (** {2 Options} *)
 
-and chartSize = object
-  method width : int Js.readonly_prop
+and chartSize =
+  object
+    method width : int Js.readonly_prop
 
-  method height : int Js.readonly_prop
-end
+    method height : int Js.readonly_prop
+  end
 
 (** {2 Chart} *)
 
 (** The configuration is used to change how the chart behaves.
     There are properties to control styling, fonts, the legend, etc. *)
-and chartOptions = object
-
-  method _animation : animation Js.t Js.prop
-  (** Chart.js animates charts out of the box.
+and chartOptions =
+  object
+    (** Chart.js animates charts out of the box.
       A number of options are provided to configure how the animation
       looks and how long it takes. *)
+    method _animation : animation Js.t Js.prop
 
-  method layout : layout Js.t Js.prop
-  (** Layout configurations. *)
+    (** Layout configurations. *)
+    method layout : layout Js.t Js.prop
 
-  method legend : legend Js.t Js.prop
-  (** The chart legend displays data about the datasets
+    (** The chart legend displays data about the datasets
       that are appearing on the chart. *)
+    method legend : legend Js.t Js.prop
 
-  method title : title Js.t Js.prop
-  (** The chart title defines text to draw at the top of the chart. *)
+    (** The chart title defines text to draw at the top of the chart. *)
+    method title : title Js.t Js.prop
 
-  method hover : hover Js.t Js.prop
+    method hover : hover Js.t Js.prop
 
-  method tooltips : tooltip Js.t Js.prop
+    method tooltips : tooltip Js.t Js.prop
 
-  method elements : elements Js.t Js.prop
-  (** While chart types provide settings to configure the styling
+    (** While chart types provide settings to configure the styling
       of each dataset, you sometimes want to style all datasets the same way.
       A common example would be to stroke all of the bars in a bar chart with
       the same colour but change the fill per dataset.
@@ -1755,114 +1818,117 @@ and chartOptions = object
       points, and rectangles. When set, these options apply to all objects
       of that type unless specifically overridden by the configuration attached
       to a dataset. *)
+    method elements : elements Js.t Js.prop
 
-  method plugins : 'a Js.t Js.prop
-  (** Plugins are the most efficient way to customize or change the default
+    (** Plugins are the most efficient way to customize or change the default
       behavior of a chart. This option allows to define plugins directly in
       the chart [plugins] config (a.k.a. inline plugins). *)
+    method plugins : 'a Js.t Js.prop
 
-  method legendCallback : (chart Js.t -> Js.js_string Js.t) Js.callback Js.optdef_prop
-  (** Sometimes you need a very complex legend. In these cases, it makes sense
+    (** Sometimes you need a very complex legend. In these cases, it makes sense
       to generate an HTML legend. Charts provide a generateLegend() method on their
       prototype that returns an HTML string for the legend.
       NOTE [legendCallback] is not called automatically and you must call
       [generateLegend] yourself in code when creating a legend using this method. *)
+    method legendCallback : (chart Js.t -> Js.js_string Js.t) Js.callback Js.optdef_prop
 
-  method responsive : bool Js.t Js.prop
-  (** Resizes the chart canvas when its container does. *)
+    (** Resizes the chart canvas when its container does. *)
+    method responsive : bool Js.t Js.prop
 
-  method responsiveAnimationDuration : int Js.prop
-  (** Duration in milliseconds it takes to animate
+    (** Duration in milliseconds it takes to animate
       to new size after a resize event. *)
+    method responsiveAnimationDuration : int Js.prop
 
-  method maintainAspectRatio : bool Js.t Js.prop
-  (** Maintain the original canvas aspect ratio (width / height) when resizing. *)
+    (** Maintain the original canvas aspect ratio (width / height) when resizing. *)
+    method maintainAspectRatio : bool Js.t Js.prop
 
-  method aspectRatio : float Js.optdef_prop
-  (** Canvas aspect ratio (i.e. width / height, a value of 1
+    (** Canvas aspect ratio (i.e. width / height, a value of 1
       representing a square canvas). Note that this option is
       ignored if the height is explicitly defined either as
       attribute or via the style. *)
+    method aspectRatio : float Js.optdef_prop
 
-  method onResize :
-    (chart Js.t
-     -> chartSize Js.t
-     -> unit) Js.callback Js.opt Js.optdef_prop
-  (** Called when a resize occurs. Gets passed two arguments:
+    (** Called when a resize occurs. Gets passed two arguments:
       the chart instance and the new size. *)
+    method onResize :
+      (chart Js.t -> chartSize Js.t -> unit) Js.callback Js.opt Js.optdef_prop
 
-  method devicePixelRatio : float Js.optdef_prop
-  (** Override the window's default devicePixelRatio. *)
+    (** Override the window's default devicePixelRatio. *)
+    method devicePixelRatio : float Js.optdef_prop
 
-  method events : Js.js_string Js.t Js.js_array Js.t Js.prop
-  (** The events option defines the browser events that
+    (** The events option defines the browser events that
       the chart should listen to for tooltips and hovering. *)
+    method events : Js.js_string Js.t Js.js_array Js.t Js.prop
 
-  method onHover :
-    (chart Js.t, Dom_html.event Js.t
-     -> 'a Js.t Js.js_array Js.t
-     -> unit)
-      Js.meth_callback Js.opt Js.optdef_prop
-  (** Called when any of the events fire.
+    (** Called when any of the events fire.
       Called in the context of the chart and passed the event
       and an array of active elements (bars, points, etc). *)
+    method onHover :
+      ( chart Js.t
+      , Dom_html.event Js.t -> 'a Js.t Js.js_array Js.t -> unit )
+      Js.meth_callback
+      Js.opt
+      Js.optdef_prop
 
-  method onClick :
-    (chart Js.t, Dom_html.event Js.t
-     -> 'a Js.t Js.js_array Js.t
-     -> unit)
-      Js.meth_callback Js.opt Js.optdef_prop
-      (** Called if the event is of type 'mouseup' or 'click'.
+    (** Called if the event is of type 'mouseup' or 'click'.
           Called in the context of the chart and passed the event
           and an array of active elements. *)
-end
+    method onClick :
+      ( chart Js.t
+      , Dom_html.event Js.t -> 'a Js.t Js.js_array Js.t -> unit )
+      Js.meth_callback
+      Js.opt
+      Js.optdef_prop
+  end
 
-and chartConfig = object
-  method data : data Js.t Js.prop
+and chartConfig =
+  object
+    method data : data Js.t Js.prop
 
-  method options : chartOptions Js.t Js.prop
+    method options : chartOptions Js.t Js.prop
 
-  method _type : Js.js_string Js.t Js.prop
-end
+    method _type : Js.js_string Js.t Js.prop
+  end
 
-and chart = object('self)
-  method id : int Js.readonly_prop
+and chart =
+  object ('self)
+    method id : int Js.readonly_prop
 
-  method height : int Js.readonly_prop
+    method height : int Js.readonly_prop
 
-  method width : int Js.readonly_prop
+    method width : int Js.readonly_prop
 
-  method offsetX : int Js.readonly_prop
+    method offsetX : int Js.readonly_prop
 
-  method offsetY : int Js.readonly_prop
+    method offsetY : int Js.readonly_prop
 
-  method borderWidth : int Js.readonly_prop
+    method borderWidth : int Js.readonly_prop
 
-  method animating : bool Js.t Js.readonly_prop
+    method animating : bool Js.t Js.readonly_prop
 
-  method aspectRatio : float Js.readonly_prop
+    method aspectRatio : float Js.readonly_prop
 
-  method canvas : Dom_html.canvasElement Js.t Js.readonly_prop
+    method canvas : Dom_html.canvasElement Js.t Js.readonly_prop
 
-  method ctx : Dom_html.canvasRenderingContext2D Js.t Js.readonly_prop
+    method ctx : Dom_html.canvasRenderingContext2D Js.t Js.readonly_prop
 
-  method data : data Js.t Js.prop
+    method data : data Js.t Js.prop
 
-  method _options : chartOptions Js.t Js.prop
+    method _options : chartOptions Js.t Js.prop
 
-  method _config : chartConfig Js.t Js.prop
+    method _config : chartConfig Js.t Js.prop
 
-  (** {2 Chart API}*)
+    (** {2 Chart API}*)
 
-  method destroy : unit Js.meth
-  (** Use this to destroy any chart instances that are created.
+    (** Use this to destroy any chart instances that are created.
       This will clean up any references stored to the chart object within Chart.js,
       along with any associated event listeners attached by Chart.js.
       This must be called before the canvas is reused for a new chart. *)
+    method destroy : unit Js.meth
 
-  method update : unit Js.meth
-  method update_withConfig : #updateConfig Js.t -> unit Js.meth
-  (** Triggers an update of the chart.
+    method update : unit Js.meth
+
+    (** Triggers an update of the chart.
       This can be safely called after updating the data object.
       This will update all scales, legends, and then re-render the chart.
       A config object can be provided with additional configuration for
@@ -1872,225 +1938,230 @@ and chart = object('self)
       [duration]: Time for the animation of the redraw in milliseconds
       [lazy]: If [true], the animation can be interrupted by other animations
       [easing]: The animation easing function. *)
+    method update_withConfig : #updateConfig Js.t -> unit Js.meth
 
-  method reset : unit Js.meth
-  (** Reset the chart to it's state before the initial animation.
+    (** Reset the chart to it's state before the initial animation.
       A new animation can then be triggered using [update]. *)
+    method reset : unit Js.meth
 
-  method render : unit Js.meth
-  method render_withConfig : #updateConfig Js.t -> unit Js.meth
-  (** Triggers a redraw of all chart elements.
+    method render : unit Js.meth
+
+    (** Triggers a redraw of all chart elements.
       Note, this does not update elements for new data.
       Use [update] in that case.
       See [update_withConfig] for more details on the config object. *)
+    method render_withConfig : #updateConfig Js.t -> unit Js.meth
 
-  method stop : 'self Js.t Js.meth
-  (** Use this to stop any current animation loop.
+    (** Use this to stop any current animation loop.
       This will pause the chart during any current animation frame.
       Call [render] to re-animate. *)
+    method stop : 'self Js.t Js.meth
 
-  method resize : 'self Js.t Js.meth
-  (** Use this to manually resize the canvas element.
+    (** Use this to manually resize the canvas element.
       This is run each time the canvas container is resized,
       but you can call this method manually if you change the size
       of the canvas nodes container element. *)
+    method resize : 'self Js.t Js.meth
 
-  method clear : 'self Js.t Js.meth
-  (** Will clear the chart canvas. Used extensively internally between
+    (** Will clear the chart canvas. Used extensively internally between
       animation frames, but you might find it useful. *)
+    method clear : 'self Js.t Js.meth
 
-  method toBase64Image : Js.js_string Js.t Js.meth
-  (** This returns a base 64 encoded string of the chart in it's current state. *)
+    (** This returns a base 64 encoded string of the chart in it's current state. *)
+    method toBase64Image : Js.js_string Js.t Js.meth
 
-  method generateLegend : Js.js_string Js.t Js.meth
-  (** Returns an HTML string of a legend for that chart.
+    (** Returns an HTML string of a legend for that chart.
       The legend is generated from the legendCallback in the options. *)
+    method generateLegend : Js.js_string Js.t Js.meth
 
-  method getDatasetMeta : int -> 'a Js.t Js.meth
-  (** Looks for the dataset that matches the current index and returns that metadata.
+    (** Looks for the dataset that matches the current index and returns that metadata.
       This returned data has all of the metadata that is used to construct the chart.
       The [data] property of the metadata will contain information about each point,
       rectangle, etc. depending on the chart type. *)
-end
+    method getDatasetMeta : int -> 'a Js.t Js.meth
+  end
 
-val create_animation : unit -> animation Js.t
+val empty_animation : unit -> animation Js.t
 
-val create_layout : unit -> layout Js.t
+val empty_layout : unit -> layout Js.t
 
-val create_legend_labels : unit -> legendLabels Js.t
+val empty_legend_labels : unit -> legendLabels Js.t
 
-val create_legend : unit -> legend Js.t
+val empty_legend : unit -> legend Js.t
 
-val create_title : unit -> title Js.t
+val empty_title : unit -> title Js.t
 
-val create_tooltip_model : unit -> tooltipModel Js.t
+val empty_tooltip_model : unit -> tooltipModel Js.t
 
-val create_tooltip_callbacks : unit -> tooltipCallbacks Js.t
+val empty_tooltip_callbacks : unit -> tooltipCallbacks Js.t
 
-val create_tooltip : unit -> tooltip Js.t
+val empty_tooltip : unit -> tooltip Js.t
 
-val create_hover : unit -> hover Js.t
+val empty_hover : unit -> hover Js.t
 
-val create_point_element : unit -> pointElement Js.t
+val empty_point_element : unit -> pointElement Js.t
 
-val create_line_element : unit -> lineElement Js.t
+val empty_line_element : unit -> lineElement Js.t
 
-val create_rectangle_element : unit -> rectangleElement Js.t
+val empty_rectangle_element : unit -> rectangleElement Js.t
 
-val create_arc_element : unit -> arcElement Js.t
+val empty_arc_element : unit -> arcElement Js.t
 
-val create_elements : unit -> elements Js.t
+val empty_elements : unit -> elements Js.t
 
-val create_update_config :
-  ?duration:int
-  -> ?_lazy:bool
-  -> ?easing:Easing.t
-  -> unit
-  -> updateConfig Js.t
+val empty_update_config : unit -> updateConfig Js.t
 
 (** {1 Charts} *)
 
 (** {2 Line Chart} *)
 
-class type ['a] lineOptionContext = object
-  method chart : lineChart Js.t Js.readonly_prop
+class type ['a] lineOptionContext =
+  object
+    method chart : lineChart Js.t Js.readonly_prop
 
-  method dataIndex : int Js.readonly_prop
+    method dataIndex : int Js.readonly_prop
 
-  method dataset : 'a lineDataset Js.t Js.readonly_prop
+    method dataset : 'a lineDataset Js.t Js.readonly_prop
 
-  method datasetIndex : int Js.readonly_prop
-end
+    method datasetIndex : int Js.readonly_prop
+  end
 
-and lineScales = object
-  method xAxes : #cartesianAxis Js.t Js.js_array Js.t Js.prop
+and lineScales =
+  object
+    method xAxes : #cartesianAxis Js.t Js.js_array Js.t Js.prop
 
-  method yAxes : #cartesianAxis Js.t Js.js_array Js.t Js.prop
-end
+    method yAxes : #cartesianAxis Js.t Js.js_array Js.t Js.prop
+  end
 
-and lineOptions = object
-  inherit chartOptions
+and lineOptions =
+  object
+    inherit chartOptions
 
-  method animation : animation Js.t Js.prop
+    method animation : animation Js.t Js.prop
 
-  method scales : lineScales Js.t Js.prop
+    method scales : lineScales Js.t Js.prop
 
-  method showLines : bool Js.t Js.prop
-  (** If [false], the lines between points are not drawn. *)
+    (** If [false], the lines between points are not drawn. *)
+    method showLines : bool Js.t Js.prop
 
-  method spanGaps : bool Js.t Js.prop
-  (** If [false], NaN data causes a break in the line. *)
-end
+    (** If [false], NaN data causes a break in the line. *)
+    method spanGaps : bool Js.t Js.prop
+  end
 
-and lineConfig = object
-  method data : data Js.t Js.prop
+and lineConfig =
+  object
+    method data : data Js.t Js.prop
 
-  method options : lineOptions Js.t Js.prop
+    method options : lineOptions Js.t Js.prop
 
-  method _type : Js.js_string Js.t Js.prop
-end
+    method _type : Js.js_string Js.t Js.prop
+  end
 
-and ['a] lineDataset = object
-  inherit dataset
+and ['a] lineDataset =
+  object
+    inherit dataset
 
-  method data : 'a Js.js_array Js.t Js.prop
+    method data : 'a Js.js_array Js.t Js.prop
 
-  (** {2 General} *)
+    (** {2 General} *)
 
-  method xAxisID : Js.js_string Js.t Js.optdef_prop
-  (** The ID of the x axis to plot this dataset on. *)
+    (** The ID of the x axis to plot this dataset on. *)
+    method xAxisID : Js.js_string Js.t Js.optdef_prop
 
-  method yAxisID : Js.js_string Js.t Js.optdef_prop
-  (** The ID of the y axis to plot this dataset on. *)
+    (** The ID of the y axis to plot this dataset on. *)
+    method yAxisID : Js.js_string Js.t Js.optdef_prop
 
-  (** {2 Point styling} *)
+    (** {2 Point styling} *)
 
-  method pointBackgroundColor :
-    ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** The fill color for points. *)
+    (** The fill color for points. *)
+    method pointBackgroundColor :
+      ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t
+      Js.optdef_prop
 
-  method pointBorderColor :
-    ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** The border color for points. *)
+    (** The border color for points. *)
+    method pointBorderColor :
+      ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t
+      Js.optdef_prop
 
-  method pointBorderWidth :
-    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** The width of the point border in pixels. *)
+    (** The width of the point border in pixels. *)
+    method pointBorderWidth :
+      ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method pointHitRadius :
-    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** The pixel size of the non-displayed point that reacts to mouse events. *)
+    (** The pixel size of the non-displayed point that reacts to mouse events. *)
+    method pointHitRadius :
+      ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method pointRadius :
-    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** The radius of the point shape. If set to 0, the point is not rendered. *)
+    (** The radius of the point shape. If set to 0, the point is not rendered. *)
+    method pointRadius :
+      ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method pointRotation :
-    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** The rotation of the point in degrees. *)
+    (** The rotation of the point in degrees. *)
+    method pointRotation :
+      ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method pointStyle : Point_style.t Js.t Js.optdef_prop
-  (** Style of the point. *)
+    (** Style of the point. *)
+    method pointStyle : Point_style.t Js.t Js.optdef_prop
 
-  (** {2 Line styling} *)
+    (** {2 Line styling} *)
 
-  method backgroundColor : Color.t Js.t Js.optdef_prop
-  (** The line fill color. *)
+    (** The line fill color. *)
+    method backgroundColor : Color.t Js.t Js.optdef_prop
 
-  method borderCapStyle : Line_cap.t Js.optdef_prop
-  (** Cap style of the line. *)
+    (** Cap style of the line. *)
+    method borderCapStyle : Line_cap.t Js.t Js.optdef_prop
 
-  method borderColor : Color.t Js.t Js.optdef_prop
-  (** The line color. *)
+    (** The line color. *)
+    method borderColor : Color.t Js.t Js.optdef_prop
 
-  method borderDash : line_dash Js.optdef_prop
-  (** Length and spacing of dashes. *)
+    (** Length and spacing of dashes. *)
+    method borderDash : line_dash Js.optdef_prop
 
-  method borderDashOffset : line_dash_offset Js.optdef_prop
-  (** Offset for line dashes. *)
+    (** Offset for line dashes. *)
+    method borderDashOffset : line_dash_offset Js.optdef_prop
 
-  method borderJoinStyle : Line_join.t Js.optdef_prop
-  (** Line joint style. *)
+    (** Line joint style. *)
+    method borderJoinStyle : Line_join.t Js.t Js.optdef_prop
 
-  method borderWidth : int Js.optdef_prop
-  (** The line width (in pixels). *)
+    (** The line width (in pixels). *)
+    method borderWidth : int Js.optdef_prop
 
-  method fill : Line_fill.t Js.t Js.optdef_prop
-  (** How to fill the area under the line. *)
+    (** How to fill the area under the line. *)
+    method fill : Line_fill.t Js.t Js.optdef_prop
 
-  method lineTension : float Js.optdef_prop
-  (** Bezier curve tension of the line. Set to 0 to draw straightlines.
+    (** Bezier curve tension of the line. Set to 0 to draw straightlines.
       This option is ignored if monotone cubic interpolation is used. *)
+    method lineTension : float Js.optdef_prop
 
-  method showLine : bool Js.t Js.optdef_prop
-  (** If [false], the line is not drawn for this dataset. *)
+    (** If [false], the line is not drawn for this dataset. *)
+    method showLine : bool Js.t Js.optdef_prop
 
-  method spanGaps : bool Js.t Js.optdef_prop
-  (** If [true], lines will be drawn between points with no or null data.
+    (** If [true], lines will be drawn between points with no or null data.
       If [false], points with NaN data will create a break in the line. *)
+    method spanGaps : bool Js.t Js.optdef_prop
 
-  (** {2 Interactions} *)
+    (** {2 Interactions} *)
 
-  method pointHoverBackgroundColor :
-    ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** Point background color when hovered. *)
+    (** Point background color when hovered. *)
+    method pointHoverBackgroundColor :
+      ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t
+      Js.optdef_prop
 
-  method pointHoverBorderColor :
-    ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** Point border color when hovered. *)
+    (** Point border color when hovered. *)
+    method pointHoverBorderColor :
+      ('a lineOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t
+      Js.optdef_prop
 
-  method pointHoverBorderWidth :
-    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** Border width of point when hovered. *)
+    (** Border width of point when hovered. *)
+    method pointHoverBorderWidth :
+      ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method pointHoverRadius :
-    ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** The radius of the point when hovered. *)
+    (** The radius of the point when hovered. *)
+    method pointHoverRadius :
+      ('a lineOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  (** {2 Cubic Interpolation Mode} *)
+    (** {2 Cubic Interpolation Mode} *)
 
-  method cubicInterpolationMode : Interpolation_mode.t Js.optdef_prop
-  (** The [default] and [monotone] interpolation modes are supported.
+    (** The [default] and [monotone] interpolation modes are supported.
       The [default] algorithm uses a custom weighted cubic interpolation,
       which produces pleasant curves for all types of datasets.
       The [monotone] algorithm is more suited to [y = f(x)] datasets : it preserves
@@ -2098,11 +2169,11 @@ and ['a] lineDataset = object
       and ensures local extremums (if any) stay at input data points.
       If left untouched (undefined), the global
       [options.elements.line.cubicInterpolationMode] property is used. *)
+    method cubicInterpolationMode : Interpolation_mode.t Js.t Js.optdef_prop
 
-  (** {2 Stepped Line} *)
+    (** {2 Stepped Line} *)
 
-  method steppedLine : Stepped_line.t Js.t Js.optdef_prop
-  (** The following values are supported for steppedLine.
+    (** The following values are supported for steppedLine.
       [false]: No Step Interpolation (default)
       [true]: Step-before Interpolation (eq. 'before')
       ['before']: Step-before Interpolation
@@ -2110,127 +2181,140 @@ and ['a] lineDataset = object
       ['middle']: Step-middle Interpolation
       If the [steppedLine] value is set to anything other than [false],
       [lineTension] will be ignored.*)
-end
+    method steppedLine : Stepped_line.t Js.t Js.optdef_prop
+  end
 
-and lineChart = object
-  inherit chart
+and lineChart =
+  object
+    inherit chart
 
-  method options : lineOptions Js.t Js.prop
+    method options : lineOptions Js.t Js.prop
 
-  method config : lineConfig Js.t Js.prop
-end
+    method config : lineConfig Js.t Js.prop
+  end
 
-val create_line_scales : unit -> lineScales Js.t
+val empty_line_scales : unit -> lineScales Js.t
 
-val create_line_options : unit -> lineOptions Js.t
+val empty_line_options : unit -> lineOptions Js.t
 
-val create_line_dataset : unit -> 'a lineDataset Js.t
+val empty_line_dataset : unit -> 'a lineDataset Js.t
 
 (** {2 Bar Chart} *)
 
-class type barAxis = object
-  method barPercentage : float Js.prop
-  (** Percent (0-1) of the available width each bar should be within
+class type barAxis =
+  object
+    (** Percent (0-1) of the available width each bar should be within
       the category width. 1.0 will take the whole category width and
       put the bars right next to each other. *)
+    method barPercentage : float Js.prop
 
-  method categoryPercentage : float Js.prop
-  (** Percent (0-1) of the available width each category should be within
+    (** Percent (0-1) of the available width each category should be within
       the sample width. *)
+    method categoryPercentage : float Js.prop
 
-  method barThickness : Bar_thickness.t Js.t Js.optdef_prop
-  (** Manually set width of each bar in pixels. If set to 'flex',
+    (** Manually set width of each bar in pixels. If set to 'flex',
       it computes "optimal" sample widths that globally arrange bars side by side.
       If not set (default), bars are equally sized based on the smallest interval. *)
+    method barThickness : Bar_thickness.t Js.t Js.optdef_prop
 
-  method maxBarThickness : float Js.optdef_prop
-  (** Set this to ensure that bars are not sized thicker than this. *)
+    (** Set this to ensure that bars are not sized thicker than this. *)
+    method maxBarThickness : float Js.optdef_prop
 
-  method minBarLength : float Js.optdef_prop
-  (** Set this to ensure that bars have a minimum length in pixels. *)
+    (** Set this to ensure that bars have a minimum length in pixels. *)
+    method minBarLength : float Js.optdef_prop
 
-  method stacked : bool Js.t Js.optdef_prop
-end
+    method stacked : bool Js.t Js.optdef_prop
+  end
 
-class type cateroryBarAxis = object
-  inherit categoryCartesianAxis
-  inherit barAxis
-end
+class type cateroryBarAxis =
+  object
+    inherit categoryAxis
 
-class type linearBarAxis = object
-  inherit linearCartesianAxis
-  inherit barAxis
-end
+    inherit barAxis
+  end
 
-class type logarithmicBarAxis = object
-  inherit logarithmicCartesianAxis
-  inherit barAxis
-end
+class type linearBarAxis =
+  object
+    inherit linearAxis
 
-class type timeBarAxis = object
-  inherit timeCartesianAxis
-  inherit barAxis
-end
+    inherit barAxis
+  end
 
-class type barScales = object
-  method xAxes : #barAxis Js.t Js.js_array Js.t Js.prop
+class type logarithmicBarAxis =
+  object
+    inherit logarithmicAxis
 
-  method yAxes : #barAxis Js.t Js.js_array Js.t Js.prop
-end
+    inherit barAxis
+  end
 
-class type ['a] barOptionContext = object
-  method chart : barChart Js.t Js.readonly_prop
+class type timeBarAxis =
+  object
+    inherit timeAxis
 
-  method dataIndex : int Js.readonly_prop
+    inherit barAxis
+  end
 
-  method dataset : 'a barDataset Js.t Js.readonly_prop
+class type barScales =
+  object
+    method xAxes : #barAxis Js.t Js.js_array Js.t Js.prop
 
-  method datasetIndex : int Js.readonly_prop
-end
+    method yAxes : #barAxis Js.t Js.js_array Js.t Js.prop
+  end
 
-and barOptions = object
-  inherit chartOptions
+class type ['a] barOptionContext =
+  object
+    method chart : barChart Js.t Js.readonly_prop
 
-  method animation : animation Js.t Js.prop
+    method dataIndex : int Js.readonly_prop
 
-  method scales : barScales Js.t Js.prop
-end
+    method dataset : 'a barDataset Js.t Js.readonly_prop
 
-and barConfig = object
-  method data : data Js.t Js.prop
+    method datasetIndex : int Js.readonly_prop
+  end
 
-  method options : barOptions Js.t Js.prop
+and barOptions =
+  object
+    inherit chartOptions
 
-  method _type : Js.js_string Js.t Js.prop
-end
+    method animation : animation Js.t Js.prop
 
-and ['a] barDataset = object
-  inherit dataset
+    method scales : barScales Js.t Js.prop
+  end
 
-  method data : 'a Js.js_array Js.t Js.prop
+and barConfig =
+  object
+    method data : data Js.t Js.prop
 
-  (** {2 General} *)
+    method options : barOptions Js.t Js.prop
 
-  method xAxisID : Js.js_string Js.t Js.optdef_prop
-  (** The ID of the x axis to plot this dataset on. *)
+    method _type : Js.js_string Js.t Js.prop
+  end
 
-  method yAxisID : Js.js_string Js.t Js.optdef_prop
-  (** The ID of the y axis to plot this dataset on. *)
+and ['a] barDataset =
+  object
+    inherit dataset
 
-  (** {2 Styling} *)
+    method data : 'a Js.js_array Js.t Js.prop
 
-  method backgroundColor :
-    ('a barOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** The bar background color. *)
+    (** {2 General} *)
 
-  method borderColor :
-    ('a barOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** The bar border color. *)
+    (** The ID of the x axis to plot this dataset on. *)
+    method xAxisID : Js.js_string Js.t Js.optdef_prop
 
-  method borderSkipped :
-    ('a barOptionContext Js.t, Position.t Js.t Or_false.t Js.t) Scriptable_indexable.t Js.t
-      Js.optdef_prop
-  (** The edge to skip when drawing bar.
+    (** The ID of the y axis to plot this dataset on. *)
+    method yAxisID : Js.js_string Js.t Js.optdef_prop
+
+    (** {2 Styling} *)
+
+    (** The bar background color. *)
+    method backgroundColor :
+      ('a barOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
+
+    (** The bar border color. *)
+    method borderColor :
+      ('a barOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
+
+    (** The edge to skip when drawing bar.
       This setting is used to avoid drawing the bar stroke at the base of the fill.
       In general, this does not need to be changed except when creating chart types
       that derive from a bar chart.
@@ -2242,177 +2326,188 @@ and ['a] barDataset = object
       ['top'],
       ['right'],
       [false] *)
-
-  method borderWidth :
-    ('a barOptionContext Js.t, Padding.t Js.t) Scriptable_indexable.t Js.t
+    method borderSkipped :
+      ('a barOptionContext Js.t, Position.t Js.t Or_false.t Js.t) Scriptable_indexable.t
+      Js.t
       Js.optdef_prop
-  (** The bar border width (in pixels).
+
+    (** The bar border width (in pixels).
       If this value is a number, it is applied to all sides of the rectangle
       (left, top, right, bottom), except [borderSkipped]. If this value is
       an object, the [left] property defines the left border width. Similarly
       the [right], [top] and [bottom] properties can also be specified.
       Omitted borders and [borderSkipped] are skipped. *)
+    method borderWidth :
+      ('a barOptionContext Js.t, Padding.t Js.t) Scriptable_indexable.t Js.t
+      Js.optdef_prop
 
-  (** {2 Interactions}
+    (** {2 Interactions}
       All these values, if undefined, fallback to the associated
       [elements.rectangle.*] options. *)
 
-  method hoverBackgroundColor : Color.t Js.t Indexable.t Js.t Js.optdef_prop
-  (** The bar background color when hovered. *)
+    (** The bar background color when hovered. *)
+    method hoverBackgroundColor : Color.t Js.t Indexable.t Js.t Js.optdef_prop
 
-  method hoverBorderColor : Color.t Js.t Indexable.t Js.t Js.optdef_prop
-  (** The bar border color when hovered. *)
+    (** The bar border color when hovered. *)
+    method hoverBorderColor : Color.t Js.t Indexable.t Js.t Js.optdef_prop
 
-  method hoverBorderWidth : Color.t Js.t Indexable.t Js.t Js.optdef_prop
-  (** The bar border width when hovered (in pixels). *)
+    (** The bar border width when hovered (in pixels). *)
+    method hoverBorderWidth : Color.t Js.t Indexable.t Js.t Js.optdef_prop
 
-  method stack : Js.js_string Js.t Js.optdef_prop
-  (** The ID of the group to which this dataset belongs to
+    (** The ID of the group to which this dataset belongs to
       (when stacked, each group will be a separate stack). *)
-end
+    method stack : Js.js_string Js.t Js.optdef_prop
+  end
 
-and barChart = object
-  inherit chart
+and barChart =
+  object
+    inherit chart
 
-  method options : barOptions Js.t Js.prop
+    method options : barOptions Js.t Js.prop
 
-  method config : barConfig Js.t Js.prop
-end
+    method config : barConfig Js.t Js.prop
+  end
 
-val create_category_bar_axis : unit -> cateroryBarAxis Js.t
+val empty_bar_axis : unit -> cateroryBarAxis Js.t
 
-val create_linear_bar_axis : unit -> linearBarAxis Js.t
+val empty_linear_bar_axis : unit -> linearBarAxis Js.t
 
-val create_logarithmic_bar_axis : unit -> logarithmicBarAxis Js.t
+val empty_logarithmic_bar_axis : unit -> logarithmicBarAxis Js.t
 
-val create_time_bar_axis : unit -> timeBarAxis Js.t
+val empty_time_bar_axis : unit -> timeBarAxis Js.t
 
-val create_bar_scales : unit -> barScales Js.t
+val empty_bar_scales : unit -> barScales Js.t
 
-val create_bar_options : unit -> barOptions Js.t
+val empty_bar_options : unit -> barOptions Js.t
 
-val create_bar_dataset : unit -> 'a barDataset Js.t
+val empty_bar_dataset : unit -> 'a barDataset Js.t
 
 (** {2 Pie Chart} *)
 
-class type ['a] pieOptionContext = object
-  method chart : pieChart Js.t Js.readonly_prop
+class type ['a] pieOptionContext =
+  object
+    method chart : pieChart Js.t Js.readonly_prop
 
-  method dataIndex : int Js.readonly_prop
+    method dataIndex : int Js.readonly_prop
 
-  method dataset : 'a pieDataset Js.t Js.readonly_prop
+    method dataset : 'a pieDataset Js.t Js.readonly_prop
 
-  method datasetIndex : int Js.readonly_prop
-end
+    method datasetIndex : int Js.readonly_prop
+  end
 
-and pieAnimation = object
-  inherit animation
+and pieAnimation =
+  object
+    inherit animation
 
-  method animateRotate : bool Js.t Js.prop
-  (** If [true], the chart will animate in with a rotation animation. *)
+    (** If [true], the chart will animate in with a rotation animation. *)
+    method animateRotate : bool Js.t Js.prop
 
-  method animateScale : bool Js.t Js.prop
-  (** If true, will animate scaling the chart from the center outwards. *)
-end
+    (** If true, will animate scaling the chart from the center outwards. *)
+    method animateScale : bool Js.t Js.prop
+  end
 
-and pieOptions = object
-  inherit chartOptions
+and pieOptions =
+  object
+    inherit chartOptions
 
-  method animation : pieAnimation Js.t Js.prop
+    method animation : pieAnimation Js.t Js.prop
 
-  method cutoutPercentage : float Js.prop
-  (** The percentage of the chart that is cut out of the middle. *)
+    (** The percentage of the chart that is cut out of the middle. *)
+    method cutoutPercentage : float Js.prop
 
-  method rotation : float Js.prop
-  (** Starting angle to draw arcs from. *)
+    (** Starting angle to draw arcs from. *)
+    method rotation : float Js.prop
 
-  method circumference : float Js.prop
-  (** Sweep to allow arcs to cover. *)
-end
+    (** Sweep to allow arcs to cover. *)
+    method circumference : float Js.prop
+  end
 
-and pieConfig = object
-  method data : data Js.t Js.prop
+and pieConfig =
+  object
+    method data : data Js.t Js.prop
 
-  method options : pieOptions Js.t Js.prop
+    method options : pieOptions Js.t Js.prop
 
-  method _type : Js.js_string Js.t Js.prop
-end
+    method _type : Js.js_string Js.t Js.prop
+  end
 
-and ['a] pieDataset = object
-  inherit dataset
+and ['a] pieDataset =
+  object
+    inherit dataset
 
-  method data : 'a Js.js_array Js.t Js.prop
+    method data : 'a Js.js_array Js.t Js.prop
 
-  (** {2 Styling} *)
+    (** {2 Styling} *)
 
-  method backgroundColor :
-    ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** Arc background color. *)
+    (** Arc background color. *)
+    method backgroundColor :
+      ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method borderColor :
-    ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** Arc border color. *)
+    (** Arc border color. *)
+    method borderColor :
+      ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method borderWidth :
-    ('a pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** Arc border width (in pixels). *)
+    (** Arc border width (in pixels). *)
+    method borderWidth :
+      ('a pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method weight : float Js.optdef_prop
-  (** The relative thickness of the dataset.
+    (** The relative thickness of the dataset.
       Providing a value for weight will cause the pie or doughnut dataset
       to be drawn with a thickness relative to the sum of all the dataset
       weight values. *)
+    method weight : float Js.optdef_prop
 
-  (** {2 Interactions} *)
+    (** {2 Interactions} *)
 
-  method hoverBackgroundColor :
-    ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** Arc background color when hovered. *)
+    (** Arc background color when hovered. *)
+    method hoverBackgroundColor :
+      ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method hoverBorderColor :
-    ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** Arc border color when hovered. *)
+    (** Arc border color when hovered. *)
+    method hoverBorderColor :
+      ('a pieOptionContext Js.t, Color.t Js.t) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  method hoverBorderWidth :
-    ('a pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
-  (** Arc border width when hovered (in pixels). *)
+    (** Arc border width when hovered (in pixels). *)
+    method hoverBorderWidth :
+      ('a pieOptionContext Js.t, int) Scriptable_indexable.t Js.t Js.optdef_prop
 
-  (** {2 Border Alignment} *)
+    (** {2 Border Alignment} *)
 
-  method borderAlign : Pie_border_align.t Js.optdef_prop
-  (** The following values are supported for [borderAlign]:
+    (** The following values are supported for [borderAlign]:
       ['center'] (default),
       ['inner'].
       When ['center'] is set, the borders of arcs next to each other will overlap.
       When ['inner'] is set, it is guaranteed that all the borders are not overlap. *)
-end
+    method borderAlign : Pie_border_align.t Js.t Js.optdef_prop
+  end
 
-and pieChart = object
-  inherit chart
+and pieChart =
+  object
+    inherit chart
 
-  method options : pieOptions Js.t Js.prop
+    method options : pieOptions Js.t Js.prop
 
-  method config : pieConfig Js.t Js.prop
-end
+    method config : pieConfig Js.t Js.prop
+  end
 
-val create_pie_animation : unit -> pieAnimation Js.t
+val empty_pie_animation : unit -> pieAnimation Js.t
 
-val create_pie_options : unit -> pieOptions Js.t
+val empty_pie_options : unit -> pieOptions Js.t
 
-val create_pie_dataset : unit -> 'a pieDataset Js.t
+val empty_pie_dataset : unit -> 'a pieDataset Js.t
 
 module Axis : sig
   type 'a typ
 
-  val cartesian_category : categoryCartesianAxis typ
+  val cartesian_category : categoryAxis typ
 
-  val cartesian_linear : linearCartesianAxis typ
+  val cartesian_linear : linearAxis typ
 
-  val cartesian_logarithmic : logarithmicCartesianAxis typ
+  val cartesian_logarithmic : logarithmicAxis typ
 
-  val cartesian_time : timeCartesianAxis typ
+  val cartesian_time : timeAxis typ
 
-  val make : string -> 'a typ
+  val of_string : string -> 'a typ
 end
 
 module Chart : sig
@@ -2428,7 +2523,7 @@ module Chart : sig
 
   val doughnut : pieChart typ
 
-  val make : string -> 'a typ
+  val of_string : string -> 'a typ
 end
 
 (** {1 Type Coercion} *)
@@ -2444,13 +2539,13 @@ module CoerceTo : sig
 
   val doughnut : #chart Js.t -> pieChart Js.t Js.opt
 
-  val cartesianCategory : #axis Js.t -> categoryCartesianAxis Js.t Js.opt
+  val cartesianCategory : #axis Js.t -> categoryAxis Js.t Js.opt
 
-  val cartesianLinear : #axis Js.t -> linearCartesianAxis Js.t Js.opt
+  val cartesianLinear : #axis Js.t -> linearAxis Js.t Js.opt
 
-  val cartesianLogarithmic : #axis Js.t -> logarithmicCartesianAxis Js.t Js.opt
+  val cartesianLogarithmic : #axis Js.t -> logarithmicAxis Js.t Js.opt
 
-  val cartesianTime : #axis Js.t -> timeCartesianAxis Js.t Js.opt
+  val cartesianTime : #axis Js.t -> timeAxis Js.t Js.opt
 end
 
 (** {1 Creating an Axis} *)
@@ -2459,20 +2554,18 @@ val create_axis : 'a Axis.typ -> 'a Js.t
 
 (** {1 Creating a Chart} *)
 
-val chart_from_canvas : 'a Chart.typ
+val chart_from_canvas :
+     'a Chart.typ
   -> data Js.t
   -> #chartOptions Js.t
   -> Dom_html.canvasElement Js.t
   -> 'a Js.t
 
-val chart_from_ctx : 'a Chart.typ
+val chart_from_ctx :
+     'a Chart.typ
   -> data Js.t
   -> #chartOptions Js.t
   -> Dom_html.canvasRenderingContext2D Js.t
   -> 'a Js.t
 
-val chart_from_id : 'a Chart.typ
-  -> data Js.t
-  -> #chartOptions Js.t
-  -> string
-  -> 'a Js.t
+val chart_from_id : 'a Chart.typ -> data Js.t -> #chartOptions Js.t -> string -> 'a Js.t

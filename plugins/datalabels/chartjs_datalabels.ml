@@ -53,107 +53,107 @@ module Text_align = struct
   let right = Js.Unsafe.coerce @@ Js.string "right"
 end
 
-class type font = object
-  method family : Js.js_string Js.t Js.optdef_prop
+class type font =
+  object
+    method family : Js.js_string Js.t Js.optdef_prop
 
-  method size : int Js.optdef_prop
+    method size : int Js.optdef_prop
 
-  method style : Js.js_string Js.t Js.optdef_prop
+    method style : Js.js_string Js.t Js.optdef_prop
 
-  method weight : Js.js_string Js.t Js.optdef_prop
+    method weight : Js.js_string Js.t Js.optdef_prop
 
-  method lineHeight : Line_height.t Js.t Js.optdef_prop
-end
+    method lineHeight : Line_height.t Js.t Js.optdef_prop
+  end
 
-class type optionContext = object
-  method active : bool Js.t Js.readonly_prop
+class type optionContext =
+  object
+    method active : bool Js.t Js.readonly_prop
 
-  method chart : chart Js.t Js.readonly_prop
+    method chart : chart Js.t Js.readonly_prop
 
-  method dataIndex : int Js.readonly_prop
+    method dataIndex : int Js.readonly_prop
 
-  method dataset : dataset Js.t Js.readonly_prop
+    method dataset : dataset Js.t Js.readonly_prop
 
-  method datasetIndex : int Js.readonly_prop
-end
+    method datasetIndex : int Js.readonly_prop
+  end
 
-class type listeners = object
-  method enter : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
+class type listeners =
+  object
+    method enter : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
 
-  method leave : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
+    method leave : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
 
-  method click : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
-end
+    method click : (optionContext Js.t -> bool Js.t) Js.callback Js.optdef_prop
+  end
 
 type 'a prop = (optionContext Js.t, 'a) Scriptable_indexable.t Js.t
 
 type 'a formatter = ('a -> optionContext Js.t -> Js.js_string Js.t) Js.callback
 
-class type datalabels = object
-  method align : Align.t Js.t prop Js.optdef_prop
+class type datalabels =
+  object
+    method align : Align.t Js.t prop Js.optdef_prop
 
-  method anchor : Anchor.t Js.t prop Js.optdef_prop
+    method anchor : Anchor.t Js.t prop Js.optdef_prop
 
-  method backgroundColor : Color.t Js.t Js.opt prop Js.optdef_prop
+    method backgroundColor : Color.t Js.t Js.opt prop Js.optdef_prop
 
-  method borderColor : Color.t Js.t Js.opt prop Js.optdef_prop
+    method borderColor : Color.t Js.t Js.opt prop Js.optdef_prop
 
-  method borderRadius : int prop Js.optdef_prop
+    method borderRadius : int prop Js.optdef_prop
 
-  method borderWidth : int prop Js.optdef_prop
+    method borderWidth : int prop Js.optdef_prop
 
-  method clamp : bool Js.t prop Js.optdef_prop
+    method clamp : bool Js.t prop Js.optdef_prop
 
-  method clip : bool Js.t prop Js.optdef_prop
+    method clip : bool Js.t prop Js.optdef_prop
 
-  method color : Color.t Js.t prop Js.optdef_prop
+    method color : Color.t Js.t prop Js.optdef_prop
 
-  method display : Visibility.t Js.t prop Js.optdef_prop
+    method display : Visibility.t Js.t prop Js.optdef_prop
 
-  method font : font Js.t prop Js.optdef_prop
+    method font : font Js.t prop Js.optdef_prop
 
-  method formatter : 'a formatter Js.opt Js.optdef_prop
+    method formatter : 'a formatter Js.opt Js.optdef_prop
 
-  method listeners : listeners Js.t Js.optdef_prop
+    method listeners : listeners Js.t Js.optdef_prop
 
-  method offset : float prop Js.optdef_prop
+    method offset : float prop Js.optdef_prop
 
-  method opacity : float prop Js.optdef_prop
+    method opacity : float prop Js.optdef_prop
 
-  method padding : Padding.t Js.t prop Js.optdef_prop
+    method padding : Padding.t Js.t prop Js.optdef_prop
 
-  method rotation : float prop Js.optdef_prop
+    method rotation : float prop Js.optdef_prop
 
-  method textAlign : Text_align.t Js.t prop Js.optdef_prop
+    method textAlign : Text_align.t Js.t prop Js.optdef_prop
 
-  method textStrokeColor : Color.t Js.t prop Js.optdef_prop
+    method textStrokeColor : Color.t Js.t prop Js.optdef_prop
 
-  method textStrokeWidth : int prop Js.optdef_prop
+    method textStrokeWidth : int prop Js.optdef_prop
 
-  method textShadowBlur : float prop Js.optdef_prop
+    method textShadowBlur : float prop Js.optdef_prop
 
-  method textShadowColor : Color.t Js.t prop Js.optdef_prop
-end
+    method textShadowColor : Color.t Js.t prop Js.optdef_prop
+  end
 
-let create_font () = Js.Unsafe.obj [||]
+let empty_font () = Js.Unsafe.obj [||]
 
-let create_listeners () = Js.Unsafe.obj [||]
+let empty_listeners () = Js.Unsafe.obj [||]
 
-let create () = Js.Unsafe.obj [||]
+let empty_datalabels_config () = Js.Unsafe.obj [||]
 
-let of_dataset dataset =
-  (Js.Unsafe.coerce dataset)##.datalabels
+let of_dataset dataset = (Js.Unsafe.coerce dataset)##.datalabels
 
-let of_chart chart =
-  (Js.Unsafe.coerce chart)##.options##.plugins##.datalabels
+let of_chart_options options = (Js.Unsafe.coerce options)##.plugins##.datalabels
 
-let of_global () =
-  Js.Unsafe.global##._Chart##.defaults##.global##.plugins##.datalabels
+let of_global () = Js.Unsafe.global##._Chart##.defaults##.global##.plugins##.datalabels
 
-let set_per_dataset dataset plugin =
-  (Js.Unsafe.coerce dataset)##.realtime := plugin
+let set_to_dataset dataset plugin = (Js.Unsafe.coerce dataset)##.realtime := plugin
 
-let set_per_chart chart plugin =
+let set_to_chart_options chart plugin =
   (Js.Unsafe.coerce chart)##.options##.plugins##.datalabels := plugin
 
 let set_globally plugin =

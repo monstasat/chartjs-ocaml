@@ -1,8 +1,6 @@
 open Js_of_ocaml
 open Chartjs
 
-let log x : unit = Js.Unsafe.global##.console##log x
-
 let () =
   (* Create first dataset. *)
   let dataset1 = create_line_dataset () in
@@ -25,15 +23,8 @@ let () =
   dataset2##.pointBorderWidth := Scriptable_indexable.of_single 2;
   (* Create chart data. *)
   let labels =
-    Array.map Js.string
-      [| "January"
-       ; "February"
-       ; "March"
-       ; "April"
-       ; "May"
-       ; "June"
-       ; "July"
-      |] in
+    Array.map Js.string [|"January"; "February"; "March"; "April"; "May"; "June"; "July"|]
+  in
   let data = create_data () in
   data##.datasets := Js.array [|dataset1; dataset2|];
   data##.labels := Js.array labels;

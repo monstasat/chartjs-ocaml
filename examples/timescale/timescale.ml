@@ -1,8 +1,6 @@
 open Js_of_ocaml
 open Chartjs
 
-let log x : unit = Js.Unsafe.global##.console##log x
-
 let format = "MM/DD/YYYY HH:mm"
 
 let new_date year = Time.of_array [|year|]
@@ -29,23 +27,23 @@ let () =
     @@ [| create_data_point ~x:(new_date 1990) ~y:(random ())
         ; create_data_point ~x:(new_date 1992) ~y:(random ())
         ; create_data_point ~x:(new_date 1994) ~y:(random ())
-        ; create_data_point ~x:(new_date 1996) ~y:(random ())
-       |];
+        ; create_data_point ~x:(new_date 1996) ~y:(random ()) |];
   dataset3##.label := Js.string "Dataset with point data";
   dataset3##.backgroundColor := Color.of_string "rgba(0, 255, 0, 0.5)";
   dataset3##.borderColor := Color.of_string "green";
   dataset3##.fill := Line_fill._false;
   let data = create_data () in
-  data##.labels := Js.array [| new_date 1990
-                             ; new_date 1991
-                             ; new_date 1992
-                             ; new_date 1993
-                             ; new_date 1994
-                             ; new_date 1995
-                             ; new_date 1996 |];
-  data##.datasets := Js.array [| coerce_dataset dataset1
-                               ; coerce_dataset dataset2
-                               ; coerce_dataset dataset3 |];
+  data##.labels :=
+    Js.array
+      [| new_date 1990
+       ; new_date 1991
+       ; new_date 1992
+       ; new_date 1993
+       ; new_date 1994
+       ; new_date 1995
+       ; new_date 1996 |];
+  data##.datasets :=
+    Js.array [|coerce_dataset dataset1; coerce_dataset dataset2; coerce_dataset dataset3|];
   (* Initialize title *)
   let title = create_title () in
   title##.display := Js._true;

@@ -10,6 +10,7 @@ Following chart types are currently supported:
 * Bar
 * Horizontal bar
 * Pie
+* Doughnut
 
 ## Installation
 
