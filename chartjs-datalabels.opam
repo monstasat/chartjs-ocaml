@@ -7,17 +7,19 @@ dev-repo: "git+https://github.com/monstasat/chartjs-ocaml.git"
 bug-reports: "https://github.com/monstasat/chartjs-ocaml/issues"
 license: "MIT"
 synopsis: "OCaml bindigns for Chart.js datalabels plugin"
+description: """
+This library provides OCaml bindings for chartjs-plugin-datalabels.
+This plugin displays labels on data for any type of charts.
+"""
 
 build: [
-  ["dune" "subst"] {pinned}
   ["dune" "build" "-p" name "-j" jobs]
-  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
 ]
 
 depends: [
-  "ocaml" {>= "4.06.0"}
-  "dune" {build}
+  "ocaml" {>= "4.08.0"}
+  "dune" {>= "1.11"}
   "js_of_ocaml"
   "js_of_ocaml-ppx"
-  "chartjs"
+  "chartjs" {= version}
 ]

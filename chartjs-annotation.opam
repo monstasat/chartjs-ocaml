@@ -6,18 +6,22 @@ homepage: "https://github.com/monstasat/chartjs-ocaml"
 dev-repo: "git+https://github.com/monstasat/chartjs-ocaml.git"
 bug-reports: "https://github.com/monstasat/chartjs-ocaml/issues"
 license: "MIT"
-         synopsis: "OCaml bindigns for Chart.js annotation plugin"
+synopsis: "OCaml bindigns for Chart.js annotation plugin"
+description: """
+This library provides OCaml bindings for chartjs-plugin-annotation.
+This plugin draws lines and boxes over the chart area.
+Annotations work with line, bar, scatter and bubble charts that use
+linear, logarithmic, or category scales.
+"""
 
 build: [
-  ["dune" "subst"] {pinned}
   ["dune" "build" "-p" name "-j" jobs]
-  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
 ]
 
 depends: [
-  "ocaml" {>= "4.06.0"}
-  "dune" {build}
+  "ocaml" {>= "4.08.0"}
+  "dune" {>= "1.11"}
   "js_of_ocaml"
   "js_of_ocaml-ppx"
-  "chartjs"
+  "chartjs" {= version}
 ]

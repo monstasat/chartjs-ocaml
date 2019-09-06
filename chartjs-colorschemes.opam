@@ -7,17 +7,20 @@ dev-repo: "git+https://github.com/monstasat/chartjs-ocaml.git"
 bug-reports: "https://github.com/monstasat/chartjs-ocaml/issues"
 license: "MIT"
 synopsis: "OCaml bindigns for Chart.js colorschemes plugin"
+description: """
+This library provides OCaml bindings for chartjs-plugin-colorschemes.
+This plugin allows to pick the color combination for the charts from
+the predefined color schemes.
+"""
 
 build: [
-  ["dune" "subst"] {pinned}
   ["dune" "build" "-p" name "-j" jobs]
-  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
 ]
 
 depends: [
-  "ocaml" {>= "4.06.0"}
-  "dune" {build}
+  "ocaml" {>= "4.08.0"}
+  "dune" {>= "1.11"}
   "js_of_ocaml"
   "js_of_ocaml-ppx"
-  "chartjs"
+  "chartjs" {= version}
 ]
