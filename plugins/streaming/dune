@@ -1,5 +1,0 @@
-(library
-  (name chartjs_streaming)
-  (public_name chartjs-streaming)
-  (libraries js_of_ocaml chartjs)
-  (preprocess (pps js_of_ocaml-ppx)))
