@@ -2005,8 +2005,6 @@ let create_axis (typ : 'a Axis.typ) =
   axis##._type := typ;
   Js.Unsafe.coerce axis
 
-let chart_constr = Js.Unsafe.global##._Chart
-
 let chart_from_canvas typ data options (canvas : Dom_html.canvasElement Js.t) =
   let config : chartConfig Js.t =
     object%js
@@ -2017,6 +2015,7 @@ let chart_from_canvas typ data options (canvas : Dom_html.canvasElement Js.t) =
       val mutable options = (options :> chartOptions Js.t)
     end
   in
+  let chart_constr = Js.Unsafe.global##._Chart in
   new%js chart_constr canvas config
 
 let chart_from_ctx typ data options (ctx : Dom_html.canvasRenderingContext2D Js.t) =
@@ -2029,6 +2028,7 @@ let chart_from_ctx typ data options (ctx : Dom_html.canvasRenderingContext2D Js.
       val mutable options = (options :> chartOptions Js.t)
     end
   in
+  let chart_constr = Js.Unsafe.global##._Chart in
   new%js chart_constr ctx config
 
 let chart_from_id typ data options (id : string) =
@@ -2041,4 +2041,5 @@ let chart_from_id typ data options (id : string) =
       val mutable options = (options :> chartOptions Js.t)
     end
   in
+  let chart_constr = Js.Unsafe.global##._Chart in
   new%js chart_constr (Js.string id) config
